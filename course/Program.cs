@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Identity; // Добавляем using для Identity
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using course.Data;
 using course.Models; // Добавляем using для наших моделей User и Role
-
+using course.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Добавляем DbContext
@@ -39,6 +40,8 @@ builder.Services.AddIdentity<User, Role>(options =>
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
+
+builder.Services.AddTransient<IEmailSender, EmailSender>(); // <-- ДОБАВИТЬ ЭТУ СТРОКУ
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
