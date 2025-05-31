@@ -1,0 +1,52 @@
+@model course.Models.Message
+
+@{
+    ViewData["Title"] = "Удалить сообщение";
+}
+
+<h1>Удалить</h1>
+
+<h3>Вы уверены, что хотите удалить это сообщение?</h3>
+<div>
+    <h4>Сообщение</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Чат
+        </dt>
+        <dd class="col-sm-10">
+            @ViewData["ChatName"] @* Название чата *@
+        </dd>
+        <dt class="col-sm-2">
+            Отправитель
+        </dt>
+        <dd class="col-sm-10">
+            @ViewData["SenderName"] @* Имя отправителя *@
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Content)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Content)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SentDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SentDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.IsRead)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IsRead)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ChatId" /> @* Для перенаправления обратно в чат *@
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-controller="Chats" asp-action="Details" asp-route-id="@Model.ChatId">Вернуться к чату</a>
+    </form>
+</div>

@@ -1,0 +1,61 @@
+@model IEnumerable<course.Models.Chat>
+@using course.Models
+
+@{
+    ViewData["Title"] = "Чаты";
+    // Получаем словарь создателей, переданный из контроллера
+    var creatorsDictionary = ViewData["Creators"] as Dictionary<int, string>;
+}
+
+<h1>Чаты</h1>
+
+<p>
+    <a asp-action="Create">Создать новый чат</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                Создатель
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedDate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @{
+                        // Безопасное получение имени создателя из словаря
+                        if (creatorsDictionary != null && creatorsDictionary.TryGetValue(item.CreatorId, out string creatorName))
+                        {
+                            @creatorName
+                        }
+                        else
+                        {
+                            <span>Неизвестный</span>
+                        }
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedDate)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Редактировать</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Детали</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

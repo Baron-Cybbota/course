@@ -1,0 +1,148 @@
+@model course.Models.Chat
+@using System.Security.Claims
+@using course.Models
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<h1>@Model.Name</h1>
+
+<div>
+    <h4>Чат</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            Создатель
+        </dt>
+        <dd class="col-sm-10">
+            @if (ViewData["CreatorName"] != null)
+            {
+                <span>@ViewData["CreatorName"]</span>
+            }
+            else
+            {
+                <span>Неизвестный создатель</span>
+            }
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreatedDate)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Редактировать</a> |
+    <a asp-action="Index">Вернуться к списку чатов</a>
+</div>
+
+---
+
+<h3 class="mt-4">Сообщения</h3>
+<div class="messages-section" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+    @{
+        var messages = ViewData["Messages"] as List<Message>;
+        var messageSenders = ViewData["MessageSenders"] as Dictionary<int, string>;
+    }
+
+    @if (messages != null && messages.Any())
+    {
+        @foreach (var message in messages)
+        {
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        @if (messageSenders != null && messageSenders.ContainsKey(message.SenderId))
+                        {
+                            <span>@messageSenders[message.SenderId]</span>
+                        }
+                        else
+                        {
+                            <span>Неизвестный отправитель</span>
+                        }
+                        <small> - @message.SentDate.ToString("dd.MM.yyyy HH:mm")</small>
+                        @if (message.IsRead)
+                        {
+                            <span class="badge bg-success float-end">Прочитано</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-info float-end">Не прочитано</span>
+                        }
+                    </h6>
+                    <p class="card-text">@message.Content</p>
+                    @* Здесь можно добавить кнопки для модераторов/админов для удаления сообщения *
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Модератор"))
+                    {
+                        <a asp-controller="Messages" asp-action="Delete" asp-route-id="@message.Id" class="btn btn-sm btn-outline-danger">Удалить сообщение</a>
+                        @* Или AJAX-кнопка для отметки как прочитанного, если текущий пользователь - получатель *
+                        @* <button type="button" class="btn btn-sm btn-outline-secondary" onclick="markMessageAsRead(@message.Id)">Прочитать</button> *@
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>В этом чате пока нет сообщений.</p>
+    }
+</div>
+
+---
+
+<h3 class="mt-4">Отправить сообщение</h3>
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="message-form-section">
+        <form asp-controller="Messages" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" name="ChatId" value="@Model.Id" /> @* Важно передать ID чата *@
+            <div class="form-group">
+                <label for="Content" class="control-label">Ваше сообщение</label>
+                <textarea name="Content" class="form-control" rows="3" required></textarea>
+                <span data-valmsg-for="Content" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <input type="submit" value="Отправить" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+}
+else
+{
+    <p>Чтобы отправить сообщение, пожалуйста, <a asp-area="Identity" asp-page="/Account/Login">войдите</a>.</p>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @* Если вы хотите добавить AJAX-функциональность для MarkAsRead, вам понадобится здесь JavaScript *@
+    @* <script>
+        function markMessageAsRead(messageId) {
+            fetch('/Messages/MarkAsRead/' + messageId, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': '@Html.AntiForgeryToken()'.split('value="')[1].split('"')[0]
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Обновить UI, например, изменить текст кнопки или добавить значок "прочитано"
+                    console.log('Сообщение помечено как прочитанное:', messageId);
+                    location.reload(); // Простейший способ обновить страницу после AJAX
+                } else {
+                    console.error('Ошибка при пометке сообщения как прочитанного.');
+                }
+            })
+            .catch(error => console.error('Ошибка сети:', error));
+        }
+    </script> *@
+}
