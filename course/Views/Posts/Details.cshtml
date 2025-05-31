@@ -1,0 +1,143 @@
+@model course.Models.Post
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@using course.Models
+
+@{
+    ViewData["Title"] = Model.Title;
+    // Автор поста уже получен в контроллере и передан через ViewData["AuthorName"]
+    // var postAuthor = ViewData["AuthorName"] as string; // Это просто строка
+}
+
+<h1>@Model.Title</h1>
+
+<div>
+    <h4>Пост</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Content)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.Raw(Model.Content) @* Используйте @Html.Raw для отображения HTML-контента *@
+        </dd>
+        <dt class="col-sm-2">
+            Автор
+        </dt>
+        <dd class="col-sm-10">
+            @if (ViewData["AuthorName"] != null)
+            {
+                <span>@ViewData["AuthorName"]</span>
+            }
+            else
+            {
+                <span>Неизвестный автор</span>
+            }
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreatedDate)
+        </dd>
+        @if (Model.IsEdited)
+        {
+            <dt class="col-sm-2">
+                Последнее редактирование
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.LastEditedDate)
+            </dd>
+        }
+    </dl>
+</div>
+
+<div class="mt-3">
+    @if (User.Identity.IsAuthenticated && (Model.AuthorId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) || User.IsInRole("Модератор")))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редактировать</a>
+    }
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Модератор"))
+    {
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Удалить</a>
+    }
+    <a asp-action="Index" class="btn btn-secondary">Вернуться к списку</a>
+</div>
+
+<h3 class="mt-4">Комментарии</h3>
+<div class="comments-section">
+    @{
+        var comments = ViewData["Comments"] as List<Comment>;
+        var commentAuthors = ViewData["CommentAuthors"] as Dictionary<int, string>;
+    }
+
+    @if (comments != null && comments.Any())
+    {
+        @foreach (var comment in comments)
+        {
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        @if (commentAuthors != null && commentAuthors.ContainsKey(comment.AuthorId))
+                        {
+                            <span>@commentAuthors[comment.AuthorId]</span>
+                        }
+                        else
+                        {
+                            <span>Неизвестный автор</span>
+                        }
+                        <small class="text-muted"> @comment.CreatedDate.ToShortDateString()</small>
+                    </h5>
+                    <p class="card-text">@comment.Content</p>
+                    @if (User.Identity.IsAuthenticated && (comment.AuthorId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) || User.IsInRole("Модератор")))
+                    {
+                        <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-sm btn-outline-primary">Редактировать</a>
+                    }
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Модератор"))
+                    {
+                        <a asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.Id" class="btn btn-sm btn-outline-danger">Удалить</a>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>К этому посту еще нет комментариев.</p>
+    }
+</div>
+
+<h3 class="mt-4">Оставить комментарий</h3>
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="comment-form-section">
+        <form asp-controller="Comments" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" name="PostId" value="@Model.Id" />
+            <div class="form-group">
+                <label for="Content" class="control-label">Ваш комментарий</label>
+                <textarea name="Content" class="form-control" rows="3"></textarea>
+                <span data-valmsg-for="Content" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <input type="submit" value="Добавить комментарий" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+}
+else
+{
+    <p>Чтобы оставить комментарий, пожалуйста, <a asp-area="Identity" asp-page="/Account/Login">войдите</a>.</p>
+}
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

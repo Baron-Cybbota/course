@@ -8,10 +8,8 @@ namespace course.Models
         public int Id { get; set; }
 
         public int ChatId { get; set; }
-        public virtual Chat Chat { get; set; }
 
         public int SenderId { get; set; }
-        public virtual User Sender { get; set; }
 
         [Required(ErrorMessage = "Содержание сообщения обязательно")]
         [StringLength(4000)]

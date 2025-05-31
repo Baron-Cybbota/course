@@ -9,7 +9,6 @@ namespace course.Models
         public int Id { get; set; }
 
         public int UserId { get; set; }
-        public virtual User User { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -18,7 +17,5 @@ namespace course.Models
         [DataType(DataType.DateTime)]
         public DateTime AssignmentDate { get; set; } = DateTime.UtcNow;
 
-        public virtual ICollection<BlacklistEntry> ManagedBlacklistEntries { get; set; } = new List<BlacklistEntry>();
-        public virtual ICollection<Complaint> HandledComplaints { get; set; } = new List<Complaint>();
     }
 }

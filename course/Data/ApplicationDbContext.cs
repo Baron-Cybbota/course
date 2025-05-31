@@ -1,13 +1,11 @@
+// Data/ApplicationDbContext.cs
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore; // Добавляем using для IdentityDbContext
-using course.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using course.Models; // Убедитесь, что здесь есть все ваши модели
 
 namespace course.Data
 {
     // Наследуемся от IdentityDbContext<User, Role, int>
-    // User - наш пользовательский класс пользователя
-    // Role - наш пользовательский класс роли (или IdentityRole<int>, если не расширяем)
-    // int - тип первичного ключа для User и Role
     public class ApplicationDbContext : IdentityDbContext<User, Role, int>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -15,9 +13,7 @@ namespace course.Data
         {
         }
 
-        // DbSets для ваших сущностей, которые не являются частью Identity
-        // IdentityDbContext уже включает DbSet для Users, Roles, UserClaims, UserLogins, UserTokens, RoleClaims.
-        // Вам НЕ нужно добавлять DbSet<User> и DbSet<Role> явно здесь.
+        // DbSets для ваших сущностей
         public DbSet<Moderator> Moderators { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
@@ -34,166 +30,100 @@ namespace course.Data
             // Это необходимо для того, чтобы Identity настроил свои таблицы.
             base.OnModelCreating(modelBuilder);
 
-            // Настройка таблиц, которые НЕ являются частью Identity.
-            // Настройка таблицы Users (больше не нужна здесь, IdentityDbContext заботится о ней)
-            // Но мы можем использовать ее для настройки уникальных полей, если IdentityUser не делает это по умолчанию.
-            // Например, для UserName (который соответствует Login в вашей ERD) и Email.
-            modelBuilder.Entity<User>().ToTable("Users"); // Убедимся, что таблица названа "Users"
-            // IdentityUser уже делает UserName и Email уникальными, но если нужно дополнительно, можно здесь.
-            // modelBuilder.Entity<User>().HasIndex(u => u.UserName).IsUnique(); // UserName уже Unique в Identity
-            // modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique(); // Email уже Unique в Identity
+            // --- Конфигурация для Identity (не трогаем, base.OnModelCreating это делает) ---
+            // modelBuilder.Entity<User>().ToTable("Users"); // IdentityDbContext уже делает это
+            // modelBuilder.Entity<Role>().ToTable("Roles"); // IdentityDbContext уже делает это
+
+            // --- КОНФИГУРАЦИИ ДЛЯ ВАШИХ МОДЕЛЕЙ БЕЗ НАВИГАЦИОННЫХ СВОЙСТВ ---
 
             // Настройка таблицы Moderators
             modelBuilder.Entity<Moderator>().ToTable("Moderators");
             modelBuilder.Entity<Moderator>().HasKey(m => m.Id);
-            modelBuilder.Entity<Moderator>()
-                .HasOne(m => m.User)
-                .WithOne(u => u.ModeratorProfile)
-                .HasForeignKey<Moderator>(m => m.UserId)
-                .IsRequired();
+            // Если у Moderators нет навигационного свойства User (а только UserId),
+            // то этот блок с .HasOne().WithOne() должен быть удален.
+            // Если вы оставили это навигационное свойство в Moderator.cs, то оставляем:
+            // modelBuilder.Entity<Moderator>()
+            //     .HasOne(m => m.User) // Предполагается, что User - это виртуальное свойство в Moderator
+            //     .WithOne(u => u.ModeratorProfile) // Предполагается, что ModeratorProfile - это виртуальное свойство в User
+            //     .HasForeignKey<Moderator>(m => m.UserId)
+            //     .IsRequired();
+
 
             // Настройка таблицы Posts
             modelBuilder.Entity<Post>().ToTable("Posts");
             modelBuilder.Entity<Post>().HasKey(p => p.Id);
-            modelBuilder.Entity<Post>()
-                .HasOne(p => p.Author)
-                .WithMany(u => u.Posts)
-                .HasForeignKey(p => p.AuthorId)
-                .IsRequired();
+            // Все отношения Posts (Author, Comments, Ratings, Complaints) теперь определяются только по ID.
+            // Конфигурации HasOne/WithMany для них должны быть удалены.
+
 
             // Настройка таблицы Comments
             modelBuilder.Entity<Comment>().ToTable("Comments");
             modelBuilder.Entity<Comment>().HasKey(c => c.Id);
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.Post)
-                .WithMany(p => p.Comments)
-                .HasForeignKey(c => c.PostId)
-                .IsRequired();
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.Author)
-                .WithMany(u => u.Comments)
-                .HasForeignKey(c => c.AuthorId)
-                .IsRequired();
+            // Все отношения Comments (Post, Author, Ratings, Complaints) теперь определяются только по ID.
+            // Конфигурации HasOne/WithMany для них должны быть удалены.
+
 
             // Настройка таблицы Chats
             modelBuilder.Entity<Chat>().ToTable("Chats");
             modelBuilder.Entity<Chat>().HasKey(c => c.Id);
-            modelBuilder.Entity<Chat>()
-                .HasOne(c => c.Creator)
-                .WithMany(u => u.CreatedChats)
-                .HasForeignKey(c => c.CreatorId)
-                .IsRequired();
+            // Отношения Chats (Creator, Messages, ChatParticipants) теперь определяются только по ID.
+            // Конфигурации HasOne/WithMany для них должны быть удалены.
 
-            // Настройка таблицы ChatParticipants (многие-ко-многим через промежуточную сущность)
+
+            // Настройка таблицы ChatParticipants
             modelBuilder.Entity<ChatParticipant>().ToTable("ChatParticipants");
             modelBuilder.Entity<ChatParticipant>().HasKey(cp => cp.Id);
+            // Уникальный индекс для ChatId и UserId, чтобы участник был уникален в чате
             modelBuilder.Entity<ChatParticipant>()
                 .HasIndex(cp => new { cp.ChatId, cp.UserId })
                 .IsUnique();
+            // Отношения ChatParticipants (Chat, User) теперь определяются только по ID.
+            // Конфигурации HasOne/WithMany для них должны быть удалены.
 
-            modelBuilder.Entity<ChatParticipant>()
-                .HasOne(cp => cp.Chat)
-                .WithMany(c => c.ChatParticipants)
-                .HasForeignKey(cp => cp.ChatId)
-                .IsRequired();
-
-            modelBuilder.Entity<ChatParticipant>()
-                .HasOne(cp => cp.User)
-                .WithMany(u => u.ChatParticipants)
-                .HasForeignKey(cp => cp.UserId)
-                .IsRequired();
 
             // Настройка таблицы Messages
             modelBuilder.Entity<Message>().ToTable("Messages");
             modelBuilder.Entity<Message>().HasKey(m => m.Id);
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.Chat)
-                .WithMany(c => c.Messages)
-                .HasForeignKey(m => m.ChatId)
-                .IsRequired();
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.Sender)
-                .WithMany(u => u.SentMessages)
-                .HasForeignKey(m => m.SenderId)
-                .IsRequired();
+            // Отношения Messages (Chat, Sender) теперь определяются только по ID.
+            // Конфигурации HasOne/WithMany для них должны быть удалены.
+
 
             // Настройка таблицы Ratings
             modelBuilder.Entity<Rating>().ToTable("Ratings");
             modelBuilder.Entity<Rating>().HasKey(r => r.Id);
-            modelBuilder.Entity<Rating>()
-                .HasOne(r => r.User)
-                .WithMany(u => u.Ratings)
-                .HasForeignKey(r => r.UserId)
-                .IsRequired();
+            // Отношения Ratings (User, Post, Comment) теперь определяются только по ID.
+            // Конфигурации HasOne/WithMany для них должны быть удалены.
 
-            modelBuilder.Entity<Rating>()
-                .HasOne(r => r.Post)
-                .WithMany(p => p.Ratings)
-                .HasForeignKey(r => r.PostId)
-                .IsRequired(false);
-
-            modelBuilder.Entity<Rating>()
-                .HasOne(r => r.Comment)
-                .WithMany(c => c.Ratings)
-                .HasForeignKey(r => r.CommentId)
-                .IsRequired(false);
-
+            // Уникальные индексы для Ratings (если рейтинг уникален для пары пользователь-пост ИЛИ пользователь-комментарий)
+            // Это важно, чтобы пользователь не мог оценить одно и то же дважды.
             modelBuilder.Entity<Rating>()
                 .HasIndex(r => new { r.UserId, r.PostId })
                 .IsUnique()
-                .HasFilter("\"PostId\" IS NOT NULL");
+                .HasFilter("\"PostId\" IS NOT NULL"); // Применяется только если PostId не null
 
             modelBuilder.Entity<Rating>()
                 .HasIndex(r => new { r.UserId, r.CommentId })
                 .IsUnique()
-                .HasFilter("\"CommentId\" IS NOT NULL");
+                .HasFilter("\"CommentId\" IS NOT NULL"); // Применяется только если CommentId не null
 
 
             // Настройка таблицы BlacklistEntries
             modelBuilder.Entity<BlacklistEntry>().ToTable("BlacklistEntries");
             modelBuilder.Entity<BlacklistEntry>().HasKey(b => b.Id);
-            modelBuilder.Entity<BlacklistEntry>()
-                .HasOne(b => b.Moderator)
-                .WithMany(m => m.ManagedBlacklistEntries)
-                .HasForeignKey(b => b.ModeratorId)
-                .IsRequired();
+            // Отношения BlacklistEntry (Moderator, User) теперь определяются только по ID.
+            // Конфигурации HasOne/WithMany для них должны быть удалены.
 
-            modelBuilder.Entity<BlacklistEntry>()
-                .HasOne(b => b.User)
-                .WithOne(u => u.CurrentBlacklistEntry)
-                .HasForeignKey<BlacklistEntry>(b => b.UserId)
-                .IsRequired();
-
+            // Уникальный индекс для UserId в BlacklistEntry, чтобы пользователь мог быть заблокирован только один раз
             modelBuilder.Entity<BlacklistEntry>()
                 .HasIndex(b => b.UserId)
                 .IsUnique();
 
+
             // Настройка таблицы Complaints
             modelBuilder.Entity<Complaint>().ToTable("Complaints");
             modelBuilder.Entity<Complaint>().HasKey(c => c.Id);
-            modelBuilder.Entity<Complaint>()
-                .HasOne(c => c.Author)
-                .WithMany(u => u.AuthoredComplaints)
-                .HasForeignKey(c => c.AuthorId)
-                .IsRequired();
-
-            modelBuilder.Entity<Complaint>()
-                .HasOne(c => c.Post)
-                .WithMany(p => p.Complaints)
-                .HasForeignKey(c => c.PostId)
-                .IsRequired(false);
-
-            modelBuilder.Entity<Complaint>()
-                .HasOne(c => c.Comment)
-                .WithMany(c => c.Complaints)
-                .HasForeignKey(c => c.CommentId)
-                .IsRequired(false);
-
-            modelBuilder.Entity<Complaint>()
-                .HasOne(c => c.HandlerModerator)
-                .WithMany(m => m.HandledComplaints)
-                .HasForeignKey(c => c.HandledByModeratorId)
-                .IsRequired(false);
+            // Отношения Complaints (Author, Post, Comment, HandlerModerator) теперь определяются только по ID.
+            // Конфигурации HasOne/WithMany для них должны быть удалены.
         }
     }
 }

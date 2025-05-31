@@ -9,10 +9,8 @@ namespace course.Models
         public int Id { get; set; }
 
         public int PostId { get; set; }
-        public virtual Post Post { get; set; }
 
         public int AuthorId { get; set; }
-        public virtual User Author { get; set; }
 
         [Required(ErrorMessage = "Содержание комментария обязательно")]
         [StringLength(2000, MinimumLength = 1, ErrorMessage = "Комментарий должен быть до 2000 символов")]
@@ -23,8 +21,5 @@ namespace course.Models
 
         public bool IsEdited { get; set; } = false;
         public DateTime? LastEditedDate { get; set; }
-
-        public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
-        public virtual ICollection<Complaint> Complaints { get; set; } = new List<Complaint>();
     }
 }

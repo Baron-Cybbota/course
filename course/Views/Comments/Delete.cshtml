@@ -1,0 +1,46 @@
+@model course.Models.Comment
+
+@{
+    ViewData["Title"] = "Удалить комментарий";
+}
+
+<h1>Удалить</h1>
+
+<h3>Вы уверены, что хотите удалить это?</h3>
+<div>
+    <h4>Комментарий</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Пост
+        </dt>
+        <dd class="col-sm-10">
+            @ViewData["PostTitle"] // Используем ViewData для заголовка поста
+        </dd>
+        <dt class="col-sm-2">
+            Автор
+        </dt>
+        <dd class="col-sm-10">
+            @ViewData["AuthorName"] // Используем ViewData для имени автора
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Content)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Content)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreatedDate)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="PostId" /> @* Для возврата на страницу поста *@
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-controller="Posts" asp-action="Details" asp-route-id="@Model.PostId">Вернуться к посту</a>
+    </form>
+</div>

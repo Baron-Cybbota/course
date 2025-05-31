@@ -6,6 +6,8 @@ using course.Data;
 using course.Models; // Добавляем using для наших моделей User и Role
 using course.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.DependencyInjection;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Добавляем DbContext
@@ -48,6 +50,22 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(); // Добавляем поддержку Razor Pages для Identity UI
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate(); // Применяем миграции при запуске, если они есть
+        await SeedData.Initialize(services); // Вызываем наш метод инициализации
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

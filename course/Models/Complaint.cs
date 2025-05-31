@@ -20,13 +20,10 @@ namespace course.Models
         public int Id { get; set; }
 
         public int AuthorId { get; set; }
-        public virtual User Author { get; set; }
 
         public int? PostId { get; set; }
-        public virtual Post? Post { get; set; }
 
         public int? CommentId { get; set; }
-        public virtual Comment? Comment { get; set; }
 
         [Required(ErrorMessage = "Причина жалобы обязательна")]
         [StringLength(1000)]
@@ -39,7 +36,6 @@ namespace course.Models
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         public int? HandledByModeratorId { get; set; }
-        public virtual Moderator? HandlerModerator { get; set; }
 
         [DataType(DataType.DateTime)]
         public DateTime? ResolvedDate { get; set; }
