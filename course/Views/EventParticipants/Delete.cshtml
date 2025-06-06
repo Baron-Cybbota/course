@@ -1,0 +1,42 @@
+@model course.Models.EventParticipant
+
+@{
+    ViewData["Title"] = "Удалить участника мероприятия";
+    var eventTitle = ViewData["EventTitle"] as string;
+    var userLogin = ViewData["UserLogin"] as string;
+}
+
+<h1>Удалить участника мероприятия</h1>
+
+<h3>Вы уверены, что хотите удалить этого участника из мероприятия?</h3>
+<div>
+    <h4>Участник мероприятия</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            Мероприятие
+        </dt>
+        <dd class="col-sm-9">
+            @eventTitle
+        </dd>
+        <dt class="col-sm-3">
+            Участник
+        </dt>
+        <dd class="col-sm-9">
+            @userLogin
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.ParticipationStatus)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ParticipationStatus)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" name="eventId" value="@Model.EventId" />
+        <input type="hidden" name="userId" value="@Model.UserId" />
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">Вернуться к списку</a>
+    </form>
+</div>

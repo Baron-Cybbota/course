@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "OR+QtBp4Tm/4hC7px97dJQgunO8vdkTSlx9X1n9alQg=",
+  "Hash": "9jpYzFWOoxbensL7GVymoUakG26rPmpRD8FXNTAvcS0=",
   "Source": "course",
   "BasePath": "_content/course",
   "Mode": "Default",
@@ -2138,12 +2138,12 @@
       "OriginalItemSpec": "D:\\College\\course\\course\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map"
     },
     {
-      "Identity": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\axc68e084u-61n19gt1b8.gz",
+      "Identity": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\axc68e084u-kbtpnb7hgc.gz",
       "SourceId": "course",
       "SourceType": "Discovered",
       "ContentRoot": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\",
       "BasePath": "_content/course",
-      "RelativePath": "favicon#[.{fingerprint=61n19gt1b8}]?.ico.gz",
+      "RelativePath": "favicon#[.{fingerprint=kbtpnb7hgc}]?.ico.gz",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Alternative",
@@ -2152,8 +2152,8 @@
       "RelatedAsset": "D:\\College\\course\\course\\wwwroot\\favicon.ico",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "nezsohjtde",
-      "Integrity": "wfFuuYm+Lh6RbCeeiUqxw334b/hIOkp5j9eokGUM1Y0=",
+      "Fingerprint": "451g3jv9jb",
+      "Integrity": "yKhkSqj9jR9yOHVYOziSPw6kSZk/LjqNgp1Au4x31Zs=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "D:\\College\\course\\course\\wwwroot\\favicon.ico"
@@ -2495,6 +2495,27 @@
       "OriginalItemSpec": "D:\\College\\course\\course\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css"
     },
     {
+      "Identity": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\fd2q991xwm-rsmve8v86f.gz",
+      "SourceId": "course",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/course",
+      "RelativePath": "images/logo-white#[.{fingerprint=rsmve8v86f}]?.svg.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "D:\\College\\course\\course\\wwwroot\\images\\logo-white.svg",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "b3p7xcpi9p",
+      "Integrity": "x/sIp115BaF0MyUDO3MAQKjcXqNEHnTxflTKJfK1k3w=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "D:\\College\\course\\course\\wwwroot\\images\\logo-white.svg"
+    },
+    {
       "Identity": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\fdqy50eotd-mrlpezrjn3.gz",
       "SourceId": "course",
       "SourceType": "Discovered",
@@ -2808,6 +2829,27 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "C:\\Users\\Barob_Cybbota\\.nuget\\packages\\microsoft.aspnetcore.identity.ui\\9.0.5\\staticwebassets\\V5\\favicon.ico"
+    },
+    {
+      "Identity": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\jqahibr82e-kpmfnm3vya.gz",
+      "SourceId": "course",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\",
+      "BasePath": "_content/course",
+      "RelativePath": "images/logo-black#[.{fingerprint=kpmfnm3vya}]?.svg.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "D:\\College\\course\\course\\wwwroot\\images\\logo-black.svg",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "Fingerprint": "vugmwdvb6i",
+      "Integrity": "Kd2zYcSaHZjOb7EIMqH2iaabalFl4Qe7+Ek0fhw3VWU=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "D:\\College\\course\\course\\wwwroot\\images\\logo-black.svg"
     },
     {
       "Identity": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\k8b25g0zwc-b7pk76d08c.gz",
@@ -3818,12 +3860,12 @@
       "OriginalItemSpec": "C:\\Users\\Barob_Cybbota\\.nuget\\packages\\microsoft.aspnetcore.identity.ui\\9.0.5\\staticwebassets\\V5\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map"
     },
     {
-      "Identity": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\y8lyr8eiux-b9sayid5wm.gz",
+      "Identity": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\y8lyr8eiux-5x77ymrmw5.gz",
       "SourceId": "course",
       "SourceType": "Discovered",
       "ContentRoot": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\",
       "BasePath": "_content/course",
-      "RelativePath": "css/site#[.{fingerprint=b9sayid5wm}]?.css.gz",
+      "RelativePath": "css/site#[.{fingerprint=5x77ymrmw5}]?.css.gz",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Alternative",
@@ -3832,8 +3874,8 @@
       "RelatedAsset": "D:\\College\\course\\course\\wwwroot\\css\\site.css",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "0suozzrugb",
-      "Integrity": "0FC1RbVkLkwKhJ1oi+r2Hw4Tm9av6DyJeo95YVvfA3Y=",
+      "Fingerprint": "h51761ysqn",
+      "Integrity": "lYt+N1BfKohxhbJRpZReePZP73ucuunKzC7HANSbG7M=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "D:\\College\\course\\course\\wwwroot\\css\\site.css"
@@ -4042,8 +4084,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "b9sayid5wm",
-      "Integrity": "j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg=",
+      "Fingerprint": "5x77ymrmw5",
+      "Integrity": "JzLFB6bgfzuN9oQZW6UZbuRuCjMD2pMU5z0vBiTLX3s=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
@@ -4063,11 +4105,53 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "61n19gt1b8",
-      "Integrity": "Jtxf9L+5ITKRc1gIRl4VbUpGkRNfOBXjYTdhJD4facM=",
+      "Fingerprint": "kbtpnb7hgc",
+      "Integrity": "sJOQWQcK4FwcyqpsLjYtX13fNq2Vo6D3Hcn2tFFohzQ=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\favicon.ico"
+    },
+    {
+      "Identity": "D:\\College\\course\\course\\wwwroot\\images\\logo-black.svg",
+      "SourceId": "course",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\College\\course\\course\\wwwroot\\",
+      "BasePath": "_content/course",
+      "RelativePath": "images/logo-black#[.{fingerprint}]?.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "kpmfnm3vya",
+      "Integrity": "uJ+z0DRQy/h78BtiMTMvb2Ul1PW/Es7o5tx2UyJWcmI=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\logo-black.svg"
+    },
+    {
+      "Identity": "D:\\College\\course\\course\\wwwroot\\images\\logo-white.svg",
+      "SourceId": "course",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\College\\course\\course\\wwwroot\\",
+      "BasePath": "_content/course",
+      "RelativePath": "images/logo-white#[.{fingerprint}]?.svg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "rsmve8v86f",
+      "Integrity": "K2MJ89UScYlwjMwzDCNGL3bHhGdZpXi4RjayD8S3bt4=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\logo-white.svg"
     },
     {
       "Identity": "D:\\College\\course\\course\\wwwroot\\js\\site.js",
@@ -5377,7 +5461,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 31 May 2025 13:33:18 GMT"
+          "Value": "Fri, 06 Jun 2025 11:10:48 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5430,7 +5514,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 31 May 2025 13:33:18 GMT"
+          "Value": "Fri, 06 Jun 2025 11:10:48 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5467,7 +5551,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 31 May 2025 13:33:18 GMT"
+          "Value": "Fri, 06 Jun 2025 11:10:48 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5514,7 +5598,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 31 May 2025 13:33:18 GMT"
+          "Value": "Fri, 06 Jun 2025 11:10:48 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5567,7 +5651,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 31 May 2025 13:33:18 GMT"
+          "Value": "Fri, 06 Jun 2025 11:10:48 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5604,7 +5688,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 31 May 2025 13:33:18 GMT"
+          "Value": "Fri, 06 Jun 2025 11:10:48 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5651,7 +5735,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 31 May 2025 13:33:18 GMT"
+          "Value": "Fri, 06 Jun 2025 11:10:48 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5712,7 +5796,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 31 May 2025 13:33:18 GMT"
+          "Value": "Fri, 06 Jun 2025 11:10:48 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5757,7 +5841,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 31 May 2025 13:33:18 GMT"
+          "Value": "Fri, 06 Jun 2025 11:10:48 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5812,7 +5896,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 31 May 2025 13:33:18 GMT"
+          "Value": "Fri, 06 Jun 2025 11:10:48 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5873,7 +5957,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 31 May 2025 13:33:18 GMT"
+          "Value": "Fri, 06 Jun 2025 11:10:48 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5918,7 +6002,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 31 May 2025 13:33:18 GMT"
+          "Value": "Fri, 06 Jun 2025 11:10:48 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5949,13 +6033,13 @@
       ]
     },
     {
-      "Route": "css/site.b9sayid5wm.css",
-      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\y8lyr8eiux-b9sayid5wm.gz",
+      "Route": "css/site.5x77ymrmw5.css",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\y8lyr8eiux-5x77ymrmw5.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.003134796238"
+          "Quality": "0.000244200244"
         }
       ],
       "ResponseHeaders": [
@@ -5965,15 +6049,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "318"
+          "Value": "4094"
         },
         {
           "Name": "ETag",
-          "Value": "\"0FC1RbVkLkwKhJ1oi+r2Hw4Tm9av6DyJeo95YVvfA3Y=\""
+          "Value": "\"lYt+N1BfKohxhbJRpZReePZP73ucuunKzC7HANSbG7M=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 21 May 2025 14:10:38 GMT"
+          "Value": "Fri, 06 Jun 2025 16:04:52 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5993,13 +6077,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg=\""
+          "Value": "W/\"JzLFB6bgfzuN9oQZW6UZbuRuCjMD2pMU5z0vBiTLX3s=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "b9sayid5wm"
+          "Value": "5x77ymrmw5"
         },
         {
           "Name": "label",
@@ -6007,12 +6091,12 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg="
+          "Value": "sha256-JzLFB6bgfzuN9oQZW6UZbuRuCjMD2pMU5z0vBiTLX3s="
         }
       ]
     },
     {
-      "Route": "css/site.b9sayid5wm.css",
+      "Route": "css/site.5x77ymrmw5.css",
       "AssetFile": "D:\\College\\course\\course\\wwwroot\\css\\site.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -6022,7 +6106,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "667"
+          "Value": "18281"
         },
         {
           "Name": "Content-Type",
@@ -6030,11 +6114,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg=\""
+          "Value": "\"JzLFB6bgfzuN9oQZW6UZbuRuCjMD2pMU5z0vBiTLX3s=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 21 May 2025 14:10:38 GMT"
+          "Value": "Fri, 06 Jun 2025 16:04:52 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -6044,7 +6128,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "b9sayid5wm"
+          "Value": "5x77ymrmw5"
         },
         {
           "Name": "label",
@@ -6052,13 +6136,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg="
+          "Value": "sha256-JzLFB6bgfzuN9oQZW6UZbuRuCjMD2pMU5z0vBiTLX3s="
         }
       ]
     },
     {
-      "Route": "css/site.b9sayid5wm.css.gz",
-      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\y8lyr8eiux-b9sayid5wm.gz",
+      "Route": "css/site.5x77ymrmw5.css.gz",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\y8lyr8eiux-5x77ymrmw5.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -6067,7 +6151,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "318"
+          "Value": "4094"
         },
         {
           "Name": "Content-Type",
@@ -6075,11 +6159,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"0FC1RbVkLkwKhJ1oi+r2Hw4Tm9av6DyJeo95YVvfA3Y=\""
+          "Value": "\"lYt+N1BfKohxhbJRpZReePZP73ucuunKzC7HANSbG7M=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 21 May 2025 14:10:38 GMT"
+          "Value": "Fri, 06 Jun 2025 16:04:52 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -6097,7 +6181,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "b9sayid5wm"
+          "Value": "5x77ymrmw5"
         },
         {
           "Name": "label",
@@ -6105,18 +6189,18 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-0FC1RbVkLkwKhJ1oi+r2Hw4Tm9av6DyJeo95YVvfA3Y="
+          "Value": "sha256-lYt+N1BfKohxhbJRpZReePZP73ucuunKzC7HANSbG7M="
         }
       ]
     },
     {
       "Route": "css/site.css",
-      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\y8lyr8eiux-b9sayid5wm.gz",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\y8lyr8eiux-5x77ymrmw5.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.003134796238"
+          "Quality": "0.000244200244"
         }
       ],
       "ResponseHeaders": [
@@ -6126,15 +6210,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "318"
+          "Value": "4094"
         },
         {
           "Name": "ETag",
-          "Value": "\"0FC1RbVkLkwKhJ1oi+r2Hw4Tm9av6DyJeo95YVvfA3Y=\""
+          "Value": "\"lYt+N1BfKohxhbJRpZReePZP73ucuunKzC7HANSbG7M=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 21 May 2025 14:10:38 GMT"
+          "Value": "Fri, 06 Jun 2025 16:04:52 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -6154,13 +6238,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg=\""
+          "Value": "W/\"JzLFB6bgfzuN9oQZW6UZbuRuCjMD2pMU5z0vBiTLX3s=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg="
+          "Value": "sha256-JzLFB6bgfzuN9oQZW6UZbuRuCjMD2pMU5z0vBiTLX3s="
         }
       ]
     },
@@ -6175,7 +6259,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "667"
+          "Value": "18281"
         },
         {
           "Name": "Content-Type",
@@ -6183,11 +6267,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg=\""
+          "Value": "\"JzLFB6bgfzuN9oQZW6UZbuRuCjMD2pMU5z0vBiTLX3s=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 21 May 2025 14:10:38 GMT"
+          "Value": "Fri, 06 Jun 2025 16:04:52 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -6197,13 +6281,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-j6fhJSuuyLpOSLuPJU0TsDV0iNjor5S3rDnvxJrt4bg="
+          "Value": "sha256-JzLFB6bgfzuN9oQZW6UZbuRuCjMD2pMU5z0vBiTLX3s="
         }
       ]
     },
     {
       "Route": "css/site.css.gz",
-      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\y8lyr8eiux-b9sayid5wm.gz",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\y8lyr8eiux-5x77ymrmw5.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -6212,7 +6296,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "318"
+          "Value": "4094"
         },
         {
           "Name": "Content-Type",
@@ -6220,11 +6304,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"0FC1RbVkLkwKhJ1oi+r2Hw4Tm9av6DyJeo95YVvfA3Y=\""
+          "Value": "\"lYt+N1BfKohxhbJRpZReePZP73ucuunKzC7HANSbG7M=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 21 May 2025 14:10:38 GMT"
+          "Value": "Fri, 06 Jun 2025 16:04:52 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -6242,179 +6326,18 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-0FC1RbVkLkwKhJ1oi+r2Hw4Tm9av6DyJeo95YVvfA3Y="
-        }
-      ]
-    },
-    {
-      "Route": "favicon.61n19gt1b8.ico",
-      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\axc68e084u-61n19gt1b8.gz",
-      "Selectors": [
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip",
-          "Quality": "0.000405022276"
-        }
-      ],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "2468"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"wfFuuYm+Lh6RbCeeiUqxw334b/hIOkp5j9eokGUM1Y0=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Wed, 21 May 2025 14:10:37 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "image/x-icon"
-        },
-        {
-          "Name": "ETag",
-          "Value": "W/\"Jtxf9L+5ITKRc1gIRl4VbUpGkRNfOBXjYTdhJD4facM=\""
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "61n19gt1b8"
-        },
-        {
-          "Name": "label",
-          "Value": "favicon.ico"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-Jtxf9L+5ITKRc1gIRl4VbUpGkRNfOBXjYTdhJD4facM="
-        }
-      ]
-    },
-    {
-      "Route": "favicon.61n19gt1b8.ico",
-      "AssetFile": "D:\\College\\course\\course\\wwwroot\\favicon.ico",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "5430"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "image/x-icon"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"Jtxf9L+5ITKRc1gIRl4VbUpGkRNfOBXjYTdhJD4facM=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Wed, 21 May 2025 14:10:37 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "61n19gt1b8"
-        },
-        {
-          "Name": "label",
-          "Value": "favicon.ico"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-Jtxf9L+5ITKRc1gIRl4VbUpGkRNfOBXjYTdhJD4facM="
-        }
-      ]
-    },
-    {
-      "Route": "favicon.61n19gt1b8.ico.gz",
-      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\axc68e084u-61n19gt1b8.gz",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "2468"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "image/x-icon"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"wfFuuYm+Lh6RbCeeiUqxw334b/hIOkp5j9eokGUM1Y0=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Wed, 21 May 2025 14:10:37 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "61n19gt1b8"
-        },
-        {
-          "Name": "label",
-          "Value": "favicon.ico.gz"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-wfFuuYm+Lh6RbCeeiUqxw334b/hIOkp5j9eokGUM1Y0="
+          "Value": "sha256-lYt+N1BfKohxhbJRpZReePZP73ucuunKzC7HANSbG7M="
         }
       ]
     },
     {
       "Route": "favicon.ico",
-      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\axc68e084u-61n19gt1b8.gz",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\axc68e084u-kbtpnb7hgc.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000405022276"
+          "Quality": "0.000043704384"
         }
       ],
       "ResponseHeaders": [
@@ -6424,15 +6347,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2468"
+          "Value": "22880"
         },
         {
           "Name": "ETag",
-          "Value": "\"wfFuuYm+Lh6RbCeeiUqxw334b/hIOkp5j9eokGUM1Y0=\""
+          "Value": "\"yKhkSqj9jR9yOHVYOziSPw6kSZk/LjqNgp1Au4x31Zs=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 21 May 2025 14:10:37 GMT"
+          "Value": "Sat, 31 May 2025 20:48:55 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -6452,13 +6375,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"Jtxf9L+5ITKRc1gIRl4VbUpGkRNfOBXjYTdhJD4facM=\""
+          "Value": "W/\"sJOQWQcK4FwcyqpsLjYtX13fNq2Vo6D3Hcn2tFFohzQ=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-Jtxf9L+5ITKRc1gIRl4VbUpGkRNfOBXjYTdhJD4facM="
+          "Value": "sha256-sJOQWQcK4FwcyqpsLjYtX13fNq2Vo6D3Hcn2tFFohzQ="
         }
       ]
     },
@@ -6473,7 +6396,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "5430"
+          "Value": "94922"
         },
         {
           "Name": "Content-Type",
@@ -6481,11 +6404,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"Jtxf9L+5ITKRc1gIRl4VbUpGkRNfOBXjYTdhJD4facM=\""
+          "Value": "\"sJOQWQcK4FwcyqpsLjYtX13fNq2Vo6D3Hcn2tFFohzQ=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 21 May 2025 14:10:37 GMT"
+          "Value": "Sat, 31 May 2025 20:48:55 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -6495,13 +6418,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-Jtxf9L+5ITKRc1gIRl4VbUpGkRNfOBXjYTdhJD4facM="
+          "Value": "sha256-sJOQWQcK4FwcyqpsLjYtX13fNq2Vo6D3Hcn2tFFohzQ="
         }
       ]
     },
     {
       "Route": "favicon.ico.gz",
-      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\axc68e084u-61n19gt1b8.gz",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\axc68e084u-kbtpnb7hgc.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -6510,7 +6433,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "2468"
+          "Value": "22880"
         },
         {
           "Name": "Content-Type",
@@ -6518,11 +6441,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"wfFuuYm+Lh6RbCeeiUqxw334b/hIOkp5j9eokGUM1Y0=\""
+          "Value": "\"yKhkSqj9jR9yOHVYOziSPw6kSZk/LjqNgp1Au4x31Zs=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 21 May 2025 14:10:37 GMT"
+          "Value": "Sat, 31 May 2025 20:48:55 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -6540,7 +6463,168 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-wfFuuYm+Lh6RbCeeiUqxw334b/hIOkp5j9eokGUM1Y0="
+          "Value": "sha256-yKhkSqj9jR9yOHVYOziSPw6kSZk/LjqNgp1Au4x31Zs="
+        }
+      ]
+    },
+    {
+      "Route": "favicon.kbtpnb7hgc.ico",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\axc68e084u-kbtpnb7hgc.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000043704384"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "22880"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"yKhkSqj9jR9yOHVYOziSPw6kSZk/LjqNgp1Au4x31Zs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 31 May 2025 20:48:55 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/x-icon"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"sJOQWQcK4FwcyqpsLjYtX13fNq2Vo6D3Hcn2tFFohzQ=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "kbtpnb7hgc"
+        },
+        {
+          "Name": "label",
+          "Value": "favicon.ico"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-sJOQWQcK4FwcyqpsLjYtX13fNq2Vo6D3Hcn2tFFohzQ="
+        }
+      ]
+    },
+    {
+      "Route": "favicon.kbtpnb7hgc.ico",
+      "AssetFile": "D:\\College\\course\\course\\wwwroot\\favicon.ico",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "94922"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/x-icon"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"sJOQWQcK4FwcyqpsLjYtX13fNq2Vo6D3Hcn2tFFohzQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 31 May 2025 20:48:55 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "kbtpnb7hgc"
+        },
+        {
+          "Name": "label",
+          "Value": "favicon.ico"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-sJOQWQcK4FwcyqpsLjYtX13fNq2Vo6D3Hcn2tFFohzQ="
+        }
+      ]
+    },
+    {
+      "Route": "favicon.kbtpnb7hgc.ico.gz",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\axc68e084u-kbtpnb7hgc.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "22880"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/x-icon"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"yKhkSqj9jR9yOHVYOziSPw6kSZk/LjqNgp1Au4x31Zs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 31 May 2025 20:48:55 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "kbtpnb7hgc"
+        },
+        {
+          "Name": "label",
+          "Value": "favicon.ico.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-yKhkSqj9jR9yOHVYOziSPw6kSZk/LjqNgp1Au4x31Zs="
         }
       ]
     },
@@ -15072,6 +15156,602 @@
         {
           "Name": "integrity",
           "Value": "sha256-JKWeHUaANNuffeRatdc54UCb84RoxjEw/nTq8Mops8Y="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo-black.kpmfnm3vya.svg",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\jqahibr82e-kpmfnm3vya.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000004703271"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "212617"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Kd2zYcSaHZjOb7EIMqH2iaabalFl4Qe7+Ek0fhw3VWU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 01 Jun 2025 15:35:04 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/svg+xml"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"uJ+z0DRQy/h78BtiMTMvb2Ul1PW/Es7o5tx2UyJWcmI=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "kpmfnm3vya"
+        },
+        {
+          "Name": "label",
+          "Value": "images/logo-black.svg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-uJ+z0DRQy/h78BtiMTMvb2Ul1PW/Es7o5tx2UyJWcmI="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo-black.kpmfnm3vya.svg",
+      "AssetFile": "D:\\College\\course\\course\\wwwroot\\images\\logo-black.svg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "284033"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/svg+xml"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"uJ+z0DRQy/h78BtiMTMvb2Ul1PW/Es7o5tx2UyJWcmI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 01 Jun 2025 15:35:04 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "kpmfnm3vya"
+        },
+        {
+          "Name": "label",
+          "Value": "images/logo-black.svg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-uJ+z0DRQy/h78BtiMTMvb2Ul1PW/Es7o5tx2UyJWcmI="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo-black.kpmfnm3vya.svg.gz",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\jqahibr82e-kpmfnm3vya.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "212617"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/svg+xml"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Kd2zYcSaHZjOb7EIMqH2iaabalFl4Qe7+Ek0fhw3VWU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 01 Jun 2025 15:35:04 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "kpmfnm3vya"
+        },
+        {
+          "Name": "label",
+          "Value": "images/logo-black.svg.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-Kd2zYcSaHZjOb7EIMqH2iaabalFl4Qe7+Ek0fhw3VWU="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo-black.svg",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\jqahibr82e-kpmfnm3vya.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000004703271"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "212617"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Kd2zYcSaHZjOb7EIMqH2iaabalFl4Qe7+Ek0fhw3VWU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 01 Jun 2025 15:35:04 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/svg+xml"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"uJ+z0DRQy/h78BtiMTMvb2Ul1PW/Es7o5tx2UyJWcmI=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-uJ+z0DRQy/h78BtiMTMvb2Ul1PW/Es7o5tx2UyJWcmI="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo-black.svg",
+      "AssetFile": "D:\\College\\course\\course\\wwwroot\\images\\logo-black.svg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "284033"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/svg+xml"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"uJ+z0DRQy/h78BtiMTMvb2Ul1PW/Es7o5tx2UyJWcmI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 01 Jun 2025 15:35:04 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-uJ+z0DRQy/h78BtiMTMvb2Ul1PW/Es7o5tx2UyJWcmI="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo-black.svg.gz",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\jqahibr82e-kpmfnm3vya.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "212617"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/svg+xml"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Kd2zYcSaHZjOb7EIMqH2iaabalFl4Qe7+Ek0fhw3VWU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 01 Jun 2025 15:35:04 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-Kd2zYcSaHZjOb7EIMqH2iaabalFl4Qe7+Ek0fhw3VWU="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo-white.rsmve8v86f.svg",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\fd2q991xwm-rsmve8v86f.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000004703381"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "212612"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"x/sIp115BaF0MyUDO3MAQKjcXqNEHnTxflTKJfK1k3w=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 31 May 2025 20:54:56 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/svg+xml"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"K2MJ89UScYlwjMwzDCNGL3bHhGdZpXi4RjayD8S3bt4=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "rsmve8v86f"
+        },
+        {
+          "Name": "label",
+          "Value": "images/logo-white.svg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-K2MJ89UScYlwjMwzDCNGL3bHhGdZpXi4RjayD8S3bt4="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo-white.rsmve8v86f.svg",
+      "AssetFile": "D:\\College\\course\\course\\wwwroot\\images\\logo-white.svg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "283983"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/svg+xml"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"K2MJ89UScYlwjMwzDCNGL3bHhGdZpXi4RjayD8S3bt4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 31 May 2025 20:54:56 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "rsmve8v86f"
+        },
+        {
+          "Name": "label",
+          "Value": "images/logo-white.svg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-K2MJ89UScYlwjMwzDCNGL3bHhGdZpXi4RjayD8S3bt4="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo-white.rsmve8v86f.svg.gz",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\fd2q991xwm-rsmve8v86f.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "212612"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/svg+xml"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"x/sIp115BaF0MyUDO3MAQKjcXqNEHnTxflTKJfK1k3w=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 31 May 2025 20:54:56 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "rsmve8v86f"
+        },
+        {
+          "Name": "label",
+          "Value": "images/logo-white.svg.gz"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-x/sIp115BaF0MyUDO3MAQKjcXqNEHnTxflTKJfK1k3w="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo-white.svg",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\fd2q991xwm-rsmve8v86f.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000004703381"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "212612"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"x/sIp115BaF0MyUDO3MAQKjcXqNEHnTxflTKJfK1k3w=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 31 May 2025 20:54:56 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/svg+xml"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"K2MJ89UScYlwjMwzDCNGL3bHhGdZpXi4RjayD8S3bt4=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-K2MJ89UScYlwjMwzDCNGL3bHhGdZpXi4RjayD8S3bt4="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo-white.svg",
+      "AssetFile": "D:\\College\\course\\course\\wwwroot\\images\\logo-white.svg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "283983"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/svg+xml"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"K2MJ89UScYlwjMwzDCNGL3bHhGdZpXi4RjayD8S3bt4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 31 May 2025 20:54:56 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-K2MJ89UScYlwjMwzDCNGL3bHhGdZpXi4RjayD8S3bt4="
+        }
+      ]
+    },
+    {
+      "Route": "images/logo-white.svg.gz",
+      "AssetFile": "D:\\College\\course\\course\\obj\\Debug\\net9.0\\compressed\\fd2q991xwm-rsmve8v86f.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "212612"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/svg+xml"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"x/sIp115BaF0MyUDO3MAQKjcXqNEHnTxflTKJfK1k3w=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 31 May 2025 20:54:56 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-x/sIp115BaF0MyUDO3MAQKjcXqNEHnTxflTKJfK1k3w="
         }
       ]
     },

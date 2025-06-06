@@ -13,6 +13,14 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
+      "Id": "D:\\College\\course\\course\\wwwroot\\images\\logo-black.svg",
+      "PackagePath": "staticwebassets\\images\\logo-black.svg"
+    },
+    {
+      "Id": "D:\\College\\course\\course\\wwwroot\\images\\logo-white.svg",
+      "PackagePath": "staticwebassets\\images\\logo-white.svg"
+    },
+    {
       "Id": "D:\\College\\course\\course\\wwwroot\\js\\site.js",
       "PackagePath": "staticwebassets\\js\\site.js"
     },

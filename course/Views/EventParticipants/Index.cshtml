@@ -1,0 +1,65 @@
+@model IEnumerable<course.Models.EventParticipant>
+
+@{
+    ViewData["Title"] = "Участники мероприятий";
+    var eventTitles = ViewData["EventTitles"] as Dictionary<int, string>;
+    var userLogins = ViewData["UserLogins"] as Dictionary<int, string>;
+}
+
+<h1>Участники мероприятий</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Добавить участника</a>
+</p>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>
+                Мероприятие
+            </th>
+            <th>
+                Участник
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ParticipationStatus)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @if (eventTitles != null && eventTitles.ContainsKey(item.EventId))
+                    {
+                        @eventTitles[item.EventId]
+                    }
+                    else
+                    {
+                        <span>Неизвестное мероприятие (ID: @item.EventId)</span>
+                    }
+                </td>
+                <td>
+                    @if (userLogins != null && userLogins.ContainsKey(item.UserId))
+                    {
+                        @userLogins[item.UserId]
+                    }
+                    else
+                    {
+                        <span>Неизвестный пользователь (ID: @item.UserId)</span>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ParticipationStatus)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-eventId="@item.EventId" asp-route-userId="@item.UserId" class="btn btn-sm btn-warning">Редактировать</a> |
+                    <a asp-action="Details" asp-route-eventId="@item.EventId" asp-route-userId="@item.UserId" class="btn btn-sm btn-info">Детали</a> |
+                    <a asp-action="Delete" asp-route-eventId="@item.EventId" asp-route-userId="@item.UserId" class="btn btn-sm btn-danger">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

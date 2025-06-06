@@ -1,0 +1,49 @@
+@model course.Models.Rating
+
+@{
+    ViewData["Title"] = "Удалить оценку";
+}
+
+<h1>Удалить оценку</h1>
+
+<h3>Вы уверены, что хотите удалить эту оценку?</h3>
+<div>
+    <h4>Оценка</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Пользователь
+        </dt>
+        <dd class="col-sm-10">
+            @ViewData["UserName"]
+        </dd>
+        <dt class="col-sm-2">
+            Относится к
+        </dt>
+        <dd class="col-sm-10">
+            @if (ViewData["RelatedContentType"] != null)
+            {
+                var controller = ViewData["RelatedContentType"] as string;
+                var action = "Details";
+                var id = ViewData["RelatedContentId"];
+                <a asp-controller="@controller" asp-action="@action" asp-route-id="@id">@ViewData["RelatedContentTitle"]</a>
+            }
+            else
+            {
+                <span>Не указано</span>
+            }
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Value)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Value)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-action="Index">Вернуться к списку оценок</a>
+    </form>
+</div>

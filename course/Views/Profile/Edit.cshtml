@@ -1,0 +1,54 @@
+@model course.Models.ViewModels.ProfileEditViewModel
+
+@{
+    ViewData["Title"] = "Редактировать профиль";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg p-4">
+                <h1 class="card-title text-center mb-4">Редактировать профиль</h1>
+                <hr />
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="RegistrationDate" /> @* Не редактируется *@
+                    <input type="hidden" asp-for="BlockStatus" /> @* Не редактируется пользователем *@
+                    <input type="hidden" asp-for="Rating" /> @* Не редактируется пользователем *@
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Login" class="form-control" placeholder="Ваш логин" />
+                        <label asp-for="Login"></label>
+                        <span asp-validation-for="Login" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                        <label asp-for="Email"></label>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="RegistrationDate" class="control-label"></label>
+                        <input asp-for="RegistrationDate" class="form-control" disabled />
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Сохранить изменения</button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <a asp-action="Index" class="btn btn-secondary">Отмена</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

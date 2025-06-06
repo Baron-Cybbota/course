@@ -1,0 +1,96 @@
+@model course.Models.Complaint
+@using course.Models
+
+@{
+    ViewData["Title"] = "Удалить жалобу";
+    var complaintStatusDisplayName = new Dictionary<ComplaintStatus, string>
+    {
+        { ComplaintStatus.Pending, "Подана" },
+        { ComplaintStatus.InProgress, "Рассматривается" },
+        { ComplaintStatus.Resolved, "Решена" },
+        { ComplaintStatus.Rejected, "Отклонена" }
+    };
+}
+
+<h1>Удалить жалобу</h1>
+
+<h3>Вы уверены, что хотите удалить эту жалобу?</h3>
+<div>
+    <h4>Жалоба</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Автор
+        </dt>
+        <dd class="col-sm-10">
+            @ViewData["AuthorName"]
+        </dd>
+        <dt class="col-sm-2">
+            Относится к
+        </dt>
+        <dd class="col-sm-10">
+            @if (ViewData["RelatedContentType"] != null)
+            {
+                var controller = ViewData["RelatedContentType"] as string;
+                var action = "Details";
+                var id = ViewData["RelatedContentId"];
+                <a asp-controller="@controller" asp-action="@action" asp-route-id="@id">@ViewData["RelatedContentTitle"]</a>
+            }
+            else
+            {
+                <span>Не указано</span>
+            }
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Reason)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Reason)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class="col-sm-10">
+            @complaintStatusDisplayName[Model.Status]
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreatedDate)
+        </dd>
+        @if (Model.AdministratorId.HasValue)
+        {
+            <dt class="col-sm-2">
+                Обработано модератором
+            </dt>
+            <dd class="col-sm-10">
+                @ViewData["ModeratorName"]
+            </dd>
+        }
+        @if (Model.ResolvedDate.HasValue)
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ResolvedDate)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ResolvedDate)
+            </dd>
+        }
+        @if (!string.IsNullOrEmpty(Model.ModeratorNotes))
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ModeratorNotes)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ModeratorNotes)
+            </dd>
+        }
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-action="Index">Вернуться к списку жалоб</a>
+    </form>
+</div>

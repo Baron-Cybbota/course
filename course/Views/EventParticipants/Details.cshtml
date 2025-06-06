@@ -1,0 +1,38 @@
+@model course.Models.EventParticipant
+
+@{
+    ViewData["Title"] = "Детали участника мероприятия";
+    var eventTitle = ViewData["EventTitle"] as string;
+    var userLogin = ViewData["UserLogin"] as string;
+}
+
+<h1>Детали участника мероприятия</h1>
+
+<div>
+    <h4>Участник мероприятия</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            Мероприятие
+        </dt>
+        <dd class="col-sm-9">
+            @eventTitle
+        </dd>
+        <dt class="col-sm-3">
+            Участник
+        </dt>
+        <dd class="col-sm-9">
+            @userLogin
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.ParticipationStatus)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ParticipationStatus)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-eventId="@Model.EventId" asp-route-userId="@Model.UserId" class="btn btn-warning">Редактировать</a> |
+    <a asp-action="Index" class="btn btn-secondary">Вернуться к списку</a>
+</div>

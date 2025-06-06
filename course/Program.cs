@@ -1,56 +1,35 @@
-// Program.cs
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity; // Добавляем using для Identity
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using course.Data;
-using course.Models; // Добавляем using для наших моделей User и Role
-using course.Services;
-using Microsoft.AspNetCore.Identity.UI.Services;
+using course.Models; // Убедитесь, что здесь есть все ваши модели
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.Cookies; // Добавляем для Cookie Authentication
+using Microsoft.AspNetCore.Authorization; // Для [AllowAnonymous] и других атрибутов авторизации
+using Microsoft.AspNetCore.Authentication; // Для HttpContext.SignInAsync
+using System.Security.Claims; // Для Claim
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавляем DbContext
+// Добавляем DbContext для ваших моделей
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<courseIdentityDbContext>();
+// Настройка аутентификации на основе файлов cookie
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login"; // Путь к странице входа
+        options.AccessDeniedPath = "/Account/AccessDenied"; // Путь к странице отказа в доступе
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Время жизни куки
+        options.SlidingExpiration = true; // Обновлять куки при активности пользователя
+    });
 
-// Добавляем Identity
-// .AddDefaultIdentity<User>(...) - это упрощенный способ настройки Identity.
-// Он автоматически добавляет UserStore, SignInManager и т.д.
-// .AddRoles<Role>() - добавляет поддержку ролей.
-// .AddEntityFrameworkStores<ApplicationDbContext>() - указывает, что Identity будет использовать EF Core и наш ApplicationDbContext.
-// .AddDefaultTokenProviders() - добавляет провайдеры для генерации токенов (например, для сброса пароля).
-builder.Services.AddIdentity<User, Role>(options =>
-{
-    // Опции для пароля
-    options.Password.RequireDigit = false;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequiredUniqueChars = 0; // Для простоты в начале
-
-    // Опции для Lockout
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-    options.Lockout.MaxFailedAccessAttempts = 5;
-    options.Lockout.AllowedForNewUsers = true;
-
-    // Опции для User
-    options.User.RequireUniqueEmail = true; // Важно: Email должен быть уникальным
-})
-.AddEntityFrameworkStores<ApplicationDbContext>()
-.AddDefaultTokenProviders();
-
-builder.Services.AddTransient<IEmailSender, EmailSender>(); // <-- ДОБАВИТЬ ЭТУ СТРОКУ
-
-// Add services to the container.
+// Добавляем сервисы в контейнер.
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages(); // Добавляем поддержку Razor Pages для Identity UI
 
 var app = builder.Build();
 
+// Применение миграций при запуске приложения
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -58,7 +37,8 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate(); // Применяем миграции при запуске, если они есть
-        await SeedData.Initialize(services); // Вызываем наш метод инициализации
+        // Здесь вы можете добавить инициализацию данных, если она необходима
+        // await DbInitializer.Initialize(services);
     }
     catch (Exception ex)
     {
@@ -67,7 +47,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
+// Конфигурируем HTTP запрос.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -81,12 +61,9 @@ app.UseStaticFiles();
 app.UseRouting();
 
 // Важно: UseAuthentication() и UseAuthorization() должны быть ПОСЛЕ UseRouting()
-// и ПЕРЕД app.MapControllerRoute()
+// и ПЕРЕД app.MapControllerRoute().
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Используйте Razor Pages для Identity UI
-app.MapRazorPages(); // Добавьте это для маршрутизации страниц Identity
 
 app.MapControllerRoute(
     name: "default",

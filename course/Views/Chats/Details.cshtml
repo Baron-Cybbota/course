@@ -4,6 +4,7 @@
 
 @{
     ViewData["Title"] = Model.Name;
+    var isCurrentUserParticipant = (bool)ViewData["IsCurrentUserParticipant"];
 }
 
 <h1>@Model.Name</h1>
@@ -32,10 +33,10 @@
             }
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedDate)
+            @Html.DisplayNameFor(model => model.CreationDate)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.CreatedDate)
+            @Html.DisplayFor(model => model.CreationDate)
         </dd>
     </dl>
 </div>
@@ -46,10 +47,71 @@
 
 ---
 
+<h3 class="mt-4">Участники чата</h3>
+<div class="participants-section mb-3">
+    @{
+        var participants = ViewData["Participants"] as List<ChatParticipant>;
+        var participantNames = ViewData["ParticipantNames"] as Dictionary<int, string>;
+    }
+    @if (participants != null && participants.Any())
+    {
+        <ul>
+            @foreach (var participant in participants)
+            {
+                <li>
+                    @if (participantNames != null && participantNames.ContainsKey(participant.UserId))
+                    {
+                        <span>@participantNames[participant.UserId]</span>
+                    }
+                    else
+                    {
+                        <span>Неизвестный пользователь</span>
+                    }
+                    <small class="text-muted">(Присоединился: @participant.JoinDate.ToShortDateString())</small>
+
+                    @* Option to remove participant for moderators/admins (excluding themselves) *@
+                    @if (User.Identity.IsAuthenticated && (User.IsInRole("Модератор") || User.IsInRole("Администратор")) && participant.UserId.ToString() != User.FindFirstValue(ClaimTypes.NameIdentifier))
+                    {
+                        <form asp-controller="ChatParticipants" asp-action="RemoveParticipant" method="post" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите удалить этого участника из чата?');">
+                            <input type="hidden" name="chatId" value="@Model.Id" />
+                            <input type="hidden" name="userId" value="@participant.UserId" />
+                            <button type="submit" class="btn btn-danger btn-sm ms-2">Удалить</button>
+                        </form>
+                    }
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>В этом чате пока нет участников, кроме создателя.</p>
+    }
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        if (isCurrentUserParticipant)
+        {
+            <form asp-controller="ChatParticipants" asp-action="LeaveChat" method="post" onsubmit="return confirm('Вы уверены, что хотите покинуть этот чат?');">
+                <input type="hidden" name="chatId" value="@Model.Id" />
+                <button type="submit" class="btn btn-warning mt-2">Покинуть чат</button>
+            </form>
+        }
+        else
+        {
+            <form asp-controller="ChatParticipants" asp-action="JoinChat" method="post">
+                <input type="hidden" name="chatId" value="@Model.Id" />
+                <button type="submit" class="btn btn-success mt-2">Присоединиться к чату</button>
+            </form>
+        }
+    }
+</div>
+
+---
+
 <h3 class="mt-4">Сообщения</h3>
 <div class="messages-section" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
     @{
-        var messages = ViewData["Messages"] as List<Message>;
+        var messages = ViewData["Messages"] as List<ChatMessage>;
         var messageSenders = ViewData["MessageSenders"] as Dictionary<int, string>;
     }
 
@@ -79,12 +141,9 @@
                         }
                     </h6>
                     <p class="card-text">@message.Content</p>
-                    @* Здесь можно добавить кнопки для модераторов/админов для удаления сообщения *
                     @if (User.Identity.IsAuthenticated && User.IsInRole("Модератор"))
                     {
                         <a asp-controller="Messages" asp-action="Delete" asp-route-id="@message.Id" class="btn btn-sm btn-outline-danger">Удалить сообщение</a>
-                        @* Или AJAX-кнопка для отметки как прочитанного, если текущий пользователь - получатель *
-                        @* <button type="button" class="btn btn-sm btn-outline-secondary" onclick="markMessageAsRead(@message.Id)">Прочитать</button> *@
                     }
                 </div>
             </div>
@@ -101,21 +160,29 @@
 <h3 class="mt-4">Отправить сообщение</h3>
 @if (User.Identity.IsAuthenticated)
 {
-    <div class="message-form-section">
-        <form asp-controller="Messages" asp-action="Create" method="post">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" name="ChatId" value="@Model.Id" /> @* Важно передать ID чата *@
-            <div class="form-group">
-                <label for="Content" class="control-label">Ваше сообщение</label>
-                <textarea name="Content" class="form-control" rows="3" required></textarea>
-                <span data-valmsg-for="Content" class="text-danger"></span>
-            </div>
-            <div class="form-group mt-2">
-                <input type="submit" value="Отправить" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+    // Only allow sending messages if the user is a participant
+    if (isCurrentUserParticipant)
+    {
+        <div class="message-form-section">
+            <form asp-controller="Messages" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" name="ChatId" value="@Model.Id" />
+                <div class="form-group">
+                    <label for="Content" class="control-label">Ваше сообщение</label>
+                    <textarea name="Content" class="form-control" rows="3" required></textarea>
+                    <span data-valmsg-for="Content" class="text-danger"></span>
+                </div>
+                <div class="form-group mt-2">
+                    <input type="submit" value="Отправить" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    }
+    else
+    {
+        <p>Вы должны быть участником чата, чтобы отправлять сообщения.</p>
+    }
 }
 else
 {
@@ -124,25 +191,4 @@ else
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    @* Если вы хотите добавить AJAX-функциональность для MarkAsRead, вам понадобится здесь JavaScript *@
-    @* <script>
-        function markMessageAsRead(messageId) {
-            fetch('/Messages/MarkAsRead/' + messageId, {
-                method: 'POST',
-                headers: {
-                    'RequestVerificationToken': '@Html.AntiForgeryToken()'.split('value="')[1].split('"')[0]
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Обновить UI, например, изменить текст кнопки или добавить значок "прочитано"
-                    console.log('Сообщение помечено как прочитанное:', messageId);
-                    location.reload(); // Простейший способ обновить страницу после AJAX
-                } else {
-                    console.error('Ошибка при пометке сообщения как прочитанного.');
-                }
-            })
-            .catch(error => console.error('Ошибка сети:', error));
-        }
-    </script> *@
 }

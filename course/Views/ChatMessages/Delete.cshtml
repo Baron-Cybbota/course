@@ -1,0 +1,55 @@
+@model course.Models.ChatMessage
+
+@{
+    ViewData["Title"] = "Удалить сообщение";
+}
+
+<h1>Удалить</h1>
+
+<h3>Вы уверены, что хотите удалить это сообщение?</h3>
+<div>
+    <h4>Сообщение</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Чат
+        </dt>
+        <dd class="col-sm-10">
+            @ViewData["ChatName"] @* Название чата, передается из контроллера *@
+        </dd>
+        <dt class="col-sm-2">
+            Отправитель
+        </dt>
+        <dd class="col-sm-10">
+            @ViewData["SenderName"] @* Имя отправителя, передается из контроллера *@
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Content)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Content)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SentDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SentDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.IsRead)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IsRead)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete" method="post"> @* Важно: метод "post" для DeleteConfirmed *@
+        <input type="hidden" asp-for="Id" />
+        @* ChatId не нужно как скрытое поле для удаления, так как DeleteConfirmed берет только Id сообщения.
+           Однако, если вы хотите вернуться к деталям чата после удаления, ChatId нужно сохранить.
+           Я оставлю его здесь, как в вашем оригинальном коде, для обратной ссылки. *@
+        <input type="hidden" asp-for="ChatId" /> 
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-controller="Chats" asp-action="Details" asp-route-id="@Model.ChatId" class="btn btn-secondary">Вернуться к чату</a>
+    </form>
+</div>

@@ -1,239 +1,362 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // Используется для ToListAsync, FindAsync, AsNoTracking
-using course.Data; // Ваш контекст базы данных
-using course.Models; // Ваши модели
-using Microsoft.AspNetCore.Authorization; // Для атрибута [Authorize]
-using Microsoft.AspNetCore.Identity; // Для UserManager
-using System.Security.Claims; // Для User.FindFirstValue
-using System.Linq; // Для Linq методов (Select, Distinct, ToDictionary)
+using Microsoft.EntityFrameworkCore;
+using course.Data;
+using course.Models;
+using System.Threading.Tasks; // Для Task
+using System; // Для DateTime
+using System.Linq; // Для Any()
+using System.Collections.Generic; // Для Dictionary
+using System.Security.Claims; // Для работы с Claims
 
 namespace course.Controllers
 {
-	public class PostsController : Controller
-	{
-		private readonly ApplicationDbContext _context;
-		private readonly UserManager<User> _userManager; // Для получения информации о пользователях
+    public class PostsController : Controller
+    {
+        private readonly ApplicationDbContext _context;
 
-		public PostsController(ApplicationDbContext context, UserManager<User> userManager)
-		{
-			_context = context;
-			_userManager = userManager;
-		}
+        public PostsController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
-		// GET: Posts
-		public async Task<IActionResult> Index()
-		{
-			// Получаем все посты, которые не скрыты
-			var posts = await _context.Posts.Where(p => !p.IsHidden).ToListAsync();
+        // GET: Posts
+        // Отображает список всех постов.
+        public async Task<IActionResult> Index()
+        {
+            var posts = await _context.Posts.ToListAsync();
 
-			// Если нужно отобразить имя автора для каждого поста в Index:
-			// 1. Собираем все уникальные AuthorId из полученных постов.
-			var authorIds = posts.Select(p => p.AuthorId).Distinct().ToList();
-			// 2. Загружаем всех соответствующих пользователей.
-			var authors = await _userManager.Users.Where(u => authorIds.Contains(u.Id)).ToListAsync();
-			// 3. Создаем словарь для быстрого поиска имени пользователя по ID в представлении.
-			ViewData["Authors"] = authors.ToDictionary(u => u.Id, u => u.UserName); // Или u.Email, в зависимости от того, что хотите отобразить.
+            // Получаем уникальные AuthorId из всех постов
+            var authorIds = posts.Select(p => p.AuthorId).Distinct().ToList();
 
-			return View(posts);
-		}
+            // Загружаем авторов для этих ID
+            var authors = await _context.Users
+                                        .Where(u => authorIds.Contains(u.Id))
+                                        .ToDictionaryAsync(u => u.Id, u => u.Login);
 
-		// GET: Posts/Details/5
-		public async Task<IActionResult> Details(int? id)
-		{
-			if (id == null)
-			{
-				return NotFound();
-			}
+            ViewData["Authors"] = authors; // Передаем словарь авторов в View
 
-			var post = await _context.Posts.FirstOrDefaultAsync(m => m.Id == id);
+            return View(posts);
+        }
 
-			if (post == null || post.IsHidden)
-			{
-				return NotFound();
-			}
+        // GET: Posts/Details/5
+        // Отображает детали конкретного поста по Id, включая связанные данные.
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound(); // Если Id не предоставлен, возвращаем 404
+            }
 
-			// Загружаем имя автора поста
-			var author = await _userManager.FindByIdAsync(post.AuthorId.ToString());
-			ViewData["AuthorName"] = author?.UserName; // Сохраняем имя автора в ViewData
+            var post = await _context.Posts
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (post == null)
+            {
+                return NotFound(); // Если пост не найден, возвращаем 404
+            }
 
-			// Загружаем комментарии для этого поста
-			var comments = await _context.Comments
-										 .Where(c => c.PostId == post.Id)
-										 .OrderBy(c => c.CreatedDate) // Отсортируем комментарии по дате
-										 .ToListAsync();
-			ViewData["Comments"] = comments;
+            // Получаем имя автора поста
+            var author = await _context.Users.FindAsync(post.AuthorId);
+            ViewData["AuthorName"] = author?.Login ?? "Неизвестный автор";
 
-			// Загружаем авторов комментариев (если они нужны в представлении)
-			var commentAuthorIds = comments.Select(c => c.AuthorId).Distinct().ToList();
-			var commentAuthors = await _userManager.Users.Where(u => commentAuthorIds.Contains(u.Id)).ToListAsync();
-			ViewData["CommentAuthors"] = commentAuthors.ToDictionary(u => u.Id, u => u.UserName);
+            // Получаем все комментарии к этому посту
+            var comments = await _context.Comments
+                                         .Where(c => c.PostId == id)
+                                         .OrderBy(c => c.CreationDate)
+                                         .ToListAsync();
+            ViewData["Comments"] = comments;
 
-			return View(post);
-		}
+            // Получаем имена авторов комментариев
+            var commentAuthorIds = comments.Select(c => c.AuthorId).Distinct().ToList();
+            var commentAuthors = await _context.Users
+                                               .Where(u => commentAuthorIds.Contains(u.Id))
+                                               .ToDictionaryAsync(u => u.Id, u => u.Login);
+            ViewData["CommentAuthors"] = commentAuthors;
 
-		// GET: Posts/Create
-		[Authorize] // Только залогиненные пользователи могут создавать посты
-		public IActionResult Create()
-		{
-			return View();
-		}
+            // Получаем рейтинги для этого поста
+            var postRatings = await _context.Ratings.Where(r => r.PostId == id).ToListAsync();
 
-		// POST: Posts/Create
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		[Authorize]
-		public async Task<IActionResult> Create([Bind("Title,Content")] Post post)
-		{
-			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Получаем ID текущего пользователя
-			if (string.IsNullOrEmpty(userId))
-			{
-				// Если пользователь не аутентифицирован (что маловероятно с [Authorize], но хорошая проверка)
-				ModelState.AddModelError(string.Empty, "Для создания поста необходимо быть авторизованным пользователем.");
-				return View(post);
-			}
+            // Вычисляем общий рейтинг поста
+            int totalPostRating = postRatings.Sum(r => r.Value ? 1 : -1);
+            ViewData["TotalPostRating"] = totalPostRating;
+            // Передаем количество оценок для поста
+            ViewData["PostRatingsCount"] = postRatings.Count;
 
-			post.AuthorId = int.Parse(userId); // Преобразуем ID в int и присваиваем посту
-			post.CreatedDate = DateTime.UtcNow; // Устанавливаем текущую дату
-			post.IsEdited = false; // Новый пост, еще не редактировался
-			post.IsHidden = false; // По умолчанию пост не скрыт
+            // Получаем текущего пользователя для логики оценки
+            int? currentUserId = null;
+            if (User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
+                {
+                    currentUserId = parsedUserId;
+                }
+            }
+            ViewData["CurrentUserId"] = currentUserId;
 
-			if (ModelState.IsValid)
-			{
-				_context.Add(post);
-				await _context.SaveChangesAsync();
-				return RedirectToAction(nameof(Index));
-			}
-			// Если модель не валидна, возвращаем представление с ошибками
-			return View(post);
-		}
+            // Проверяем, оценил ли текущий пользователь пост
+            if (currentUserId.HasValue)
+            {
+                var existingPostRating = await _context.Ratings.FirstOrDefaultAsync(r => r.UserId == currentUserId.Value && r.PostId == post.Id);
+                ViewData["ExistingPostRating"] = existingPostRating;
+            }
 
-		// GET: Posts/Edit/5
-		[Authorize] // Только залогиненные пользователи могут редактировать
-		public async Task<IActionResult> Edit(int? id)
-		{
-			if (id == null)
-			{
-				return NotFound();
-			}
+            // Получаем рейтинги для каждого комментария и вычисляем их сумму и количество
+            var commentTotalRatings = new Dictionary<int, int>();
+            var commentRatingsCounts = new Dictionary<int, int>();
+            if (comments != null) // Добавлена проверка на null
+            {
+                foreach (var comment in comments)
+                {
+                    var currentCommentRatings = await _context.Ratings
+                                                            .Where(r => r.CommentId == comment.Id)
+                                                            .ToListAsync();
+                    commentTotalRatings[comment.Id] = currentCommentRatings.Sum(r => r.Value ? 1 : -1);
+                    commentRatingsCounts[comment.Id] = currentCommentRatings.Count;
+                }
+            }
+            ViewData["CommentTotalRatings"] = commentTotalRatings;
+            ViewData["CommentRatingsCounts"] = commentRatingsCounts;
 
-			var post = await _context.Posts.FindAsync(id);
-			if (post == null || post.IsHidden)
-			{
-				return NotFound();
-			}
+            // Pre-fetch existing ratings for the current user for all comments
+            if (currentUserId.HasValue)
+            {
+                var userCommentRatings = await _context.Ratings
+                                                       .Where(r => r.UserId == currentUserId.Value && r.CommentId.HasValue && comments.Select(c => c.Id).Contains(r.CommentId.Value))
+                                                       .ToDictionaryAsync(r => r.CommentId.Value, r => r);
+                ViewData["ExistingCommentRatings"] = userCommentRatings;
+            }
+            else
+            {
+                ViewData["ExistingCommentRatings"] = new Dictionary<int, Rating>(); // Пустой словарь, если пользователь не аутентифицирован
+            }
 
-			var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			// Проверка: только автор поста или модератор могут редактировать
-			if (post.AuthorId != int.Parse(currentUserId) && !User.IsInRole("Модератор"))
-			{
-				return Forbid(); // Запрещаем доступ
-			}
+            return View(post);
+        }
 
-			return View(post);
-		}
-		// POST: Posts/Edit/5
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		[Authorize]
-		public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content")] Post post) // Убираем CreatedDate, AuthorId, IsHidden из Bind
-		{
-			if (id != post.Id)
-			{
-				return NotFound();
-			}
+        // GET: Posts/Create
+        // Отображает форму для создания нового поста.
+        public IActionResult Create()
+        {
+            // Здесь не нужно передавать AuthorId, так как он будет установлен на сервере
+            return View();
+        }
 
-			// Получаем существующий пост из базы данных для сохранения неизменяемых полей
-			var existingPost = await _context.Posts.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
-			if (existingPost == null || existingPost.IsHidden)
-			{
-				return NotFound();
-			}
+        // POST: Posts/Create
+        // Обрабатывает отправку формы для создания нового поста.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        // Исключаем AuthorId из привязки, чтобы он не приходил из формы
+        public async Task<IActionResult> Create([Bind("Title,Content,IsHidden")] Post post)
+        {
+            // Получаем ID текущего залогиненного пользователя
+            int? currentUserId = null;
+            if (User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
+                {
+                    currentUserId = parsedUserId;
+                }
+            }
 
-			var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			// Повторная проверка прав доступа, если пост был изменен другим способом до отправки формы
-			if (existingPost.AuthorId != int.Parse(currentUserId) && !User.IsInRole("Модератор"))
-			{
-				return Forbid();
-			}
+            if (!currentUserId.HasValue)
+            {
+                // Если пользователь не залогинен, можно перенаправить на страницу логина
+                // или добавить ошибку в ModelState
+                ModelState.AddModelError(string.Empty, "Вы должны быть залогинены, чтобы создать пост.");
+                return View(post);
+            }
 
-			if (ModelState.IsValid)
-			{
-				try
-				{
-					// Важно: переносим значения, которые не должны меняться из формы
-					post.AuthorId = existingPost.AuthorId;
-					post.CreatedDate = existingPost.CreatedDate;
-					post.IsHidden = existingPost.IsHidden; // Сохраняем текущее состояние IsHidden
-					post.IsEdited = true; // Отмечаем, что пост был отредактирован
-					post.LastEditedDate = DateTime.UtcNow; // Обновляем дату последнего редактирования
+            if (ModelState.IsValid)
+            {
+                post.AuthorId = currentUserId.Value; // Устанавливаем AuthorId из залогиненного пользователя
+                post.CreationDate = DateTime.UtcNow; // Устанавливаем дату создания
+                post.LastEditDate = null; // Дата последнего редактирования отсутствует, так как пост новый
+                post.Rating = 0; // Начальный рейтинг
 
-					_context.Update(post);
-					await _context.SaveChangesAsync();
-				}
-				catch (DbUpdateConcurrencyException)
-				{
-					if (!PostExists(post.Id))
-					{
-						return NotFound();
-					}
-					else
-					{
-						throw; // Повторно бросаем исключение, если это не ошибка "не найден"
-					}
-				}
-				return RedirectToAction(nameof(Index));
-			}
-			return View(post);
-		}
+                _context.Add(post); // Добавляем пост в контекст
+                await _context.SaveChangesAsync(); // Сохраняем изменения в базе данных
+                return RedirectToAction(nameof(Index)); // Перенаправляем на список постов
+            }
+            // Если модель невалидна, возвращаем форму с ошибками
+            return View(post);
+        }
 
-		// GET: Posts/Delete/5
-		[Authorize(Roles = "Модератор")] // Только модераторы могут удалять посты
-		public async Task<IActionResult> Delete(int? id)
-		{
-			if (id == null)
-			{
-				return NotFound();
-			}
+        // GET: Posts/Edit/5
+        // Отображает форму для редактирования существующего поста.
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-			var post = await _context.Posts.FirstOrDefaultAsync(m => m.Id == id);
-			if (post == null || post.IsHidden)
-			{
-				return NotFound();
-			}
+            var post = await _context.Posts.FindAsync(id); // Находим пост по Id
+            if (post == null)
+            {
+                return NotFound();
+            }
+            // Проверка на то, является ли текущий пользователь автором поста
+            int? currentUserId = null;
+            if (User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
+                {
+                    currentUserId = parsedUserId;
+                }
+            }
 
-			// Если вам нужно имя автора для представления удаления:
-			var author = await _userManager.FindByIdAsync(post.AuthorId.ToString());
-			ViewData["AuthorName"] = author?.UserName;
+            if (!currentUserId.HasValue || post.AuthorId != currentUserId.Value)
+            {
+                return Forbid(); // Или NotFound(), в зависимости от вашей логики доступа
+            }
 
-			// Дополнительная проверка на возможность удаления для автора (если нужно)
-			// var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			// if (post.AuthorId != int.Parse(currentUserId) && !User.IsInRole("Модератор"))
-			// {
-			//     return Forbid();
-			// }
+            return View(post);
+        }
 
-			return View(post);
-		}
+        // POST: Posts/Edit/5
+        // Обрабатывает отправку формы для редактирования поста.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        // Убедитесь, что все поля, которые могут быть изменены пользователем, включены.
+        // CreationDate, Id, AuthorId, Rating не должны меняться через форму редактирования.
+        // LastEditDate устанавливается здесь.
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content,IsHidden")] Post post)
+        {
+            if (id != post.Id) // Проверяем, совпадает ли Id из маршрута с Id модели
+            {
+                return NotFound();
+            }
 
-		// POST: Posts/Delete/5
-		[HttpPost, ActionName("Delete")] // Связываем с методом Delete (GET)
-		[ValidateAntiForgeryToken]
-		[Authorize(Roles = "Модератор")] // Только модераторы могут подтвердить удаление
-		public async Task<IActionResult> DeleteConfirmed(int id)
-		{
-			var post = await _context.Posts.FindAsync(id);
-			if (post != null)
-			{
-				// Физическое удаление (если IsHidden = true означает скрытие, то удалять не нужно)
-				_context.Posts.Remove(post); // Удаляем запись из базы данных
-				await _context.SaveChangesAsync();
-			}
-			return RedirectToAction(nameof(Index));
-		}
+            // Получаем ID текущего залогиненного пользователя
+            int? currentUserId = null;
+            if (User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
+                {
+                    currentUserId = parsedUserId;
+                }
+            }
 
-		private bool PostExists(int id)
-		{
-			return _context.Posts.Any(e => e.Id == id && !e.IsHidden);
-		}
-	}
+            // Загружаем существующий пост из базы данных для проверки AuthorId
+            var existingPost = await _context.Posts.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+            if (existingPost == null)
+            {
+                return NotFound();
+            }
+
+            // Проверяем, что текущий пользователь является автором поста
+            if (!currentUserId.HasValue || existingPost.AuthorId != currentUserId.Value)
+            {
+                return Forbid(); // Пользователь не имеет прав на редактирование этого поста
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    post.LastEditDate = DateTime.UtcNow; // Обновляем дату последнего редактирования
+                    post.CreationDate = existingPost.CreationDate; // Сохраняем оригинальную дату создания
+                    post.AuthorId = existingPost.AuthorId; // Сохраняем оригинального автора
+                    post.Rating = existingPost.Rating; // Сохраняем текущий рейтинг
+
+                    _context.Update(post); // Обновляем пост в контексте
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException) // Обработка конфликтов параллельного доступа
+                {
+                    if (!PostExists(post.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw; // Пробрасываем ошибку, если это не конфликт параллельного доступа
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            // Если модель невалидна, возвращаем форму с ошибками
+            return View(post);
+        }
+
+        // GET: Posts/Delete/5
+        // Отображает страницу подтверждения удаления поста.
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var post = await _context.Posts
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+            // Проверка на то, является ли текущий пользователь автором поста
+            int? currentUserId = null;
+            if (User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
+                {
+                    currentUserId = parsedUserId;
+                }
+            }
+
+            if (!currentUserId.HasValue || post.AuthorId != currentUserId.Value)
+            {
+                return Forbid(); // Или NotFound(), в зависимости от вашей логики доступа
+            }
+
+            // Получаем имя автора для отображения на странице удаления
+            var author = await _context.Users.FindAsync(post.AuthorId);
+            ViewData["AuthorName"] = author?.Login ?? "Неизвестный автор";
+
+            return View(post);
+        }
+
+        // POST: Posts/Delete/5
+        // Обрабатывает подтверждение удаления поста.
+        [HttpPost, ActionName("Delete")] // Указываем, что это POST-действие для маршрута Delete
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var post = await _context.Posts.FindAsync(id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            // Проверка на то, является ли текущий пользователь автором поста
+            int? currentUserId = null;
+            if (User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
+                {
+                    currentUserId = parsedUserId;
+                }
+            }
+
+            if (!currentUserId.HasValue || post.AuthorId != currentUserId.Value)
+            {
+                return Forbid(); // Пользователь не имеет прав на удаление этого поста
+            }
+
+            _context.Posts.Remove(post); // Удаляем пост из контекста
+            await _context.SaveChangesAsync(); // Сохраняем изменения
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Вспомогательный метод для проверки существования поста
+        private bool PostExists(int id)
+        {
+            return _context.Posts.Any(e => e.Id == id);
+        }
+    }
 }

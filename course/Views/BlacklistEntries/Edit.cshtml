@@ -1,0 +1,46 @@
+@model course.Models.BlacklistEntry
+
+@{
+    ViewData["Title"] = "Редактировать запись в черном списке";
+}
+
+<h1>Редактировать запись в черном списке</h1>
+
+<h4>Запись в черном списке</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="AdministratorId" /> @* Не меняем модератора из формы *@
+            <input type="hidden" asp-for="BlockDate" />     @* Не меняем дату блокировки из формы *@
+            <div class="form-group">
+                <label asp-for="UserId" class="control-label">ID заблокированного пользователя</label>
+                <input asp-for="UserId" class="form-control" />
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Reason" class="control-label"></label>
+                <input asp-for="Reason" class="form-control" />
+                <span asp-validation-for="Reason" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BlockDuration" class="control-label"></label>
+                <input asp-for="BlockDuration" class="form-control" />
+                <span asp-validation-for="BlockDuration" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Сохранить" class="btn btn-primary mt-2" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Вернуться к списку</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

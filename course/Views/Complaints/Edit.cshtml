@@ -1,0 +1,85 @@
+@model course.Models.Complaint
+@using course.Models
+
+@{
+    ViewData["Title"] = "Редактировать жалобу";
+    var complaintStatusDisplayName = new Dictionary<ComplaintStatus, string>
+    {
+        { ComplaintStatus.Pending, "Подана" },
+        { ComplaintStatus.InProgress, "Рассматривается" },
+        { ComplaintStatus.Resolved, "Решена" },
+        { ComplaintStatus.Rejected, "Отклонена" }
+    };
+}
+
+<h1>Редактировать жалобу</h1>
+
+<h4>Жалоба</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            @* These are hidden because they should not be changed from the form *@
+            <input type="hidden" asp-for="AuthorId" />
+            <input type="hidden" asp-for="PostId" />
+            <input type="hidden" asp-for="CommentId" />
+            <input type="hidden" asp-for="CreatedDate" />
+            @* HandledByModeratorId and ResolvedDate are set by the controller based on status *@
+            <input type="hidden" asp-for="AdministratorId" />
+            <input type="hidden" asp-for="ResolvedDate" />
+
+
+            <div class="form-group mb-2">
+                <label class="control-label">Автор жалобы:</label>
+                <input type="text" value="@ViewData["AuthorName"]" class="form-control" readonly />
+            </div>
+
+            <div class="form-group mb-2">
+                <label class="control-label">Относится к:</label>
+                @if (ViewData["RelatedContentType"] != null)
+                {
+                    var controller = ViewData["RelatedContentType"] as string;
+                    var action = "Details";
+                    var id = ViewData["RelatedContentId"];
+                    <a asp-controller="@controller" asp-action="@action" asp-route-id="@id" class="form-control-plaintext">@ViewData["RelatedContentTitle"]</a>
+                }
+                else
+                {
+                    <input type="text" value="Не указано" class="form-control-plaintext" readonly />
+                }
+            </div>
+
+            <div class="form-group mb-2">
+                <label asp-for="Reason" class="control-label"></label>
+                <textarea asp-for="Reason" class="form-control" rows="4" readonly></textarea> @* Reason is usually not editable by mods *@
+                <span asp-validation-for="Reason" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-2">
+                <label asp-for="Status" class="control-label"></label>
+                <select asp-for="Status" asp-items="Html.GetEnumSelectList<ComplaintStatus>()" class="form-control"></select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-2">
+                <label asp-for="ModeratorNotes" class="control-label"></label>
+                <textarea asp-for="ModeratorNotes" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="ModeratorNotes" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Сохранить" class="btn btn-primary mt-2" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Вернуться к списку жалоб</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

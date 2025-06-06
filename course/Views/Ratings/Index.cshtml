@@ -1,0 +1,65 @@
+@model IEnumerable<course.Models.Rating>
+@using course.Models
+
+@{
+    ViewData["Title"] = "Оценки";
+    var userNames = ViewData["UserNames"] as Dictionary<int, string>;
+    var postTitles = ViewData["PostTitles"] as Dictionary<int, string>;
+    var commentContents = ViewData["CommentContents"] as Dictionary<int, string>;
+}
+
+<h1>Оценки</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserId)
+            </th>
+            <th>
+                Относится к
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Value)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @if (userNames != null && userNames.ContainsKey(item.UserId))
+                    {
+                        @userNames[item.UserId]
+                    }
+                    else
+                    {
+                        <span>Неизвестный пользователь</span>
+                    }
+                </td>
+                <td>
+                    @if (item.PostId.HasValue && postTitles != null && postTitles.ContainsKey(item.PostId.Value))
+                    {
+                        <a asp-controller="Posts" asp-action="Details" asp-route-id="@item.PostId">Пост: @postTitles[item.PostId.Value]</a>
+                    }
+                    else if (item.CommentId.HasValue && commentContents != null && commentContents.ContainsKey(item.CommentId.Value))
+                    {
+                        <a asp-controller="Comments" asp-action="Details" asp-route-id="@item.CommentId">Комментарий: @commentContents[item.CommentId.Value]</a>
+                    }
+                    else
+                    {
+                        <span>Неизвестный контент</span>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Value)
+                </td>
+                <td>
+                    <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

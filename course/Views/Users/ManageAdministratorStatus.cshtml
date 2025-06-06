@@ -1,0 +1,72 @@
+@model course.Models.UserAdminStatusViewModel
+
+@{
+    ViewData["Title"] = $"Управление статусом администратора для {Model.UserName}";
+}
+
+<h1>Управление статусом администратора</h1>
+
+<h4>Пользователь: @Model.UserName (@Model.Email)</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="ManageAdministratorStatus">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="UserId" /> @* Id пользователя передается для контроллера *@
+
+            <div class="form-group form-check mb-3">
+                <input class="form-check-input" asp-for="IsAdministrator" id="isAdministratorCheckbox" />
+                <label class="form-check-label" asp-for="IsAdministrator"></label>
+            </div>
+
+            <div class="form-group mb-3" id="accessLevelGroup" style="@(Model.IsAdministrator ? "" : "display:none;")">
+                <label asp-for="AccessLevel" class="control-label"></label>
+                <input asp-for="AccessLevel" class="form-control" type="number" />
+                <span asp-validation-for="AccessLevel" class="text-danger"></span>
+            </div>
+
+            @if (Model.IsAdministrator && Model.AssignmentDate.HasValue)
+            {
+                <div class="form-group mb-3">
+                    <label asp-for="AssignmentDate" class="control-label"></label>
+                    <input asp-for="AssignmentDate" class="form-control" disabled /> @* Дата назначения не редактируется через эту форму *@
+                </div>
+            }
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Сохранить изменения" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Вернуться к списку пользователей</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const isAdministratorCheckbox = document.getElementById('isAdministratorCheckbox');
+            const accessLevelGroup = document.getElementById('accessLevelGroup');
+
+            // Функция для переключения видимости поля AccessLevel
+            function toggleAccessLevelVisibility() {
+                if (isAdministratorCheckbox.checked) {
+                    accessLevelGroup.style.display = 'block';
+                } else {
+                    accessLevelGroup.style.display = 'none';
+                    // Опционально: очистить значение AccessLevel, если флаг снят
+                    // document.getElementById('AccessLevel').value = '';
+                }
+            }
+
+            // Добавляем слушатель события на изменение состояния чекбокса
+            isAdministratorCheckbox.addEventListener('change', toggleAccessLevelVisibility);
+
+            // Вызываем функцию при загрузке страницы, чтобы установить начальное состояние
+            toggleAccessLevelVisibility();
+        });
+    </script>
+}

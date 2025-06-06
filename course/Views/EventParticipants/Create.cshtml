@@ -1,0 +1,49 @@
+@model course.Models.EventParticipant
+
+@{
+    ViewData["Title"] = "Добавить участника мероприятия";
+    var eventsSelectList = ViewBag.Events as SelectList;
+    var usersSelectList = ViewBag.Users as SelectList;
+}
+
+<h1>Добавить участника мероприятия</h1>
+
+<h4>Участник мероприятия</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group mb-3">
+                <label asp-for="EventId" class="control-label">Мероприятие</label>
+                <select asp-for="EventId" class="form-control" asp-items="@eventsSelectList">
+                    <option value="">-- Выберите мероприятие --</option>
+                </select>
+                <span asp-validation-for="EventId" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="UserId" class="control-label">Пользователь</label>
+                <select asp-for="UserId" class="form-control" asp-items="@usersSelectList">
+                    <option value="">-- Выберите пользователя --</option>
+                </select>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="ParticipationStatus" class="control-label"></label>
+                <input asp-for="ParticipationStatus" class="form-control" />
+                <span asp-validation-for="ParticipationStatus" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="Создать" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Вернуться к списку</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

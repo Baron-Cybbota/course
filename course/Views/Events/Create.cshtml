@@ -1,0 +1,56 @@
+@model course.Models.Event
+
+@{
+    ViewData["Title"] = "Создать мероприятие";
+    var boardGameSelectList = ViewBag.BoardGameId as SelectList;
+}
+
+<h1>Создать мероприятие</h1>
+
+<h4>Мероприятие</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group mb-3">
+                <label asp-for="BoardGameId" class="control-label">Настольная игра</label>
+                <select asp-for="BoardGameId" class="form-control" asp-items="@boardGameSelectList">
+                    <option value="">-- Выберите игру --</option>
+                </select>
+                <span asp-validation-for="BoardGameId" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Date" class="control-label"></label>
+                <input asp-for="Date" class="form-control" type="date" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Time" class="control-label"></label>
+                <input asp-for="Time" class="form-control" type="time" step="1" /> @* Добавлено step="1" для секунд *@
+                <span asp-validation-for="Time" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Location" class="control-label"></label>
+                <input asp-for="Location" class="form-control" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="Создать" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Вернуться к списку</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

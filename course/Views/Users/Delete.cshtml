@@ -1,0 +1,51 @@
+@model course.Models.User
+
+@{
+    ViewData["Title"] = "Удалить пользователя: " + Model.Login;
+}
+
+<h1>Удалить пользователя</h1>
+
+<h3>Вы уверены, что хотите удалить этого пользователя?</h3>
+<div>
+    <h4>@Model.Login</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Login)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Login)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.RegistrationDate)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.RegistrationDate)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.BlockStatus)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.BlockStatus)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Rating)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Rating)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">Вернуться к списку</a>
+    </form>
+</div>

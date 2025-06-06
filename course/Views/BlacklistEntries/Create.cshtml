@@ -1,0 +1,60 @@
+@model course.Models.BlacklistEntry
+
+@{
+    ViewData["Title"] = "Добавить в черный список";
+    // Получаем SelectList из ViewBag, которые должны быть заполнены в контроллере
+    var administratorsSelectList = ViewBag.AdministratorId as SelectList;
+    var usersSelectList = ViewBag.UserId as SelectList;
+}
+
+<h1>Добавить в черный список</h1>
+
+<h4>Запись в черном списке</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="AdministratorId" class="control-label">Администратор</label>
+                <select asp-for="AdministratorId" class="form-control" asp-items="@administratorsSelectList">
+                    <option value="">-- Выберите администратора --</option>
+                </select>
+                <span asp-validation-for="AdministratorId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="UserId" class="control-label">Пользователь для блокировки</label>
+                <select asp-for="UserId" class="form-control" asp-items="@usersSelectList">
+                    <option value="">-- Выберите пользователя --</option>
+                </select>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Reason" class="control-label"></label>
+                <textarea asp-for="Reason" class="form-control" rows="3"></textarea> @* Изменено на textarea для более длинной причины *@
+                <span asp-validation-for="Reason" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="BlockDuration" class="control-label"></label> @* Исправлено: ExpiryDate на BlockDuration *@
+                <input asp-for="BlockDuration" class="form-control" type="datetime-local" /> @* Тип input для DateTime? *@
+                <span asp-validation-for="BlockDuration" class="text-danger"></span> @* Исправлено: ExpiryDate на BlockDuration *@
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Добавить" class="btn btn-primary mt-2" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Вернуться к списку</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

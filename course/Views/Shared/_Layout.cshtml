@@ -1,55 +1,209 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="ru" class="h-100">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - course</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - BoardClassic</title> @* Обновлено название сайта *@
+    <link rel="icon" type="image/png" href="~/images/favicon.png" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/course.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100 pt-3"> @* ДОБАВЛЕНО: pt-3 для отступа от фиксированной навигации *@
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 fixed-top"> @* ДОБАВЛЕНО: fixed-top *@
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">course</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo-black.svg" alt="Логотип сайта" style="height: 50px; max-height: 50px; width: auto; margin-right: 8px; margin-left: 15px;" id="site-logo"> @* ДОБАВЛЕНО: max-height и width: auto для адаптивности *@
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item"></li>
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Posts" asp-action="Index">Посты</a> @* <-- ДОБАВЬТЕ ЭТУ СТРОКУ *@
-                        </li>
+                        @* Навигационные ссылки для аутентифицированных пользователей *@
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Главная</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Posts" asp-action="Index">Посты</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="BoardGames" asp-action="Index">Настольные Игры</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Events" asp-action="Index">Мероприятия</a>
+                            </li>
+                            @* Дополнительные ссылки, которые могут быть видны всем, или только аутентифицированным пользователям.
+                               Для управления видимостью на основе ролей используйте User.IsInRole("Administrator") и т.д. *@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Chats" asp-action="Index">Чаты</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Complaints" asp-action="Index">Жалобы</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Administrators" asp-action="Index">Администраторы</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Ratings" asp-action="Index">Оценки</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Пользователи</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="EventParticipants" asp-action="Index">Участники Мероприятий</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="BlacklistEntries" asp-action="Index">Черный Список</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="ChatMessages" asp-action="Index">Сообщения Чатов</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Comments" asp-action="Index">Комментарии</a>
+                            </li>
+                            @* Кнопка для открытия боковой панели на мобильных устройствах *@
+                            <li class="nav-item d-block d-lg-none"> @* Отображается только на экранах меньше lg *@
+                                <button class="nav-link btn btn-link text-dark d-flex align-items-center" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas" title="Последние мероприятия">
+                                    <i class="bi bi-calendar-event me-1"></i> Мероприятия @* Иконка мероприятия *@
+                                </button>
+                            </li>
+                        }
                     </ul>
+                    <div class="d-flex align-items-center">
+                        <ul class="navbar-nav">
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark d-flex align-items-center" asp-controller="Profile" asp-action="Index">
+                                        <i class="bi bi-person-circle me-1"></i> <strong>@User.Identity.Name</strong>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="form-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="nav-link btn btn-link text-dark">Выйти</button>
+                                    </form>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="btn btn-outline-primary me-2" asp-controller="Account" asp-action="Login">Вход</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="btn btn-primary" asp-controller="Account" asp-action="Register">Регистрация</a>
+                                </li>
+                            }
+                        </ul>
+                        
+                        @* Кнопка переключения темы *@
+                        <button id="theme-toggle" class="btn btn-outline-secondary ms-3" title="Переключить тему">
+                            <i class="bi bi-moon-fill" id="theme-icon"></i> @* Иконка луны для темной темы по умолчанию *@
+                        </button>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
+    <main class="flex-grow-1 mt-5"> @* ДОБАВЛЕНО: mt-5 для отступа основного контента от фиксированной навигации *@
+        <div class="container-fluid"> @* ИЗМЕНЕНО: container-fluid для использования всей ширины для сайдбара *@
+            <div class="row">
+                <div class="col-lg-2 d-none d-lg-block"> @* Боковая панель для больших экранов *@
+                    @await Component.InvokeAsync("LatestEvents") @* Вызов View Component *@
+                </div>
+                <div class="col-lg-10"> @* Основной контент *@
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-top text-muted mt-auto py-3">
         <div class="container">
-            &copy; 2025 - course - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; @DateTime.Now.Year - BoardClassic
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @* Bootstrap Offcanvas для мобильного бокового меню (последних мероприятий) *@
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sidebarOffcanvasLabel">Последние мероприятия</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            @await Component.InvokeAsync("LatestEvents")
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const body = document.body;
+            const navbar = document.querySelector('.navbar');
+            const siteLogo = document.getElementById('site-logo'); // Получаем элемент логотипа
+
+            // Функция для установки темы
+            function setTheme(theme) {
+                if (theme === 'dark') {
+                    body.classList.add('dark-theme');
+                    navbar.classList.remove('navbar-light', 'bg-white');
+                    navbar.classList.add('navbar-dark', 'bg-dark');
+                    themeIcon.classList.remove('bi-moon-fill');
+                    themeIcon.classList.add('bi-sun-fill');
+                    themeToggle.setAttribute('aria-label', 'Переключить на светлую тему');
+                    themeToggle.classList.remove('btn-outline-secondary');
+                    themeToggle.classList.add('btn-outline-light');
+                    siteLogo.src = '/images/logo-white.svg'; // Меняем логотип на белый для темной темы
+                } else {
+                    body.classList.remove('dark-theme');
+                    navbar.classList.remove('navbar-dark', 'bg-dark');
+                    navbar.classList.add('navbar-light', 'bg-white');
+                    themeIcon.classList.remove('bi-sun-fill');
+                    themeIcon.classList.add('bi-moon-fill');
+                    themeToggle.setAttribute('aria-label', 'Переключить на темную тему');
+                    themeToggle.classList.remove('btn-outline-light');
+                    themeToggle.classList.add('btn-outline-secondary');
+                    siteLogo.src = '/images/logo-black.svg'; // Меняем логотип на черный для светлой темы
+                }
+                localStorage.setItem('theme', theme);
+            }
+
+            // Проверяем сохраненную тему при загрузке страницы
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                // Если тема не сохранена, но система предпочитает темную
+                setTheme('dark');
+            } else {
+                // По умолчанию светлая тема
+                setTheme('light');
+            }
+
+            // Обработчик клика по кнопке
+            themeToggle.addEventListener('click', function () {
+                if (body.classList.contains('dark-theme')) {
+                    setTheme('light');
+                } else {
+                    setTheme('dark');
+                }
+            });
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 

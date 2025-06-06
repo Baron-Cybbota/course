@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Доступ запрещен";
+}
+
+<div class="container py-5 text-center">
+    <div class="alert alert-danger" role="alert">
+        <h1 class="alert-heading">Доступ запрещен</h1>
+        <p>У вас нет разрешения для доступа к этому ресурсу.</p>
+        <hr>
+        <p class="mb-0">Пожалуйста, свяжитесь с администратором, если считаете, что это ошибка.</p>
+    </div>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-primary mt-3">Вернуться на главную</a>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <form asp-action="Logout" asp-controller="Account" method="post" class="d-inline ms-2">
+            <button type="submit" class="btn btn-secondary mt-3">Выйти</button>
+        </form>
+    }
+</div>

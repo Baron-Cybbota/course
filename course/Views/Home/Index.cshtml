@@ -1,8 +1,242 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<course.Models.Post>
+@using course.Models
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims @* Убедитесь, что эта директива присутствует для User.Identity *@
+
+@{
+    ViewData["Title"] = "Главная страница";
+    var authorNames = ViewData["AuthorNames"] as Dictionary<int, string>;
+    var postRatings = ViewData["PostRatings"] as Dictionary<int, int>;
+    var commentCounts = ViewData["CommentCounts"] as Dictionary<int, int>;
+
+    // Инициализация пустых словарей для безопасности, если данные не были переданы из контроллера
+    postRatings ??= new Dictionary<int, int>();
+    commentCounts ??= new Dictionary<int, int>();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@* Hero Section - Отображается только если пользователь не аутентифицирован *@
+@if (!User.Identity?.IsAuthenticated ?? true)
+{
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">BoardClassic</h1>
+            <p class="hero-subtitle">Откройте для себя мир настольных приключений</p>
+            <div class="hero-cta">
+                <a asp-controller="Account" asp-action="Register" class="btn btn-gold">Начать путешествие</a> @* Перенаправление на регистрацию *@
+                <a asp-controller="Home" asp-action="About" class="btn btn-outline-light">Узнать больше</a> @* Перенаправление на страницу "О нас" *@
+            </div>
+        </div>
+    </div>
+}
+
+<div class="container mt-5">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h2 class="section-title">Популярные категории</h2>
+            <div class="category-grid">
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="bi bi-dice-5"></i>
+                    </div>
+                    <h3>Стратегии</h3>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h3>Для компании</h3>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="bi bi-hourglass"></i>
+                    </div>
+                    <h3>Классика</h3>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="bi bi-stars"></i>
+                    </div>
+                    <h3>Новинки</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="featured-games mb-5">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2>Игра месяца</h2>
+                <h3 class="game-title">Королевство мечей</h3>
+                <p class="game-description">Эпическая стратегия для 2-6 игроков с уникальным механиком строительства королевства и динамичными битвами.</p>
+                <div class="game-rating">
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-half"></i>
+                    <span>4.7/5</span>
+                </div>
+                <a href="#" class="btn btn-gold">Подробнее</a>
+            </div>
+            <div class="col-md-6">
+                <div class="game-preview">
+                    <div class="game-image"></div>
+                    <div class="game-badge">Лучший выбор</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h2 class="section-title">Последние обзоры</h2>
+            <div class="review-slider">
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar" style="background-image: url('https://via.placeholder.com/50')"></div>
+                        <div class="review-author">
+                            <h4>Алексей В.</h4>
+                            <div class="review-rating">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        <p>"Отличная игра для вечера с друзьями. Механики простые, но глубина стратегии впечатляет."</p>
+                    </div>
+                    <div class="review-game">Колонизаторы</div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar" style="background-image: url('https://via.placeholder.com/50')"></div>
+                        <div class="review-author">
+                            <h4>Марина К.</h4>
+                            <div class="review-rating">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        <p>"Потрясающая атмосфера и качество компонентов. Идеально для любителей фэнтези."</p>
+                    </div>
+                    <div class="review-game">Архипелаг</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="newsletter-box">
+                <h3>Подпишитесь на новости</h3>
+                <p>Получайте информацию о новых играх, акциях и игровых вечерах</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Ваш email" class="form-control">
+                    <button type="submit" class="btn btn-gold">Подписаться</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="community-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="section-title">Сообщество</h2>
+                <div class="community-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">5,000+</div>
+                        <div class="stat-label">Игроков</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">300+</div>
+                        <div class="stat-label">Игр в каталоге</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Игровых мероприятий</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="section-title text-center mb-4">Последние посты</h2>
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    Пока нет опубликованных постов. Будьте первым!
+                </div>
+            }
+            else
+            {
+                @foreach (var post in Model)
+                {
+                    // Получаем суммарный рейтинг и количество комментариев из ViewData
+                    var totalPostRating = postRatings.TryGetValue(post.Id, out int rating) ? rating : 0;
+                    var commentCount = commentCounts.TryGetValue(post.Id, out int count) ? count : 0;
+
+                    <div class="card post-card mb-4">
+                        <div class="card-body">
+                            <h3 class="card-title post-title">
+                                @Html.DisplayFor(modelItem => post.Title)
+                            </h3>
+                            <div class="post-meta mb-3">
+                                <i class="bi bi-person-circle"></i>
+                                Опубликовано:
+                                @if (authorNames != null && authorNames.ContainsKey(post.AuthorId))
+                                {
+                                    <a asp-controller="Users" asp-action="Details" asp-route-id="@post.AuthorId" class="post-author">
+                                        <strong>@authorNames[post.AuthorId]</strong>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <strong class="post-author">Неизвестный автор</strong>
+                                }
+                                <span class="post-date">(от @post.CreationDate.ToString("dd.MM.yyyy в HH:mm"))</span>
+
+                                @if (post.LastEditDate.HasValue) @* Проверяем наличие даты последнего редактирования *@
+                                {
+                                    <br />
+                                    <small class="post-edited-info">
+                                        <i class="bi bi-pencil-square"></i> Изменено: @post.LastEditDate.Value.ToString("dd.MM.yyyy в HH:mm")
+                                    </small>
+                                }
+                            </div>
+                            <p class="card-text post-content">
+                                @Html.Raw(post.Content.Length > 300 ? post.Content.Substring(0, 300) + "..." : post.Content)
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <div class="btn-group">
+                                    <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.Id" class="btn btn-primary post-readmore-btn">
+                                        Читать далее <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                                <small class="post-stats">
+                                    <span class="@(totalPostRating > 0 ? "text-success" : (totalPostRating < 0 ? "text-danger" : "text-muted"))">
+                                        <i class="bi bi-hand-thumbs-up-fill me-1"></i> @(totalPostRating > 0 ? "+" : "")@totalPostRating
+                                    </span>
+                                    <i class="bi bi-chat-dots-fill ms-3 me-1"></i> @commentCount комментариев
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
 </div>

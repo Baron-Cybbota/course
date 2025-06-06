@@ -1,0 +1,83 @@
+@model course.Models.BoardGame
+
+@{
+    ViewData["Title"] = "Удалить игру: " + Model.Title;
+}
+
+<h1>Удалить игру</h1>
+
+<h3>Вы уверены, что хотите удалить эту настольную игру?</h3>
+<div>
+    <h4>@Model.Title</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.ReleaseYear)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ReleaseYear)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.MinPlayers)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.MinPlayers)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.MaxPlayers)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.MaxPlayers)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.AveragePlayTime)
+        </dt>
+        <dd class="col-sm-9">
+            @(Model.AveragePlayTime.HasValue ? Model.AveragePlayTime.Value.ToString(@"hh\:mm") : "N/A")
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Genre)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Genre)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Difficulty)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Difficulty)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.ImageUrl)
+        </dt>
+        <dd class="col-sm-9">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" alt="Обложка игры @Model.Title" class="img-fluid rounded" style="max-width: 250px; height: auto;"
+                     onerror="this.onerror=null;this.src='https://placehold.co/250x250/cccccc/333333?text=Нет+изображения';" />
+            }
+            else
+            {
+                <img src="https://placehold.co/250x250/cccccc/333333?text=Нет+изображения" alt="Нет изображения" class="img-fluid rounded" style="max-width: 250px; height: auto;" />
+            }
+        </dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">Вернуться к списку</a>
+    </form>
+</div>

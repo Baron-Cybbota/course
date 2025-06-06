@@ -1,0 +1,91 @@
+@model course.Models.UserAdminStatusViewModel
+
+@{
+    ViewData["Title"] = $"Управление статусом администратора для {Model.UserName}";
+}
+
+<h1>Управление статусом администратора для @Model.UserName</h1>
+
+<h4>Email: @Model.Email</h4>
+<hr />
+
+@* Отображение сообщений об успехе/ошибке *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success mt-3">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger mt-3">@TempData["ErrorMessage"]</div>
+}
+
+@* Отображение ошибок валидации *@
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger mt-3">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="ManageAdministratorStatus" asp-controller="Users" method="post">
+    @* Скрытые поля для передачи ID пользователя обратно в контроллер *@
+    <input type="hidden" asp-for="UserId" />
+
+    <div class="form-group mb-3">
+        <div class="form-check">
+            <input type="checkbox" asp-for="IsAdministrator" class="form-check-input" />
+            <label class="form-check-label" asp-for="IsAdministrator"></label>
+        </div>
+    </div>
+
+    <div id="accessLevelSection" class="form-group mb-3" style="display: @(Model.IsAdministrator ? "block" : "none");">
+        <label asp-for="AccessLevel" class="control-label"></label>
+        <input asp-for="AccessLevel" class="form-control" type="number" min="1" />
+        <span asp-validation-for="AccessLevel" class="text-danger"></span>
+    </div>
+
+    @if (Model.IsAdministrator && Model.AssignmentDate.HasValue)
+    {
+        <div class="form-group mb-3">
+            <label asp-for="AssignmentDate" class="control-label"></label>
+            <input asp-for="AssignmentDate" class="form-control" readonly />
+        </div>
+    }
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        <a asp-action="Index" asp-controller="Users" class="btn btn-secondary ms-2">Отмена</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var isAdministratorCheckbox = document.getElementById('IsAdministrator');
+            var accessLevelSection = document.getElementById('accessLevelSection');
+
+            function toggleAccessLevelSection() {
+                if (isAdministratorCheckbox.checked) {
+                    accessLevelSection.style.display = 'block';
+                } else {
+                    accessLevelSection.style.display = 'none';
+                    // Очищаем AccessLevel, когда пользователь не администратор,
+                    // чтобы он не отправлялся с некорректным значением.
+                    document.getElementById('AccessLevel').value = '';
+                }
+            }
+
+            isAdministratorCheckbox.addEventListener('change', toggleAccessLevelSection);
+
+            // Вызываем при загрузке страницы, чтобы установить правильное состояние
+            toggleAccessLevelSection();
+        });
+    </script>
+}

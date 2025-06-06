@@ -1,0 +1,49 @@
+@model course.Models.Event
+
+@{
+    ViewData["Title"] = "Детали мероприятия: " + ViewData["BoardGameTitle"];
+    var boardGameTitle = ViewData["BoardGameTitle"] as string;
+}
+
+<h1>Детали мероприятия</h1>
+
+<div>
+    <h4>Мероприятие</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            Настольная игра
+        </dt>
+        <dd class="col-sm-9">
+            @boardGameTitle
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Date)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Date)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Time)
+        </dt>
+        <dd class="col-sm-9">
+            @Model.Time.ToString(@"hh\:mm")
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Location)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Location)
+        </dd>
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактировать</a> |
+    <a asp-action="Index" class="btn btn-secondary">Вернуться к списку</a>
+</div>

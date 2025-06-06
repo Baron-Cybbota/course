@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "lMMux0m8PI8=",
+  "dgSpecHash": "7y+4xaIbKbc=",
   "success": true,
   "projectFilePath": "D:\\College\\course\\course\\course.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Barob_Cybbota\\.nuget\\packages\\bcrypt.net-core\\1.6.0\\bcrypt.net-core.1.6.0.nupkg.sha512",
     "C:\\Users\\Barob_Cybbota\\.nuget\\packages\\humanizer\\2.14.1\\humanizer.2.14.1.nupkg.sha512",
     "C:\\Users\\Barob_Cybbota\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Barob_Cybbota\\.nuget\\packages\\humanizer.core.af\\2.14.1\\humanizer.core.af.2.14.1.nupkg.sha512",
