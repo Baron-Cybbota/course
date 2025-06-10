@@ -1,5 +1,6 @@
 @model course.Models.Post
 @using Microsoft.EntityFrameworkCore
+@using System.Security.Claims // Убедитесь, что эта директива присутствует для User.Identity
 
 @{
     ViewData["Title"] = Model.Title;
@@ -15,7 +16,7 @@
     var existingPostRating = ViewData["ExistingPostRating"] as course.Models.Rating;
     var currentUserId = ViewData["CurrentUserId"] as int?; // ID текущего пользователя, если есть
     var existingCommentRatings = ViewData["ExistingCommentRatings"] as Dictionary<int, course.Models.Rating>;
-    var isCurrentUserAuthor = currentUserId.HasValue && Model.IdUser == currentUserId.Value; // Corrected: Model.IdUser
+    var isCurrentUserAuthor = currentUserId.HasValue && Model.IdUser == currentUserId.Value;
     var isCurrentUserAdminOrModerator = ViewData["IsUserAdminOrModerator"] as bool? ?? false; // Assuming this is passed from controller
 
     // Устанавливаем значения по умолчанию, если они не были вычислены (хотя контроллер должен их всегда предоставлять)
@@ -38,105 +39,84 @@
         <div class="card-body">
             <h2 class="card-title mb-4 border-bottom pb-2">Содержание поста</h2>
             <div class="post-content-container">
-                @Html.Raw(Model.Content) @* Используйте @Html.Raw для отображения HTML-контента *@
+                @Html.Raw(Model.Content)
             </div>
 
-            @* BEGIN - Rating section moved here *@
             <hr class="my-4"/>
             <div class="post-rating-section">
-                <h6 class="mb-3 text-center text-muted">Оценка поста</h6>
-                <div class="d-flex align-items-center justify-content-center flex-wrap gap-3 mb-3">
-                    @if (currentUserId.HasValue)
+    <h6 class="mb-3 text-center text-muted">Оценка поста</h6>
+    <div class="d-flex align-items-center justify-content-center flex-wrap gap-3 mb-3">
+        @if (currentUserId.HasValue)
+        {
+            @* Cannot rate own post, unless the previous logic allowed it.
+                This condition `!isCurrentUserAuthor` now allows rating if it's NOT the author.
+                If you want to allow authors to rate their posts, remove `!isCurrentUserAuthor`. *@
+            @if (!isCurrentUserAuthor)
+            {
+                <div id="user-post-rating-controls-@Model.IdPost" data-post-id="@Model.IdPost" class="d-flex align-items-center gap-2"> @* Added d-flex, align-items-center, gap-2 here *@
+                    @if (existingPostRating == null)
                     {
-                        if (!isCurrentUserAuthor) @* Нельзя оценить свой пост *@
-                        {
-                            if (existingPostRating == null)
-                            {
-                                <span class="me-2 text-muted">Ваша оценка:</span>
-                                <form asp-controller="Posts" asp-action="Vote" method="post" class="d-inline-flex gap-2">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="postId" value="@Model.IdPost" /> @* Corrected: Model.IdPost *@
-                                    <input type="hidden" name="voteType" value="up" />
-                                    <button type="submit" class="btn btn-success btn-sm" title="Понравилось">
-                                        <i class="bi bi-hand-thumbs-up-fill me-1"></i> +1
-                                    </button>
-                                </form>
-                                <form asp-controller="Posts" asp-action="Vote" method="post" class="d-inline-flex gap-2">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="postId" value="@Model.IdPost" /> @* Corrected: Model.IdPost *@
-                                    <input type="hidden" name="voteType" value="down" />
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Не понравилось">
-                                        <i class="bi bi-hand-thumbs-down-fill me-1"></i> -1
-                                    </button>
-                                </form>
-                            }
-                            else
-                            {
-                                <p class="mb-0 fs-6 me-2">
-                                    Вы уже оценили этот пост:
-                                    <strong class="@(existingPostRating.Value ? "text-success" : "text-danger")">
-                                        @(existingPostRating.Value ? "+1" : "-1")
-                                    </strong>
-                                </p>
-                                <form asp-controller="Posts" asp-action="Vote" method="post" class="d-inline-flex">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="postId" value="@Model.IdPost" /> @* Corrected: Model.IdPost *@
-                                    <input type="hidden" name="voteType" value="@(existingPostRating.Value ? "down" : "up")" /> @* Toggles the vote type *@
-                                    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Изменить оценку">
-                                        <i class="bi bi-arrow-repeat me-1"></i> Изменить
-                                    </button>
-                                </form>
-                            }
-                        }
-                        else
-                        {
-                            <p class="mb-0 text-muted">Вы не можете оценить свой собственный пост.</p>
-                        }
+                        <span class="text-muted">Ваша оценка:</span>
+                        <button type="button" class="btn btn-success btn-sm vote-post-btn" data-post-id="@Model.IdPost" data-vote-type="up" title="Понравилось">
+                            <i class="bi bi-hand-thumbs-up-fill me-1"></i> +1
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm vote-post-btn" data-post-id="@Model.IdPost" data-vote-type="down" title="Не понравилось">
+                            <i class="bi bi-hand-thumbs-down-fill me-1"></i> -1
+                        </button>
                     }
                     else
                     {
-                        <p class="mb-0">Чтобы оценить пост, пожалуйста, <a asp-controller="Account" asp-action="Login" class="text-decoration-none">войдите</a>.</p>
+                        <p class="mb-0 fs-6"> @* Removed me-2 from here, added to span below *@
+                            Вы уже оценили этот пост:
+                            <strong class="@(existingPostRating.Value ? "text-success" : "text-danger")" id="user-post-vote-value-@Model.IdPost">
+                                @(existingPostRating.Value ? "+1" : "-1")
+                            </strong>
+                        </p>
+                        <button type="button" class="btn btn-outline-secondary btn-sm vote-post-btn" data-post-id="@Model.IdPost" data-vote-type="@(existingPostRating.Value ? "down" : "up")" title="Изменить оценку">
+                            <i class="bi bi-arrow-repeat me-1"></i> Изменить
+                        </button>
                     }
                 </div>
+            }
+            else
+            {
+                <p class="mb-0 text-muted">Вы не можете оценить свой собственный пост.</p>
+            }
+        }
+        else
+        {
+            <p class="mb-0">Чтобы оценить пост, пожалуйста, <a asp-controller="Account" asp-action="Login" class="text-decoration-none">войдите</a>.</p>
+        }
+    </div>
 
-                <p class="fs-5 fw-bold text-center mb-0">
-                    Общий рейтинг:
-                    <strong class="@(totalPostRating > 0 ? "text-success" : (totalPostRating < 0 ? "text-danger" : "text-muted"))">
-                        @(totalPostRating > 0 ? "+" : "")@totalPostRating
-                    </strong>
-                    <span class="text-muted fs-6 ms-2">(@postRatingsCount оценок)</span>
-                </p>
+    <p class="fs-5 fw-bold text-center mb-0 d-flex justify-content-center align-items-center flex-wrap gap-2"> @* Added d-flex, justify-content-center, align-items-center, flex-wrap, gap-2 here *@
+        Общий рейтинг:
+        <strong id="post-total-rating-display-@Model.IdPost" class="@(totalPostRating > 0 ? "text-success" : (totalPostRating < 0 ? "text-danger" : "text-muted"))">
+            @(totalPostRating > 0 ? "+" : "")@totalPostRating
+        </strong>
+        <span class="text-muted fs-6" id="post-ratings-count-display-@Model.IdPost">(@postRatingsCount оценок)</span> @* Removed ms-2 here, gap handles spacing *@
+    </p>
 
-                @* Сообщения об успехе/ошибке для рейтинга поста (TempData) *@
-                @if (TempData["ErrorMessage"] != null)
-                {
-                    <div class="alert alert-danger mt-3 mb-0">@TempData["ErrorMessage"]</div>
-                }
-                @if (TempData["Message"] != null)
-                {
-                    <div class="alert alert-success mt-3 mb-0">@TempData["Message"]</div>
-                }
-            </div>
-            @* END - Rating section moved here *@
+    @* Dynamic messages will be handled by JavaScript *@
+    <div id="post-vote-message-@Model.IdPost" class="mt-3 mb-0" style="display:none;"></div>
+</div>
         </div>
     </div>
 
-    <div class="d-flex flex-wrap gap-3 mb-5 justify-content-center"> @* Added justify-content-center for better button alignment *@
-        @* Логика доступа: Кнопки редактировать и удалить только для автора или админа/модератора *@
+    <div class="d-flex flex-wrap gap-3 mb-5 justify-content-center">
         @if (isCurrentUserAuthor || isCurrentUserAdminOrModerator)
         {
-            <a asp-action="Edit" asp-route-id="@Model.IdPost" class="btn btn-primary btn-lg custom-button-width"> @* Corrected: Model.IdPost *@
+            <a asp-action="Edit" asp-route-id="@Model.IdPost" class="btn btn-primary btn-lg custom-button-width">
                 <i class="bi bi-pencil-fill me-2"></i> Редактировать
             </a>
-            <a asp-action="Delete" asp-route-id="@Model.IdPost" class="btn btn-danger btn-lg custom-button-width"> @* Corrected: Model.IdPost *@
+            <a asp-action="Delete" asp-route-id="@Model.IdPost" class="btn btn-danger btn-lg custom-button-width">
                 <i class="bi bi-trash-fill me-2"></i> Удалить
             </a>
         }
-        
-        @* Кнопка "Пожаловаться" для всех, кроме автора и админа/модератора (или если пользователь не автор) *@
+
         @if (currentUserId.HasValue && !isCurrentUserAuthor && !isCurrentUserAdminOrModerator)
         {
-            <a asp-controller="Complaints" asp-action="Create" asp-route-postId="@Model.IdPost" class="btn btn-outline-warning btn-lg custom-button-width"> @* Corrected: Model.IdPost *@
+            <a asp-controller="Complaints" asp-action="Create" asp-route-postId="@Model.IdPost" class="btn btn-outline-warning btn-lg custom-button-width">
                 <i class="bi bi-flag-fill me-2"></i> Пожаловаться на пост
             </a>
         }
@@ -150,18 +130,18 @@
         {
             @foreach (var comment in comments)
             {
-                var currentCommentTotalRating = commentTotalRatings != null && commentTotalRatings.ContainsKey(comment.IdComment) ? commentTotalRatings[comment.IdComment] : 0; @* Corrected: comment.IdComment *@
-                var currentCommentRatingsCount = commentRatingsCounts != null && commentRatingsCounts.ContainsKey(comment.IdComment) ? commentRatingsCounts[comment.IdComment] : 0; @* Corrected: comment.IdComment *@
-                var existingUserCommentRating = existingCommentRatings != null && existingCommentRatings.ContainsKey(comment.IdComment) ? existingCommentRatings[comment.IdComment] : null; @* Corrected: comment.IdComment *@
-                var isCommentAuthor = currentUserId.HasValue && comment.IdUser == currentUserId.Value; @* Corrected: comment.IdUser *@
+                var currentCommentTotalRating = commentTotalRatings != null && commentTotalRatings.ContainsKey(comment.IdComment) ? commentTotalRatings[comment.IdComment] : 0;
+                var currentCommentRatingsCount = commentRatingsCounts != null && commentRatingsCounts.ContainsKey(comment.IdComment) ? commentRatingsCounts[comment.IdComment] : 0;
+                var existingUserCommentRating = existingCommentRatings != null && existingCommentRatings.ContainsKey(comment.IdComment) ? existingCommentRatings[comment.IdComment] : null;
+                var isCommentAuthor = currentUserId.HasValue && comment.IdUser == currentUserId.Value;
 
-                <div class="card mb-3 shadow-sm comment-card-custom">
+                <div class="card mb-3 shadow-sm comment-card-custom" id="comment-card-@comment.IdComment">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h5 class="card-title mb-0">
-                                @if (commentAuthors != null && commentAuthors.ContainsKey(comment.IdUser)) @* Corrected: comment.IdUser *@
+                                @if (commentAuthors != null && commentAuthors.ContainsKey(comment.IdUser))
                                 {
-                                    <strong class="comment-author-name">@commentAuthors[comment.IdUser]</strong> @* Corrected: comment.IdUser *@
+                                    <strong class="comment-author-name">@commentAuthors[comment.IdUser]</strong>
                                 }
                                 else
                                 {
@@ -177,88 +157,75 @@
                         <p class="card-text comment-content-text">@comment.Content</p>
 
                         <div class="d-flex flex-wrap gap-2 mb-2">
-                            @* Редактировать и Удалить комментарий: Только автор комментария или админ/модератор *@
                             @if (isCommentAuthor || isCurrentUserAdminOrModerator)
                             {
-                                <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.IdComment" class="btn btn-sm btn-outline-primary" title="Редактировать"> @* Corrected: comment.IdComment *@
+                                <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.IdComment" class="btn btn-sm btn-outline-primary" title="Редактировать">
                                     <i class="bi bi-pencil-fill"></i> <span class="d-none d-md-inline">Редактировать</span>
                                 </a>
-                                <a asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.IdComment" class="btn btn-sm btn-outline-danger" title="Удалить"> @* Corrected: comment.IdComment *@
+                                <a asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.IdComment" class="btn btn-sm btn-outline-danger" title="Удалить">
                                     <i class="bi bi-trash-fill"></i> <span class="d-none d-md-inline">Удалить</span>
                                 </a>
                             }
-                            
-                            @* Пожаловаться на комментарий: Всем, кроме автора комментария и админа/модератора (или если пользователь не автор) *@
+
                             @if (currentUserId.HasValue && !isCommentAuthor && !isCurrentUserAdminOrModerator)
                             {
-                                <a asp-controller="Complaints" asp-action="Create" asp-route-commentId="@comment.IdComment" class="btn btn-sm btn-outline-warning ms-auto" title="Пожаловаться"> @* Corrected: comment.IdComment *@
+                                <a asp-controller="Complaints" asp-action="Create" asp-route-commentId="@comment.IdComment" class="btn btn-sm btn-outline-warning ms-auto" title="Пожаловаться">
                                     <i class="bi bi-flag-fill"></i> <span class="d-none d-md-inline">Пожаловаться</span>
                                 </a>
                             }
                         </div>
 
                         <h6 class="mt-3 mb-2 small-heading text-muted">Оценка комментария:</h6>
-                        @if (currentUserId.HasValue)
-                        {
-                            if (!isCommentAuthor) @* Нельзя оценить свой комментарий *@
+                        <div class="d-flex align-items-center flex-wrap gap-2">
+                            @if (currentUserId.HasValue)
                             {
-                                <div class="rating-form-section mb-2 d-flex align-items-center flex-wrap gap-2">
-                                    @if (existingUserCommentRating == null)
-                                    {
-                                        <span class="me-2 text-muted">Ваша оценка:</span>
-                                        <form asp-controller="Comments" asp-action="Vote" method="post" class="d-inline-flex gap-2">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="commentId" value="@comment.IdComment" /> @* Corrected: comment.IdComment *@
-                                            <input type="hidden" name="voteType" value="up" />
-                                            <button type="submit" class="btn btn-success btn-sm" title="Понравилось">
+                                @* Cannot rate own comment *@
+                                @if (!isCommentAuthor)
+                                {
+                                    <div id="user-comment-rating-controls-@comment.IdComment" data-comment-id="@comment.IdComment">
+                                        @if (existingUserCommentRating == null)
+                                        {
+                                            <span class="me-2 text-muted">Ваша оценка:</span>
+                                            <button type="button" class="btn btn-success btn-sm vote-comment-btn" data-comment-id="@comment.IdComment" data-vote-type="up" title="Понравилось">
                                                 <i class="bi bi-hand-thumbs-up-fill"></i> +1
                                             </button>
-                                        </form>
-                                        <form asp-controller="Comments" asp-action="Vote" method="post" class="d-inline-flex gap-2">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="commentId" value="@comment.IdComment" /> @* Corrected: comment.IdComment *@
-                                            <input type="hidden" name="voteType" value="down" />
-                                            <button type="submit" class="btn btn-danger btn-sm" title="Не понравилось">
+                                            <button type="button" class="btn btn-danger btn-sm vote-comment-btn" data-comment-id="@comment.IdComment" data-vote-type="down" title="Не понравилось">
                                                 <i class="bi bi-hand-thumbs-down-fill"></i> -1
                                             </button>
-                                        </form>
-                                    }
-                                    else
-                                    {
-                                        <p class="mb-0">
-                                            Вы уже оценили этот комментарий:
-                                            <strong class="@(existingUserCommentRating.Value ? "text-success" : "text-danger")">
-                                                @(existingUserCommentRating.Value ? "+1" : "-1")
-                                            </strong>
-                                        </p>
-                                        <form asp-controller="Comments" asp-action="Vote" method="post" class="d-inline-flex ms-2">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="commentId" value="@comment.IdComment" /> @* Corrected: comment.IdComment *@
-                                            <input type="hidden" name="voteType" value="@(existingUserCommentRating.Value ? "down" : "up")" /> @* Toggles the vote type *@
-                                            <button type="submit" class="btn btn-outline-secondary btn-sm" title="Изменить оценку">
+                                        }
+                                        else
+                                        {
+                                            <p class="mb-0">
+                                                Вы уже оценили этот комментарий:
+                                                <strong class="@(existingUserCommentRating.Value ? "text-success" : "text-danger")" id="user-comment-vote-value-@comment.IdComment">
+                                                    @(existingUserCommentRating.Value ? "+1" : "-1")
+                                                </strong>
+                                            </p>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm vote-comment-btn" data-comment-id="@comment.IdComment" data-vote-type="@(existingUserCommentRating.Value ? "down" : "up")" title="Изменить оценку">
                                                 <i class="bi bi-arrow-repeat"></i> Изменить
                                             </button>
-                                        </form>
-                                    }
-                                </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="mb-2 text-muted">Вы не можете оценить свой собственный комментарий.</p>
+                                }
                             }
                             else
                             {
-                                <p class="mb-2 text-muted">Вы не можете оценить свой собственный комментарий.</p>
+                                <p class="mb-2">Чтобы оценить комментарий, <a asp-controller="Account" asp-action="Login" class="text-decoration-none">войдите</a>.</p>
                             }
-                        }
-                        else
-                        {
-                            <p class="mb-2">Чтобы оценить комментарий, <a asp-controller="Account" asp-action="Login" class="text-decoration-none">войдите</a>.</p>
-                        }
+                        </div>
 
                         <p class="mt-1 mb-0 fs-5 fw-bold">
                             Рейтинг комментария:
-                            <strong class="@(currentCommentTotalRating > 0 ? "text-success" : (currentCommentTotalRating < 0 ? "text-danger" : "text-muted"))">
+                            <strong id="comment-total-rating-display-@comment.IdComment" class="@(currentCommentTotalRating > 0 ? "text-success" : (currentCommentTotalRating < 0 ? "text-danger" : "text-muted"))">
                                 @(currentCommentTotalRating > 0 ? "+" : "")@currentCommentTotalRating
                             </strong>
-                            <span class="text-muted fs-6 ms-2">(@currentCommentRatingsCount оценок)</span>
+                            <span class="text-muted fs-6 ms-2" id="comment-ratings-count-display-@comment.IdComment">(@currentCommentRatingsCount оценок)</span>
                         </p>
+                        <div id="comment-vote-message-@comment.IdComment" class="mt-2 mb-0" style="display:none;"></div>
                     </div>
                 </div>
             }
@@ -279,10 +246,10 @@
                 <form asp-controller="Comments" asp-action="Create" method="post">
                     @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                    <input type="hidden" name="PostId" value="@Model.IdPost" /> @* Corrected: Model.IdPost *@
-                    <input type="hidden" name="IdUser" value="@currentUserId.Value" /> @* Corrected: name="IdUser" *@
+                    <input type="hidden" name="PostId" value="@Model.IdPost" />
+                    <input type="hidden" name="IdUser" value="@currentUserId.Value" />
                     <div class="mb-3">
-                        <label for="Content" class="form-label visually-hidden">Ваш комментарий</label> @* Visually hidden for accessibility, input has placeholder *@
+                        <label for="Content" class="form-label visually-hidden">Ваш комментарий</label>
                         <textarea name="Content" class="form-control" rows="5" placeholder="Напишите свой комментарий здесь..." required></textarea>
                         <span data-valmsg-for="Content" class="text-danger d-block mt-1"></span>
                     </div>
@@ -306,8 +273,236 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // No specific JS for dynamic theming needed here, as CSS handles most of it.
-            // The theme toggle logic should primarily reside in _Layout.cshtml if it affects the entire body.
+
+            // Helper to get Anti-Forgery Token
+            function getAntiForgeryToken() {
+                const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+                return tokenElement ? tokenElement.value : null;
+            }
+
+            // Function to show a dynamic message (success/error)
+            function showMessage(containerId, message, type = 'success') {
+                const container = document.getElementById(containerId);
+                if (container) {
+                    container.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+                    container.style.display = 'block';
+                    setTimeout(() => {
+                        const alert = container.querySelector('.alert');
+                        if (alert) {
+                            new bootstrap.Alert(alert).close();
+                        }
+                    }, 5000); // Message disappears after 5 seconds
+                }
+            }
+
+            // --- Post Voting Logic ---
+            document.querySelectorAll('.vote-post-btn').forEach(button => {
+                button.addEventListener('click', async function (event) {
+                    const postId = this.dataset.postId;
+                    const voteType = this.dataset.voteType;
+                    const messageContainerId = `post-vote-message-${postId}`;
+
+                    try {
+                        const response = await fetch(`/Posts/Vote?postId=${postId}&voteType=${voteType}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': getAntiForgeryToken()
+                            }
+                        });
+
+                        if (!response.ok) {
+                            if (response.status === 401 || response.status === 403) { // Unauthorized or Forbidden
+                                const result = await response.json();
+                                if (result.redirectTo) {
+                                    window.location.href = result.redirectTo; // Redirect to login
+                                    return;
+                                }
+                            }
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            // Update total post rating and count
+                            const totalRatingElement = document.getElementById(`post-total-rating-display-${postId}`);
+                            const ratingsCountElement = document.getElementById(`post-ratings-count-display-${postId}`);
+
+                            if (totalRatingElement) {
+                                totalRatingElement.textContent = (result.newRating > 0 ? "+" : "") + result.newRating;
+                                totalRatingElement.classList.remove('text-success', 'text-danger', 'text-muted');
+                                if (result.newRating > 0) totalRatingElement.classList.add('text-success');
+                                else if (result.newRating < 0) totalRatingElement.classList.add('text-danger');
+                                else totalRatingElement.classList.add('text-muted');
+                            }
+                            if (ratingsCountElement) {
+                                ratingsCountElement.textContent = `(${result.newRatingsCount} оценок)`;
+                            }
+
+                            // Update user's personal vote status
+                            const userRatingContainer = document.getElementById(`user-post-rating-controls-${postId}`);
+                            if (userRatingContainer) {
+                                userRatingContainer.innerHTML = ''; // Clear existing buttons/text
+
+                                if (result.userHasVoted) {
+                                    const voteText = result.userVoteValue ? '+1' : '-1';
+                                    const voteColorClass = result.userVoteValue ? 'text-success' : 'text-danger';
+                                    const nextVoteType = result.userVoteValue ? 'down' : 'up'; // If current is up, next action is down
+
+                                    userRatingContainer.innerHTML = `
+                                        <p class="mb-0 fs-6 me-2">
+                                            Вы уже оценили этот пост:
+                                            <strong class="${voteColorClass}">${voteText}</strong>
+                                        </p>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm vote-post-btn" data-post-id="${postId}" data-vote-type="${nextVoteType}" title="Изменить оценку">
+                                            <i class="bi bi-arrow-repeat me-1"></i> Изменить
+                                        </button>
+                                    `;
+                                } else {
+                                    // No vote, show initial up/down buttons
+                                    userRatingContainer.innerHTML = `
+                                        <span class="me-2 text-muted">Ваша оценка:</span>
+                                        <button type="button" class="btn btn-success btn-sm vote-post-btn" data-post-id="${postId}" data-vote-type="up" title="Понравилось">
+                                            <i class="bi bi-hand-thumbs-up-fill me-1"></i> +1
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm vote-post-btn" data-post-id="${postId}" data-vote-type="down" title="Не понравилось">
+                                            <i class="bi bi-hand-thumbs-down-fill me-1"></i> -1
+                                        </button>
+                                    `;
+                                }
+                                // Re-attach event listeners to the newly created buttons
+                                userRatingContainer.querySelectorAll('.vote-post-btn').forEach(newButton => {
+                                    newButton.addEventListener('click', handlePostVoteButtonClick);
+                                });
+                            }
+                            showMessage(messageContainerId, result.message, 'success');
+                        } else {
+                            showMessage(messageContainerId, result.message, 'danger');
+                        }
+                    } catch (error) {
+                        console.error('Error voting on post:', error);
+                        showMessage(messageContainerId, 'Произошла ошибка при голосовании за пост. Пожалуйста, попробуйте еще раз.', 'danger');
+                    }
+                });
+            });
+
+            // Handle post vote button clicks (separate function for re-attaching)
+            function handlePostVoteButtonClick(event) {
+                const postId = this.dataset.postId;
+                const voteType = this.dataset.voteType;
+                const messageContainerId = `post-vote-message-${postId}`;
+                // Call the original logic for voting
+                document.querySelector(`.vote-post-btn[data-post-id="${postId}"][data-vote-type="${voteType}"]`).click();
+            }
+
+            // --- Comment Voting Logic ---
+            document.querySelectorAll('.vote-comment-btn').forEach(button => {
+                button.addEventListener('click', async function (event) {
+                    const commentId = this.dataset.commentId;
+                    const voteType = this.dataset.voteType;
+                    const messageContainerId = `comment-vote-message-${commentId}`;
+
+                    try {
+                        const response = await fetch(`/Comments/Vote?commentId=${commentId}&voteType=${voteType}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': getAntiForgeryToken()
+                            }
+                        });
+
+                        if (!response.ok) {
+                            if (response.status === 401 || response.status === 403) {
+                                const result = await response.json();
+                                if (result.redirectTo) {
+                                    window.location.href = result.redirectTo;
+                                    return;
+                                }
+                            }
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            // Update total comment rating and count
+                            const totalRatingElement = document.getElementById(`comment-total-rating-display-${commentId}`);
+                            const ratingsCountElement = document.getElementById(`comment-ratings-count-display-${commentId}`);
+
+                            if (totalRatingElement) {
+                                totalRatingElement.textContent = (result.newRating > 0 ? "+" : "") + result.newRating;
+                                totalRatingElement.classList.remove('text-success', 'text-danger', 'text-muted');
+                                if (result.newRating > 0) totalRatingElement.classList.add('text-success');
+                                else if (result.newRating < 0) totalRatingElement.classList.add('text-danger');
+                                else totalRatingElement.classList.add('text-muted');
+                            }
+                            if (ratingsCountElement) {
+                                ratingsCountElement.textContent = `(${result.newRatingsCount} оценок)`;
+                            }
+
+                            // Update user's personal comment vote status
+                            const userRatingContainer = document.getElementById(`user-comment-rating-controls-${commentId}`);
+                            if (userRatingContainer) {
+                                userRatingContainer.innerHTML = ''; // Clear existing buttons/text
+
+                                if (result.userHasVoted) {
+                                    const voteText = result.userVoteValue ? '+1' : '-1';
+                                    const voteColorClass = result.userVoteValue ? 'text-success' : 'text-danger';
+                                    const nextVoteType = result.userVoteValue ? 'down' : 'up';
+
+                                    userRatingContainer.innerHTML = `
+                                        <p class="mb-0">
+                                            Вы уже оценили этот комментарий:
+                                            <strong class="${voteColorClass}">${voteText}</strong>
+                                        </p>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm vote-comment-btn" data-comment-id="${commentId}" data-vote-type="${nextVoteType}" title="Изменить оценку">
+                                            <i class="bi bi-arrow-repeat"></i> Изменить
+                                        </button>
+                                    `;
+                                } else {
+                                    userRatingContainer.innerHTML = `
+                                        <span class="me-2 text-muted">Ваша оценка:</span>
+                                        <button type="button" class="btn btn-success btn-sm vote-comment-btn" data-comment-id="${commentId}" data-vote-type="up" title="Понравилось">
+                                            <i class="bi bi-hand-thumbs-up-fill"></i> +1
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm vote-comment-btn" data-comment-id="${commentId}" data-vote-type="down" title="Не понравилось">
+                                            <i class="bi bi-hand-thumbs-down-fill"></i> -1
+                                        </button>
+                                    `;
+                                }
+                                // Re-attach event listeners to the newly created buttons
+                                userRatingContainer.querySelectorAll('.vote-comment-btn').forEach(newButton => {
+                                    newButton.addEventListener('click', handleCommentVoteButtonClick);
+                                });
+                            }
+                            showMessage(messageContainerId, result.message, 'success');
+                        } else {
+                            showMessage(messageContainerId, result.message, 'danger');
+                        }
+                    } catch (error) {
+                        console.error('Error voting on comment:', error);
+                        showMessage(messageContainerId, 'Произошла ошибка при голосовании за комментарий. Пожалуйста, попробуйте еще раз.', 'danger');
+                    }
+                });
+            });
+
+            // Handle comment vote button clicks (separate function for re-attaching)
+            function handleCommentVoteButtonClick(event) {
+                const commentId = this.dataset.commentId;
+                const voteType = this.dataset.voteType;
+                const messageContainerId = `comment-vote-message-${commentId}`;
+                // Call the original logic for voting
+                document.querySelector(`.vote-comment-btn[data-comment-id="${commentId}"][data-vote-type="${voteType}"]`).click();
+            }
+
+            // Remove TempData messages on page load after a few seconds
+            const tempAlerts = document.querySelectorAll('.alert-dismissible');
+            tempAlerts.forEach(alert => {
+                setTimeout(() => {
+                    new bootstrap.Alert(alert).close();
+                }, 5000);
+            });
         });
     </script>
 }

@@ -12,22 +12,22 @@
 <p>
     <a asp-action="Create">Создать новый пост</a>
 </p>
-<table class="table">
+<table class="table"> @* Класс остается "table" *@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                Заголовок
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Content)
+                Содержание
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreationDate)
+                Дата создания
             </th>
             <th>
-                Автор
+                Автор @* Изменено на русский *@
             </th>
-            <th></th>
+            <th></th> @* Этот заголовок оставьте пустым или добавьте что-то, например, "Действия" *@
         </tr>
     </thead>
     <tbody>

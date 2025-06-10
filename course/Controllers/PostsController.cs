@@ -342,74 +342,79 @@ namespace course.Controllers
         }
 
         // Новый экшен для обработки голосования
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Vote(int postId, string voteType)
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> VotePost(int postId, string voteType)
+{
+    int? currentUserId = GetCurrentUserId();
+    if (!currentUserId.HasValue)
+    {
+        return Json(new { success = false, message = "Вы должны быть залогинены, чтобы голосовать.", redirectTo = "/Account/Login" });
+    }
+
+    var post = await _context.Posts.FindAsync(postId);
+    if (post == null)
+    {
+        return Json(new { success = false, message = "Пост не найден." });
+    }
+
+    bool isUpvote = voteType == "up";
+    var existingRating = await _context.Ratings
+        .FirstOrDefaultAsync(r => r.IdUser == currentUserId.Value && r.IdPost == postId);
+
+    int ratingChange = 0;
+    bool? userVoteAfterAction = null;
+
+    if (existingRating == null)
+    {
+        // New vote
+        _context.Ratings.Add(new Rating
         {
-            int? currentUserId = GetCurrentUserId();
+            IdUser = currentUserId.Value,
+            IdPost = postId,
+            Value = isUpvote
+        });
+        ratingChange = isUpvote ? 1 : -1;
+        userVoteAfterAction = isUpvote;
+    }
+    else if (existingRating.Value == isUpvote)
+    {
+        // Remove existing vote
+        _context.Ratings.Remove(existingRating);
+        ratingChange = isUpvote ? -1 : 1;
+    }
+    else
+    {
+        // Change vote
+        existingRating.Value = isUpvote;
+        ratingChange = isUpvote ? 2 : -2; // E.g., from -1 to +1 or +1 to -1
+        userVoteAfterAction = isUpvote;
+    }
 
-            if (!currentUserId.HasValue)
-            {
-                return Json(new { success = false, message = "Вы должны быть залогинены, чтобы голосовать." });
-            }
+    post.Rating += ratingChange;
 
-            var post = await _context.Posts.FindAsync(postId);
-            if (post == null)
-            {
-                return Json(new { success = false, message = "Пост не найден." });
-            }
+    try
+    {
+        await _context.SaveChangesAsync();
+        var newRatingsCount = await _context.Ratings.CountAsync(r => r.IdPost == postId);
 
-            var existingRating = await _context.Ratings
-                                               .FirstOrDefaultAsync(r => r.IdUser == currentUserId.Value && r.IdPost == postId);
+        return Json(new
+        {
+            success = true,
+            message = "Ваша оценка учтена!",
+            newRating = post.Rating,
+            newRatingsCount,
+            userHasVoted = userVoteAfterAction.HasValue,
+            userVoteValue = userVoteAfterAction
+        });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error voting: {ex.Message}");
+        return Json(new { success = false, message = "Произошла ошибка. Попробуйте снова." });
+    }
+}
 
-            bool isUpvote = (voteType == "up");
-            int voteValue = isUpvote ? 1 : -1;
-
-            if (existingRating == null)
-            {
-                // Пользователь еще не голосовал за этот пост, добавляем новую запись
-                var newRating = new Rating
-                {
-                    IdUser = currentUserId.Value,
-                    IdPost = postId,
-                    Value = isUpvote,
-                };
-                _context.Ratings.Add(newRating);
-                post.Rating += voteValue; // Update Post.Rating
-            }
-            else
-            {
-                // Пользователь уже голосовал
-                if (existingRating.Value == isUpvote)
-                {
-                    // Голос тот же, что и был - отменяем голос (удаляем запись)
-                    _context.Ratings.Remove(existingRating);
-                    post.Rating -= voteValue; // Update Post.Rating
-                }
-                else
-                {
-                    // Голос противоположный - меняем голос
-                    existingRating.Value = isUpvote;
-                    _context.Ratings.Update(existingRating);
-                    post.Rating += (voteValue * 2); // Update Post.Rating: -1 becomes 1 (+2), 1 becomes -1 (-2)
-                }
-            }
-
-            try
-            {
-                await _context.SaveChangesAsync();
-                return Json(new { success = true, newRating = post.Rating }); // Return the updated post.Rating
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return Json(new { success = false, message = "Ошибка сохранения данных. Пожалуйста, попробуйте снова." });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error voting: {ex.Message}");
-                return Json(new { success = false, message = "Произошла непредвиденная ошибка." });
-            }
-        }
 
 
         // Вспомогательный метод для проверки существования поста

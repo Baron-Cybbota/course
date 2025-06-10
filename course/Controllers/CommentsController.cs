@@ -2,12 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using course.Data;
 using course.Models;
-using course.Models.ViewModels; // Still assuming you'll use these ViewModels
+using course.Models.ViewModels;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
+using System.Security.Claims; // Required for Claims
 
 namespace course.Controllers
 {
@@ -20,32 +21,41 @@ namespace course.Controllers
             _context = context;
         }
 
+        // Helper method to get the current user's ID from claims.
+        private int? GetCurrentUserId()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
+                {
+                    return parsedUserId;
+                }
+            }
+            return null;
+        }
+
         // GET: Comments
-        /// <summary>
         /// Displays a list of all comments.
-        /// </summary>
         public async Task<IActionResult> Index()
         {
             var comments = await _context.Comments.ToListAsync();
 
-            // Explicitly fetch Post Titles and User Logins for display
             var postTitles = new Dictionary<int, string>();
             var userLogins = new Dictionary<int, string>();
 
-            // Get all unique Post Ids and User Ids from comments
             var postIds = comments.Select(c => c.IdPost).Distinct().ToList();
             var userIds = comments.Select(c => c.IdUser).Distinct().ToList();
 
-            // Fetch all necessary post titles and user logins in batches
             var posts = await _context.Posts
                                       .Where(p => postIds.Contains(p.IdPost))
                                       .Select(p => new { p.IdPost, p.Title })
                                       .ToListAsync();
 
             var users = await _context.Users
-                                    .Where(u => userIds.Contains(u.IdUser))
-                                    .Select(u => new { u.IdUser, u.Login })
-                                    .ToListAsync();
+                                      .Where(u => userIds.Contains(u.IdUser))
+                                      .Select(u => new { u.IdUser, u.Login })
+                                      .ToListAsync();
 
             foreach (var post in posts)
             {
@@ -64,9 +74,7 @@ namespace course.Controllers
         }
 
         // GET: Comments/Details/5
-        /// <summary>
         /// Displays details of a specific comment by Id.
-        /// </summary>
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -85,13 +93,13 @@ namespace course.Controllers
 
             // Explicitly fetch related Post Title and User Login
             var postTitle = await _context.Posts
-                                            .Where(p => p.IdPost == comment.IdPost)
-                                            .Select(p => p.Title)
-                                            .FirstOrDefaultAsync();
+                                          .Where(p => p.IdPost == comment.IdPost)
+                                          .Select(p => p.Title)
+                                          .FirstOrDefaultAsync();
             var userLogin = await _context.Users
-                                            .Where(u => u.IdUser == comment.IdUser)
-                                            .Select(u => u.Login)
-                                            .FirstOrDefaultAsync();
+                                          .Where(u => u.IdUser == comment.IdUser)
+                                          .Select(u => u.Login)
+                                          .FirstOrDefaultAsync();
 
             ViewData["PostTitle"] = postTitle ?? "Неизвестная публикация";
             ViewData["UserLogin"] = userLogin ?? "Неизвестный пользователь";
@@ -100,9 +108,7 @@ namespace course.Controllers
         }
 
         // GET: Comments/Create
-        /// <summary>
         /// Displays the form for creating a new comment.
-        /// </summary>
         public async Task<IActionResult> Create()
         {
             // Populate SelectLists for the ViewModel
@@ -119,9 +125,7 @@ namespace course.Controllers
         }
 
         // POST: Comments/Create
-        /// <summary>
         /// Handles the form submission for creating a new comment.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdPost,IdUser,Content")] CommentCreateViewModel viewModel)
@@ -154,9 +158,7 @@ namespace course.Controllers
         }
 
         // GET: Comments/Edit/5
-        /// <summary>
         /// Displays the form for editing an existing comment.
-        /// </summary>
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -177,9 +179,7 @@ namespace course.Controllers
         }
 
         // POST: Comments/Edit/5
-        /// <summary>
         /// Handles the form submission for editing a comment.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdComment,Content")] Comment comment)
@@ -232,9 +232,7 @@ namespace course.Controllers
         }
 
         // GET: Comments/Delete/5
-        /// <summary>
         /// Displays the confirmation page for deleting a comment.
-        /// </summary>
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -252,13 +250,13 @@ namespace course.Controllers
 
             // Explicitly fetch related Post Title and User Login for display
             var postTitle = await _context.Posts
-                                            .Where(p => p.IdPost == comment.IdPost)
-                                            .Select(p => p.Title)
-                                            .FirstOrDefaultAsync();
+                                          .Where(p => p.IdPost == comment.IdPost)
+                                          .Select(p => p.Title)
+                                          .FirstOrDefaultAsync();
             var userLogin = await _context.Users
-                                            .Where(u => u.IdUser == comment.IdUser)
-                                            .Select(u => u.Login)
-                                            .FirstOrDefaultAsync();
+                                          .Where(u => u.IdUser == comment.IdUser)
+                                          .Select(u => u.Login)
+                                          .FirstOrDefaultAsync();
 
             // Populate the ViewModel for the delete confirmation view
             var viewModel = new CommentDeleteViewModel
@@ -275,9 +273,7 @@ namespace course.Controllers
         }
 
         // POST: Comments/Delete/5
-        /// <summary>
         /// Handles the confirmation of deleting a comment.
-        /// </summary>
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -304,9 +300,80 @@ namespace course.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        /// <summary>
+ [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> VoteComment(int commentId, string voteType)
+{
+    int? currentUserId = GetCurrentUserId();
+    if (!currentUserId.HasValue)
+    {
+        return Json(new { success = false, message = "Вы должны быть залогинены, чтобы голосовать.", redirectTo = "/Account/Login" });
+    }
+
+    var comment = await _context.Comments.FindAsync(commentId);
+    if (comment == null)
+    {
+        return Json(new { success = false, message = "Комментарий не найден." });
+    }
+
+    bool isUpvote = voteType == "up";
+    var existingRating = await _context.Ratings
+        .FirstOrDefaultAsync(r => r.IdUser == currentUserId.Value && r.IdComment == commentId);
+
+    int ratingChange = 0;
+    bool? userVoteAfterAction = null;
+
+    if (existingRating == null)
+    {
+        // New vote
+        _context.Ratings.Add(new Rating
+        {
+            IdUser = currentUserId.Value,
+            IdComment = commentId,
+            Value = isUpvote
+        });
+        ratingChange = isUpvote ? 1 : -1;
+        userVoteAfterAction = isUpvote;
+    }
+    else if (existingRating.Value == isUpvote)
+    {
+        // Remove existing vote
+        _context.Ratings.Remove(existingRating);
+        ratingChange = isUpvote ? -1 : 1;
+    }
+    else
+    {
+        // Change vote
+        existingRating.Value = isUpvote;
+        ratingChange = isUpvote ? 2 : -2;
+        userVoteAfterAction = isUpvote;
+    }
+
+    comment.Rating += ratingChange;
+
+    try
+    {
+        await _context.SaveChangesAsync();
+        var newRatingsCount = await _context.Ratings.CountAsync(r => r.IdComment == commentId);
+
+        return Json(new
+        {
+            success = true,
+            message = "Ваша оценка учтена!",
+            newRating = comment.Rating,
+            newRatingsCount,
+            userHasVoted = userVoteAfterAction.HasValue,
+            userVoteValue = userVoteAfterAction
+        });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error voting: {ex.Message}");
+        return Json(new { success = false, message = "Произошла ошибка. Попробуйте снова." });
+    }
+}
+
         /// Helper method to check if a comment exists.
-        /// </summary>
         private bool CommentExists(int id)
         {
             return _context.Comments.Any(e => e.IdComment == id);

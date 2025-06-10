@@ -682,6 +682,6 @@ D:\College\course\course\obj\Debug\net9.0\course.RazorAssemblyInfo.cache
 D:\College\course\course\obj\Debug\net9.0\course.RazorAssemblyInfo.cs
 D:\College\course\course\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 D:\College\course\course\obj\Debug\net9.0\scopedcss\projectbundle\course.bundle.scp.css
-D:\College\course\course\obj\Debug\net9.0\compressed\y8lyr8eiux-ntd15iiyli.gz
 D:\College\course\course\obj\Debug\net9.0\compressed\4zif0i503t-y4q7osg93h.gz
 D:\College\course\course\obj\Debug\net9.0\compressed\3517n8zu9i-y4q7osg93h.gz
+D:\College\course\course\obj\Debug\net9.0\compressed\y8lyr8eiux-hhkk5iuh2g.gz

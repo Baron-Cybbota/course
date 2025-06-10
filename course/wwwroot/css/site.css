@@ -1,3 +1,16 @@
+/* Добавляем отступ сверху для body, чтобы компенсировать фиксированный navbar */
+body {
+    padding-top: 70px; /* Здесь 70px - это пример, вы можете настроить это значение.
+                         Обычно navbar имеет высоту около 56-60px, плюс 10-20px дополнительного отступа. */
+}
+
+/* При необходимости, можно добавить медиа-запрос для мобильных устройств,
+   если ваш navbar на мобильных устройствах имеет другую высоту. */
+@media (max-width: 991.98px) { /* Bootstrap's 'lg' breakpoint for navbar collapse */
+    body {
+        padding-top: 80px; /* Возможно, на мобильных устройствах навбар чуть выше или больше отступов */
+    }
+}
 
 :root {
     --primary-dark: #1a1a2e;
@@ -486,6 +499,38 @@ body.dark-theme .nav-link,
 body.dark-theme .text-dark {
     color: var(--dark-theme-text) !important;
 }
+/* --- ADD THESE NEW RULES OR MODIFY EXISTING ONES BELOW --- */
+
+/* Make the "Опубликовано" text white in dark theme */
+body.dark-theme .hero-subtitleD { /* This targets the paragraph for "Опубликовано" */
+    color: var(--dark-theme-text) !important; 
+    text-shadow: none; /* Remove text shadow in dark theme for better contrast */
+}
+
+/* Make the author's name (strong tag) within "Опубликовано" an accent color */
+body.dark-theme .hero-subtitleD strong {
+    color: var(--accent-teal) !important; 
+}
+
+/* Make the "Последнее редактирование" text white in dark theme */
+body.dark-theme .text-muted.fst-italic { /* This targets the paragraph for "Последнее редактирование" */
+    color: var(--dark-theme-muted-text) !important; /* Using muted text color for a softer look */
+}
+
+/* Make general text-muted elements more visible in dark theme */
+body.dark-theme .text-muted {
+    color: var(--dark-theme-muted-text) !important;
+}
+
+/* Ensure comment author name is visible */
+body.dark-theme .comment-author-name {
+    color: var(--accent-teal) !important;
+}
+
+/* Ensure the 'Оценка комментария:' heading is visible */
+body.dark-theme h6.small-heading {
+    color: var(--dark-theme-muted-text) !important;
+}
 
 body.dark-theme .hero-section {
     background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--primary-dark) 100%);
@@ -622,6 +667,7 @@ body.dark-theme .review-game {
 }
 
 
+/* Общие стили для таблицы (по умолчанию светлая тема) */
 .table {
     margin-top: 20px;
     border-radius: 0.75rem;
@@ -633,43 +679,47 @@ body.dark-theme .review-game {
     padding: 1rem;
 }
 
-.table-light thead th {
+/* Заголовки таблицы в светлой теме */
+.table thead th { /* Изменено с .table-light thead th */
     background-color: var(--light-bg);
     color: var(--text-dark);
     border-bottom: 2px solid rgba(0, 0, 0, 0.1); 
 }
 
-.table-light tbody tr {
+/* Строки таблицы в светлой теме */
+.table tbody tr { /* Изменено с .table-light tbody tr */
     background-color: white;
     color: var(--text-dark);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05); 
 }
 
-.table-light tbody tr:last-child {
+.table tbody tr:last-child { /* Изменено с .table-light tbody tr:last-child */
     border-bottom: none; 
 }
 
-.table-light tbody tr:hover {
+/* Ховер эффект для строк таблицы в светлой теме */
+.table tbody tr:hover { /* Изменено с .table-light tbody tr:hover */
     background-color: #e9ecef;
 }
 
-body.dark-theme .table-dark thead th {
+/* Стили для таблицы в темной теме (когда body имеет класс dark-theme) */
+body.dark-theme .table thead th { /* Изменено с body.dark-theme .table-dark thead th */
     background-color: var(--dark-theme-card-bg);
     color: var(--dark-theme-text);
     border-bottom: 2px solid var(--dark-theme-border);
 }
 
-body.dark-theme .table-dark tbody tr {
+body.dark-theme .table tbody tr { /* Изменено с body.dark-theme .table-dark tbody tr */
     background-color: #2b2b2b;
     color: var(--dark-theme-text);
     border-bottom: 1px solid var(--dark-theme-border);
 }
 
-body.dark-theme .table-dark tbody tr:last-child {
+body.dark-theme .table tbody tr:last-child { /* Изменено с body.dark-theme .table-dark tbody tr:last-child */
     border-bottom: none; 
 }
 
-body.dark-theme .table-dark tbody tr:hover {
+body.dark-theme .table tbody tr:hover { /* Изменено с body.dark-theme .table-dark tbody tr:hover */
     background-color: #3a3a3a;
 }
 
@@ -826,4 +876,3 @@ body.dark-theme .alert-info {
 .card-text.post-content{
     white-space: pre-wrap;
 }
-

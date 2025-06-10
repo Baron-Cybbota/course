@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Регистрация";
 }
-
 <style>
     /* Main container styling for full height and centering */
     .container-fluid.vh-100 {
@@ -11,7 +10,7 @@
         justify-content: center;
         align-items: center;
         min-height: 100vh; /* Ensure it takes full viewport height */
-        background-color: #f8f9fa; /* Light background for the whole page */
+        /* REMOVE: background-color: #f8f9fa; */
     }
 
     /* Custom style for the background image section on larger screens */
@@ -53,7 +52,7 @@
         border: none; /* Remove default card border */
         border-radius: 0 0.5rem 0.5rem 0; /* Rounded corners on the right side on larger screens */
         box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important; /* More pronounced shadow */
-        background-color: #ffffff; /* White background for the card */
+        /* REMOVE: background-color: #ffffff; */
     }
 
     /* Form input and button styling */
@@ -80,7 +79,6 @@
         border-top: 1px solid rgba(0, 0, 0, 0.1);
     }
 </style>
-
 <div class="container-fluid vh-100 d-flex justify-content-center align-items-center">
     <div class="row w-100">
         @* Background image section - visible only on medium and larger screens *@
