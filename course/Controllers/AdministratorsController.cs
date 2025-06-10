@@ -5,6 +5,7 @@ using course.Models;
 using System.Threading.Tasks; // Для Task
 using System; // Для DateTime
 using System.Linq; // Для Any()
+using Microsoft.AspNetCore.Mvc.Rendering; // For SelectList, although not strictly needed for AvailableUsers as it's just a List.
 
 namespace course.Controllers
 {
@@ -21,9 +22,19 @@ namespace course.Controllers
         // Отображает список всех администраторов.
         public async Task<IActionResult> Index()
         {
-            // В реальном приложении, возможно, вы захотите подгружать данные пользователя:
-            // return View(await _context.Administrators.Include(a => a.User).ToListAsync());
-            return View(await _context.Administrators.ToListAsync());
+            var administrators = await _context.Administrators.ToListAsync();
+
+            // Collect all unique IdUser from administrators
+            var userIds = administrators.Select(a => a.IdUser).Distinct().ToList();
+
+            // Fetch User logins using the collected Ids
+            var userLogins = await _context.Users
+                                            .Where(u => userIds.Contains(u.IdUser))
+                                            .ToDictionaryAsync(u => u.IdUser, u => u.Login);
+
+            ViewData["UserLogins"] = userLogins; // Pass dictionary to ViewData
+
+            return View(administrators);
         }
 
         // GET: Administrators/Details/5
@@ -36,13 +47,15 @@ namespace course.Controllers
             }
 
             var administrator = await _context.Administrators
-                // В реальном приложении, возможно, вы захотите подгружать данные пользователя:
-                // .Include(a => a.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                                            .FirstOrDefaultAsync(m => m.IdAdministrator == id); // Using IdAdministrator as primary key
             if (administrator == null)
             {
                 return NotFound(); // Если администратор не найден, возвращаем 404
             }
+
+            // Fetch the associated user's login
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.IdUser == administrator.IdUser);
+            ViewData["UserLogin"] = user?.Login ?? "Неизвестный пользователь"; // Pass user login to ViewData
 
             return View(administrator);
         }
@@ -51,11 +64,16 @@ namespace course.Controllers
         // Отображает форму для создания нового администратора.
         public async Task<IActionResult> Create()
         {
-            // Для выбора UserId, передаем список пользователей, которые еще не являются администраторами.
-            // В реальном UI это был бы выпадающий список.
-            ViewBag.AvailableUsers = await _context.Users
-                                                    .Where(u => !_context.Administrators.Any(a => a.UserId == u.Id))
-                                                    .ToListAsync();
+            // Для выбора IdUser, передаем список пользователей, которые еще не являются администраторами.
+            // In a real UI this would be a dropdown.
+            // Using SelectList to prepare data for a dropdown in the view
+            ViewBag.AvailableUsers = new SelectList(
+                await _context.Users
+                              .Where(u => !_context.Administrators.Any(a => a.IdUser == u.IdUser))
+                              .ToListAsync(),
+                "IdUser", // Value property for SelectListItem
+                "Login"   // Text property for SelectListItem
+            );
             return View();
         }
 
@@ -63,32 +81,45 @@ namespace course.Controllers
         // Обрабатывает отправку формы для создания нового администратора.
         [HttpPost]
         [ValidateAntiForgeryToken] // Защита от CSRF-атак
-        public async Task<IActionResult> Create([Bind("UserId,AccessLevel")] Administrator administrator)
+        public async Task<IActionResult> Create([Bind("IdUser")] Administrator administrator)
         {
             if (ModelState.IsValid) // Проверяем валидность модели на основе Data Annotations
             {
                 // Проверяем, не является ли пользователь уже администратором.
                 // Это предотвратит ошибку уникального индекса.
-                if (await _context.Administrators.AnyAsync(a => a.UserId == administrator.UserId))
+                if (await _context.Administrators.AnyAsync(a => a.IdUser == administrator.IdUser))
                 {
-                    ModelState.AddModelError("UserId", "Этот пользователь уже является администратором.");
-                    ViewBag.AvailableUsers = await _context.Users
-                                                            .Where(u => !_context.Administrators.Any(a => a.UserId == u.Id))
-                                                            .ToListAsync();
+                    ModelState.AddModelError("IdUser", "Этот пользователь уже является администратором.");
+                    // Re-populate ViewBag if model state is invalid
+                    ViewBag.AvailableUsers = new SelectList(
+                        await _context.Users
+                                      .Where(u => !_context.Administrators.Any(a => a.IdUser == u.IdUser))
+                                      .ToListAsync(),
+                        "IdUser",
+                        "Login",
+                        administrator.IdUser // Select the invalid user if it was chosen
+                    );
                     return View(administrator);
                 }
 
                 administrator.AssignmentDate = DateTime.UtcNow; // Устанавливаем дату назначения
-                
+
                 _context.Add(administrator); // Добавляем администратора в контекст
                 await _context.SaveChangesAsync(); // Сохраняем изменения в базе данных
+                TempData["SuccessMessage"] = "Администратор успешно добавлен.";
                 return RedirectToAction(nameof(Index)); // Перенаправляем на список администраторов
             }
 
             // Если модель невалидна, возвращаем форму с ошибками
-            ViewBag.AvailableUsers = await _context.Users
-                                                    .Where(u => !_context.Administrators.Any(a => a.UserId == u.Id))
-                                                    .ToListAsync();
+            ViewBag.AvailableUsers = new SelectList(
+                await _context.Users
+                              .Where(u => !_context.Administrators.Any(a => a.IdUser == u.IdUser))
+                              .ToListAsync(),
+                "IdUser",
+                "Login",
+                administrator.IdUser
+            );
+            TempData["ErrorMessage"] = "Ошибка при создании администратора. Проверьте введенные данные.";
             return View(administrator);
         }
 
@@ -101,17 +132,20 @@ namespace course.Controllers
                 return NotFound();
             }
 
-            var administrator = await _context.Administrators.FindAsync(id); // Находим администратора по Id
+            var administrator = await _context.Administrators.FindAsync(id);
             if (administrator == null)
             {
                 return NotFound();
             }
 
-            // Для редактирования, возможно, вы захотите дать выбрать другого пользователя,
-            // но обычно UserId для существующего администратора не меняется.
-            // Если UserId не подлежит изменению, то его не нужно включать в форму редактирования.
-            // Если вы хотите, чтобы UserId был редактируемым, вам нужно будет обрабатывать уникальность.
-            ViewBag.AvailableUsers = await _context.Users.ToListAsync(); // Или только текущий пользователь
+            // For editing, you would typically not change the UserId of an existing administrator.
+            // If you want to allow changing the associated user, you need to handle uniqueness checks.
+            // Also, consider if only specific users should be available for selection.
+            // We pass all users for simplicity, assuming the IdUser is displayed but not typically changed via dropdown.
+            // If it should be a dropdown, use SelectList as in Create().
+            ViewBag.AllUsers = await _context.Users.ToListAsync(); // This is just a list of User objects
+                                                                   // If you want a dropdown, it should be:
+                                                                   // ViewBag.AllUsers = new SelectList(await _context.Users.ToListAsync(), "IdUser", "Login", administrator.IdUser);
             return View(administrator);
         }
 
@@ -119,18 +153,29 @@ namespace course.Controllers
         // Обрабатывает отправку формы для редактирования администратора.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Bind("Id,UserId,AssignmentDate,AccessLevel") - убедитесь, что все поля, которые могут быть изменены, включены.
-        // UserId и AssignmentDate обычно не редактируются после создания.
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,AssignmentDate,AccessLevel")] Administrator administrator)
+        public async Task<IActionResult> Edit(int id, [Bind("IdAdministrator,IdUser,AssignmentDate")] Administrator administrator)
         {
-            if (id != administrator.Id) // Проверяем, совпадает ли Id из маршрута с Id модели
+            if (id != administrator.IdAdministrator)
             {
                 return NotFound();
             }
 
-            // Важно: если UserId редактируется, нужно повторно проверять уникальность,
-            // а также удостовериться, что старый UserId не остается в базе данных, если он больше не админ.
-            // Для простоты, предполагается, что UserId не меняется в форме редактирования.
+            // IMPORTANT: If IdUser is allowed to be edited here, you MUST re-validate its uniqueness
+            // against other administrators, excluding the current one.
+            // For simplicity, I'm assuming IdUser is NOT intended to be changed via the edit form.
+            // If it can be changed, uncomment and adapt the logic below:
+            /*
+            var existingAdministrator = await _context.Administrators.AsNoTracking().FirstOrDefaultAsync(a => a.IdAdministrator == id);
+            if (existingAdministrator != null && existingAdministrator.IdUser != administrator.IdUser)
+            {
+                if (await _context.Administrators.AnyAsync(a => a.IdUser == administrator.IdUser && a.IdAdministrator != administrator.IdAdministrator))
+                {
+                    ModelState.AddModelError("IdUser", "Этот пользователь уже назначен администратором.");
+                    ViewBag.AllUsers = await _context.Users.ToListAsync(); // Or a SelectList
+                    return View(administrator);
+                }
+            }
+            */
 
             if (ModelState.IsValid)
             {
@@ -138,10 +183,11 @@ namespace course.Controllers
                 {
                     _context.Update(administrator); // Обновляем администратора в контексте
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Администратор успешно обновлен.";
                 }
                 catch (DbUpdateConcurrencyException) // Обработка конфликтов параллельного доступа
                 {
-                    if (!AdministratorExists(administrator.Id))
+                    if (!AdministratorExists(administrator.IdAdministrator))
                     {
                         return NotFound();
                     }
@@ -152,7 +198,9 @@ namespace course.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.AvailableUsers = await _context.Users.ToListAsync();
+            // If model is invalid, return the form with errors
+            ViewBag.AllUsers = await _context.Users.ToListAsync(); // Or a SelectList
+            TempData["ErrorMessage"] = "Ошибка при обновлении администратора. Проверьте введенные данные.";
             return View(administrator);
         }
 
@@ -166,13 +214,15 @@ namespace course.Controllers
             }
 
             var administrator = await _context.Administrators
-                // В реальном приложении, возможно, вы захотите подгружать данные пользователя:
-                // .Include(a => a.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                                            .FirstOrDefaultAsync(m => m.IdAdministrator == id);
             if (administrator == null)
             {
                 return NotFound();
             }
+
+            // Fetch the associated user's login for display on the delete confirmation page
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.IdUser == administrator.IdUser);
+            ViewData["UserLogin"] = user?.Login ?? "Неизвестный пользователь";
 
             return View(administrator);
         }
@@ -188,15 +238,16 @@ namespace course.Controllers
             {
                 _context.Administrators.Remove(administrator); // Удаляем администратора из контекста
             }
-            
+
             await _context.SaveChangesAsync(); // Сохраняем изменения
+            TempData["SuccessMessage"] = "Администратор успешно удален.";
             return RedirectToAction(nameof(Index));
         }
 
         // Вспомогательный метод для проверки существования администратора
         private bool AdministratorExists(int id)
         {
-            return _context.Administrators.Any(e => e.Id == id);
+            return _context.Administrators.Any(e => e.IdAdministrator == id);
         }
     }
 }

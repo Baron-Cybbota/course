@@ -1,21 +1,21 @@
 @model course.Models.BoardGame
 
 @{
-    ViewData["Title"] = "Удалить игру: " + Model.Title;
+    ViewData["Title"] = "Удалить игру: " + Model.Name; 
 }
 
 <h1>Удалить игру</h1>
 
 <h3>Вы уверены, что хотите удалить эту настольную игру?</h3>
 <div>
-    <h4>@Model.Title</h4>
+    <h4>@Model.Name</h4> 
     <hr />
     <dl class="row">
         <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Title)
+            @Html.DisplayNameFor(model => model.Name) 
         </dt>
         <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Title)
+            @Html.DisplayFor(model => model.Name) 
         </dd>
         <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Description)
@@ -42,10 +42,10 @@
             @Html.DisplayFor(model => model.MaxPlayers)
         </dd>
         <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.AveragePlayTime)
+            @Html.DisplayNameFor(model => model.EstimatedPlayTime) 
         </dt>
         <dd class="col-sm-9">
-            @(Model.AveragePlayTime.HasValue ? Model.AveragePlayTime.Value.ToString(@"hh\:mm") : "N/A")
+            @(Model.EstimatedPlayTime.HasValue ? Model.EstimatedPlayTime.Value.ToString(@"hh\:mm") : "N/A") 
         </dd>
         <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Genre)
@@ -59,6 +59,8 @@
         <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Difficulty)
         </dd>
+        @* {{-- Removed ImageUrl section as it's not a property of the BoardGame model --}}
+        {{--
         <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.ImageUrl)
         </dt>
@@ -73,10 +75,11 @@
                 <img src="https://placehold.co/250x250/cccccc/333333?text=Нет+изображения" alt="Нет изображения" class="img-fluid rounded" style="max-width: 250px; height: auto;" />
             }
         </dd>
+        --}} *@
     </dl>
 
     <form asp-action="Delete" method="post">
-        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="IdBoardGame" /> 
         <input type="submit" value="Удалить" class="btn btn-danger" /> |
         <a asp-action="Index" class="btn btn-secondary">Вернуться к списку</a>
     </form>

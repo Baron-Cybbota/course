@@ -24,72 +24,67 @@ namespace course.Migrations
 
             modelBuilder.Entity("course.Models.Administrator", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdAdministrator")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccessLevel")
-                        .HasColumnType("integer");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdAdministrator"));
 
                     b.Property<DateTime>("AssignmentDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("IdUser")
                         .HasColumnType("integer");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdAdministrator");
 
-                    b.HasIndex("UserId")
+                    b.HasIndex("IdUser")
                         .IsUnique();
 
-                    b.ToTable("Administrators", (string)null);
+                    b.ToTable("Administrators");
                 });
 
             modelBuilder.Entity("course.Models.BlacklistEntry", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdBlacklist")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AdministratorId")
-                        .HasColumnType("integer");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdBlacklist"));
 
                     b.Property<DateTime>("BlockDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("BlockDuration")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<TimeSpan?>("BlockDuration")
+                        .HasColumnType("interval");
+
+                    b.Property<int>("IdAdministrator")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdUser")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.HasKey("IdBlacklist");
 
-                    b.HasKey("Id");
+                    b.HasIndex("IdAdministrator");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("IdUser");
 
-                    b.ToTable("BlacklistEntries", (string)null);
+                    b.ToTable("BlacklistEntries");
                 });
 
             modelBuilder.Entity("course.Models.BoardGame", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdBoardGame")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<TimeSpan?>("AveragePlayTime")
-                        .HasColumnType("interval");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdBoardGame"));
 
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
@@ -98,13 +93,12 @@ namespace course.Migrations
                     b.Property<int?>("Difficulty")
                         .HasColumnType("integer");
 
+                    b.Property<TimeSpan?>("EstimatedPlayTime")
+                        .HasColumnType("interval");
+
                     b.Property<string>("Genre")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
-
-                    b.Property<string>("ImageUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
 
                     b.Property<int?>("MaxPlayers")
                         .HasColumnType("integer");
@@ -112,99 +106,26 @@ namespace course.Migrations
                     b.Property<int?>("MinPlayers")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ReleaseYear")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Title")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("BoardGames", (string)null);
-                });
-
-            modelBuilder.Entity("course.Models.Chat", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int?>("ReleaseYear")
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.HasKey("IdBoardGame");
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("CreatorId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Chats", (string)null);
-                });
-
-            modelBuilder.Entity("course.Models.ChatMessage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ChatId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("character varying(4000)");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("SenderId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("SentDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ChatMessages", (string)null);
-                });
-
-            modelBuilder.Entity("course.Models.ChatParticipant", b =>
-                {
-                    b.Property<int>("ChatId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("JoinDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("ChatId", "UserId");
-
-                    b.ToTable("ChatParticipants", (string)null);
+                    b.ToTable("BoardGames");
                 });
 
             modelBuilder.Entity("course.Models.Comment", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdComment")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("integer");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdComment"));
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -214,73 +135,98 @@ namespace course.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("LastEditDate")
+                    b.Property<DateTime?>("EditDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("PostId")
+                    b.Property<int>("IdPost")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdUser")
                         .HasColumnType("integer");
 
                     b.Property<int>("Rating")
                         .HasColumnType("integer");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdComment");
 
-                    b.ToTable("Comments", (string)null);
+                    b.HasIndex("IdPost");
+
+                    b.HasIndex("IdUser");
+
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("course.Models.Complaint", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdComplaint")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdComplaint"));
 
-                    b.Property<int?>("AdministratorId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("CommentId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("IdAdministrator")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("IdComment")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("IdEvent")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("IdMessage")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("IdPost")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdUser")
+                        .HasColumnType("integer");
 
                     b.Property<string>("ModeratorNotes")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
-
-                    b.Property<int?>("PostId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<DateTime?>("ResolvedDate")
+                    b.Property<DateTime?>("ResolutionDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdComplaint");
 
-                    b.ToTable("Complaints", (string)null);
+                    b.HasIndex("IdAdministrator");
+
+                    b.HasIndex("IdComment");
+
+                    b.HasIndex("IdEvent");
+
+                    b.HasIndex("IdMessage");
+
+                    b.HasIndex("IdPost");
+
+                    b.HasIndex("IdUser");
+
+                    b.ToTable("Complaints", t =>
+                        {
+                            t.HasCheckConstraint("CHK_Complaint_Target", "((\"IdPost\" IS NOT NULL AND \"IdComment\" IS NULL AND \"IdEvent\" IS NULL AND \"IdMessage\" IS NULL) OR (\"IdPost\" IS NULL AND \"IdComment\" IS NOT NULL AND \"IdEvent\" IS NULL AND \"IdMessage\" IS NULL) OR (\"IdPost\" IS NULL AND \"IdComment\" IS NULL AND \"IdEvent\" IS NOT NULL AND \"IdMessage\" IS NULL) OR (\"IdPost\" IS NULL AND \"IdComment\" IS NULL AND \"IdEvent\" IS NULL AND \"IdMessage\" IS NOT NULL))");
+                        });
                 });
 
             modelBuilder.Entity("course.Models.Event", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdEvent")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BoardGameId")
-                        .HasColumnType("integer");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdEvent"));
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
@@ -289,25 +235,35 @@ namespace course.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
 
-                    b.Property<string>("Location")
+                    b.Property<int?>("IdBoardGame")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdLocation")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<TimeSpan>("Time")
                         .HasColumnType("interval");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdEvent");
 
-                    b.ToTable("Events", (string)null);
+                    b.HasIndex("IdBoardGame");
+
+                    b.HasIndex("IdLocation");
+
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("course.Models.EventParticipant", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("IdUser")
                         .HasColumnType("integer");
 
-                    b.Property<int>("EventId")
+                    b.Property<int>("IdEvent")
                         .HasColumnType("integer");
 
                     b.Property<string>("ParticipationStatus")
@@ -315,21 +271,114 @@ namespace course.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.HasKey("UserId", "EventId");
+                    b.HasKey("IdUser", "IdEvent");
 
-                    b.ToTable("EventParticipants", (string)null);
+                    b.HasIndex("IdEvent");
+
+                    b.ToTable("EventParticipants");
+                });
+
+            modelBuilder.Entity("course.Models.Image", b =>
+                {
+                    b.Property<int>("IdImage")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdImage"));
+
+                    b.Property<int?>("IdBoardGame")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("IdEvent")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("IdPost")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("IdImage");
+
+                    b.HasIndex("IdBoardGame");
+
+                    b.HasIndex("IdEvent");
+
+                    b.HasIndex("IdPost");
+
+                    b.ToTable("Images", t =>
+                        {
+                            t.HasCheckConstraint("CHK_Image_Association", "((\"IdPost\" IS NOT NULL AND \"IdEvent\" IS NULL AND \"IdBoardGame\" IS NULL) OR (\"IdPost\" IS NULL AND \"IdEvent\" IS NOT NULL AND \"IdBoardGame\" IS NULL) OR (\"IdPost\" IS NULL AND \"IdEvent\" IS NULL AND \"IdBoardGame\" IS NOT NULL))");
+                        });
+                });
+
+            modelBuilder.Entity("course.Models.Location", b =>
+                {
+                    b.Property<int>("IdLocation")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdLocation"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("IdLocation");
+
+                    b.ToTable("Locations");
+                });
+
+            modelBuilder.Entity("course.Models.Message", b =>
+                {
+                    b.Property<int>("IdMessage")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdMessage"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<int?>("IdEvent")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdUser")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("SendDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("IdMessage");
+
+                    b.HasIndex("IdEvent");
+
+                    b.HasIndex("IdUser");
+
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("course.Models.Post", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdPost")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("integer");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdPost"));
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -338,11 +387,17 @@ namespace course.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("EditDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("IdEvent")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdUser")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsHidden")
                         .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("LastEditDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Rating")
                         .HasColumnType("integer");
@@ -352,51 +407,56 @@ namespace course.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdPost");
 
-                    b.ToTable("Posts", (string)null);
+                    b.HasIndex("IdEvent");
+
+                    b.HasIndex("IdUser");
+
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("course.Models.Rating", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdRating")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdRating"));
 
-                    b.Property<int?>("CommentId")
+                    b.Property<int?>("IdComment")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("PostId")
+                    b.Property<int?>("IdPost")
                         .HasColumnType("integer");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("IdUser")
                         .HasColumnType("integer");
 
                     b.Property<bool>("Value")
                         .HasColumnType("boolean");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdRating");
 
-                    b.HasIndex("UserId", "CommentId")
-                        .IsUnique()
-                        .HasFilter("\"CommentId\" IS NOT NULL");
+                    b.HasIndex("IdComment");
 
-                    b.HasIndex("UserId", "PostId")
-                        .IsUnique()
-                        .HasFilter("\"PostId\" IS NOT NULL");
+                    b.HasIndex("IdPost");
 
-                    b.ToTable("Ratings", (string)null);
+                    b.HasIndex("IdUser");
+
+                    b.ToTable("Ratings", t =>
+                        {
+                            t.HasCheckConstraint("CHK_Rating_Target", "(\"IdPost\" IS NULL AND \"IdComment\" IS NOT NULL) OR (\"IdPost\" IS NOT NULL AND \"IdComment\" IS NULL)");
+                        });
                 });
 
             modelBuilder.Entity("course.Models.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdUser")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdUser"));
 
                     b.Property<bool>("BlockStatus")
                         .HasColumnType("boolean");
@@ -421,9 +481,163 @@ namespace course.Migrations
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdUser");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("course.Models.Administrator", b =>
+                {
+                    b.HasOne("course.Models.User", null)
+                        .WithOne()
+                        .HasForeignKey("course.Models.Administrator", "IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("course.Models.BlacklistEntry", b =>
+                {
+                    b.HasOne("course.Models.Administrator", null)
+                        .WithMany()
+                        .HasForeignKey("IdAdministrator")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("course.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("course.Models.Comment", b =>
+                {
+                    b.HasOne("course.Models.Post", null)
+                        .WithMany()
+                        .HasForeignKey("IdPost")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("course.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("course.Models.Complaint", b =>
+                {
+                    b.HasOne("course.Models.Administrator", null)
+                        .WithMany()
+                        .HasForeignKey("IdAdministrator");
+
+                    b.HasOne("course.Models.Comment", null)
+                        .WithMany()
+                        .HasForeignKey("IdComment");
+
+                    b.HasOne("course.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("IdEvent");
+
+                    b.HasOne("course.Models.Message", null)
+                        .WithMany()
+                        .HasForeignKey("IdMessage");
+
+                    b.HasOne("course.Models.Post", null)
+                        .WithMany()
+                        .HasForeignKey("IdPost");
+
+                    b.HasOne("course.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("course.Models.Event", b =>
+                {
+                    b.HasOne("course.Models.BoardGame", null)
+                        .WithMany()
+                        .HasForeignKey("IdBoardGame");
+
+                    b.HasOne("course.Models.Location", null)
+                        .WithMany()
+                        .HasForeignKey("IdLocation")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("course.Models.EventParticipant", b =>
+                {
+                    b.HasOne("course.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("IdEvent")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("course.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("course.Models.Image", b =>
+                {
+                    b.HasOne("course.Models.BoardGame", null)
+                        .WithMany()
+                        .HasForeignKey("IdBoardGame");
+
+                    b.HasOne("course.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("IdEvent");
+
+                    b.HasOne("course.Models.Post", null)
+                        .WithMany()
+                        .HasForeignKey("IdPost");
+                });
+
+            modelBuilder.Entity("course.Models.Message", b =>
+                {
+                    b.HasOne("course.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("IdEvent");
+
+                    b.HasOne("course.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("course.Models.Post", b =>
+                {
+                    b.HasOne("course.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("IdEvent");
+
+                    b.HasOne("course.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("course.Models.Rating", b =>
+                {
+                    b.HasOne("course.Models.Comment", null)
+                        .WithMany()
+                        .HasForeignKey("IdComment");
+
+                    b.HasOne("course.Models.Post", null)
+                        .WithMany()
+                        .HasForeignKey("IdPost");
+
+                    b.HasOne("course.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

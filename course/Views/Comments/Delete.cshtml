@@ -1,4 +1,4 @@
-@model course.Models.Comment
+@model course.Models.ViewModels.CommentDeleteViewModel 
 
 @{
     ViewData["Title"] = "Удалить комментарий";
@@ -12,16 +12,16 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            Пост
+            @Html.DisplayNameFor(model => model.PostTitle) @* Use DisplayNameFor ViewModel property *@
         </dt>
         <dd class="col-sm-10">
-            @ViewData["PostTitle"] // Используем ViewData для заголовка поста
+            @Html.DisplayFor(model => model.PostTitle) @* Use DisplayFor ViewModel property *@
         </dd>
         <dt class="col-sm-2">
-            Автор
+            @Html.DisplayNameFor(model => model.AuthorName) @* Use DisplayNameFor ViewModel property *@
         </dt>
         <dd class="col-sm-10">
-            @ViewData["AuthorName"] // Используем ViewData для имени автора
+            @Html.DisplayFor(model => model.AuthorName) @* Use DisplayFor ViewModel property *@
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Content)
@@ -38,9 +38,9 @@
     </dl>
 
     <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="hidden" asp-for="PostId" /> @* Для возврата на страницу поста *@
+        <input type="hidden" asp-for="IdComment" />
+        <input type="hidden" asp-for="IdPost" /> @* Для возврата на страницу поста *@
         <input type="submit" value="Удалить" class="btn btn-danger" /> |
-        <a asp-controller="Posts" asp-action="Details" asp-route-id="@Model.PostId">Вернуться к посту</a>
+        <a asp-controller="Posts" asp-action="Details" asp-route-id="@Model.IdPost">Вернуться к посту</a>
     </form>
 </div>

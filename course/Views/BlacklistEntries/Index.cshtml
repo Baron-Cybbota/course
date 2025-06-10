@@ -38,9 +38,9 @@
         {
             <tr>
                 <td>
-                    @if (moderatorNames != null && moderatorNames.ContainsKey(item.AdministratorId))
+                    @if (moderatorNames != null && moderatorNames.ContainsKey(item.IdAdministrator))
                     {
-                        @moderatorNames[item.AdministratorId]
+                        @moderatorNames[item.IdAdministrator]
                     }
                     else
                     {
@@ -48,9 +48,9 @@
                     }
                 </td>
                 <td>
-                    @if (userNames != null && userNames.ContainsKey(item.UserId))
+                    @if (userNames != null && userNames.ContainsKey(item.IdUser))
                     {
-                        @userNames[item.UserId]
+                        @userNames[item.IdUser]
                     }
                     else
                     {
@@ -67,9 +67,9 @@
                     @Html.DisplayFor(modelItem => item.BlockDuration)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Редактировать</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Детали</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+                    <a asp-action="Edit" asp-route-id="@item.IdBlacklist">Редактировать</a> |
+                    <a asp-action="Details" asp-route-id="@item.IdBlacklist">Детали</a> |
+                    <a asp-action="Delete" asp-route-id="@item.IdBlacklist">Удалить</a>
                 </td>
             </tr>
         }

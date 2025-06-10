@@ -1,8 +1,9 @@
 @model course.Models.Event
 
 @{
-    ViewData["Title"] = "Детали мероприятия: " + ViewData["BoardGameTitle"];
-    var boardGameTitle = ViewData["BoardGameTitle"] as string;
+    var boardGameTitle = ViewData["BoardGameName"] as string; // Corrected ViewData key name
+    var locationAddress = ViewData["LocationAddress"] as string; // Added for Location address
+    ViewData["Title"] = "Детали мероприятия: " + boardGameTitle;
 }
 
 <h1>Детали мероприятия</h1>
@@ -11,6 +12,12 @@
     <h4>Мероприятие</h4>
     <hr />
     <dl class="row">
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
         <dt class="col-sm-3">
             Настольная игра
         </dt>
@@ -30,10 +37,10 @@
             @Model.Time.ToString(@"hh\:mm")
         </dd>
         <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Location)
+            Место проведения
         </dt>
         <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Location)
+            @locationAddress
         </dd>
         <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Description)
@@ -44,6 +51,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактировать</a> |
+    <a asp-action="Edit" asp-route-id="@Model.IdEvent" class="btn btn-warning">Редактировать</a> |
     <a asp-action="Index" class="btn btn-secondary">Вернуться к списку</a>
 </div>

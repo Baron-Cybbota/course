@@ -36,7 +36,7 @@
             <thead>
                 <tr>
                     <th scope="col">
-                        @Html.DisplayNameFor(model => model.AuthorId)
+                        @Html.DisplayNameFor(model => model.IdUser)
                     </th>
                     <th scope="col">
                         Относится к
@@ -48,15 +48,15 @@
                         @Html.DisplayNameFor(model => model.Status)
                     </th>
                     <th scope="col">
-                        @Html.DisplayNameFor(model => model.CreatedDate)
+                        @Html.DisplayNameFor(model => model.CreationDate)
                     </th>
                     @if (User.IsInRole("Модератор") || User.IsInRole("Администратор"))
                     {
                         <th scope="col">
-                            @Html.DisplayNameFor(model => model.AdministratorId)
+                            @Html.DisplayNameFor(model => model.IdAdministrator)
                         </th>
                         <th scope="col">
-                            @Html.DisplayNameFor(model => model.ResolvedDate)
+                            @Html.DisplayNameFor(model => model.ResolutionDate)
                         </th>
                     }
                     <th scope="col"></th>
@@ -65,11 +65,11 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr class="table-row-clickable" data-href="@Url.Action("Details", new { id = item.Id })">
+                    <tr class="table-row-clickable" data-href="@Url.Action("Details", new { id = item.IdComplaint })">
                         <td>
-                            @if (userNames != null && userNames.ContainsKey(item.AuthorId))
+                            @if (userNames != null && userNames.ContainsKey(item.IdUser))
                             {
-                                @userNames[item.AuthorId]
+                                @userNames[item.IdUser]
                             }
                             else
                             {
@@ -77,16 +77,16 @@
                             }
                         </td>
                         <td>
-                            @if (item.PostId.HasValue && allPosts != null && allPosts.ContainsKey(item.PostId.Value))
+                            @if (item.IdPost.HasValue && allPosts != null && allPosts.ContainsKey(item.IdPost.Value))
                             {
-                                <a asp-controller="Posts" asp-action="Details" asp-route-id="@item.PostId" class="text-decoration-none">
-                                    <span class="badge bg-primary me-1">Пост</span> @(allPosts[item.PostId.Value].Length > 30 ? allPosts[item.PostId.Value].Substring(0, 30) + "..." : allPosts[item.PostId.Value])
+                                <a asp-controller="Posts" asp-action="Details" asp-route-id="@item.IdPost" class="text-decoration-none">
+                                    <span class="badge bg-primary me-1">Пост</span> @(allPosts[item.IdPost.Value].Length > 30 ? allPosts[item.IdPost.Value].Substring(0, 30) + "..." : allPosts[item.IdPost.Value])
                                 </a>
                             }
-                            else if (item.CommentId.HasValue && allComments != null && allComments.ContainsKey(item.CommentId.Value))
+                            else if (item.IdComment.HasValue && allComments != null && allComments.ContainsKey(item.IdComment.Value))
                             {
-                                <a asp-controller="Comments" asp-action="Details" asp-route-id="@item.CommentId" class="text-decoration-none">
-                                    <span class="badge bg-info text-dark me-1">Комм.</span> @(allComments[item.CommentId.Value].Length > 30 ? allComments[item.CommentId.Value].Substring(0, 30) + "..." : allComments[item.CommentId.Value])
+                                <a asp-controller="Comments" asp-action="Details" asp-route-id="@item.IdComment" class="text-decoration-none">
+                                    <span class="badge bg-info text-dark me-1">Комм.</span> @(allComments[item.IdComment.Value].Length > 30 ? allComments[item.IdComment.Value].Substring(0, 30) + "..." : allComments[item.IdComment.Value])
                                 </a>
                             }
                             else
@@ -103,30 +103,30 @@
                                 switch (item.Status)
                                 {
                                     case ComplaintStatus.Pending:
-                                        statusClass = "badge bg-warning text-dark"; // Желтый для "Подана"
+                                        statusClass = "badge bg-warning text-dark";
                                         break;
                                     case ComplaintStatus.InProgress:
-                                        statusClass = "badge bg-primary"; // Синий для "Рассматривается"
+                                        statusClass = "badge bg-primary";
                                         break;
                                     case ComplaintStatus.Resolved:
-                                        statusClass = "badge bg-success"; // Зеленый для "Решена"
+                                        statusClass = "badge bg-success";
                                         break;
                                     case ComplaintStatus.Rejected:
-                                        statusClass = "badge bg-danger"; // Красный для "Отклонена"
+                                        statusClass = "badge bg-danger";
                                         break;
                                 }
                             }
                             <span class="@statusClass">@complaintStatusDisplayName[item.Status]</span>
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.CreatedDate)
+                            @Html.DisplayFor(modelItem => item.CreationDate)
                         </td>
                         @if (User.IsInRole("Модератор") || User.IsInRole("Администратор"))
                         {
                             <td>
-                                @if (item.AdministratorId.HasValue && userNames != null && userNames.ContainsKey(item.AdministratorId.Value))
+                                @if (item.IdAdministrator.HasValue && userNames != null && userNames.ContainsKey(item.IdAdministrator.Value))
                                 {
-                                    @userNames[item.AdministratorId.Value]
+                                    @userNames[item.IdAdministrator.Value]
                                 }
                                 else
                                 {
@@ -134,21 +134,21 @@
                                 }
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.ResolvedDate)
+                                @Html.DisplayFor(modelItem => item.ResolutionDate)
                             </td>
                         }
                         <td class="text-end">
-                            @if (User.IsInRole("Модератор") || User.IsInRole("Администратор") || item.AuthorId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))
+                            @if (User.IsInRole("Модератор") || User.IsInRole("Администратор") || item.IdUser == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))
                             {
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info me-2" title="Детали">
+                                <a asp-action="Details" asp-route-id="@item.IdComplaint" class="btn btn-sm btn-outline-info me-2" title="Детали">
                                     <i class="bi bi-info-circle-fill"></i> <span class="d-none d-lg-inline">Детали</span>
                                 </a>
                                 if (User.IsInRole("Модератор") || User.IsInRole("Администратор"))
                                 {
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary me-2" title="Редактировать">
+                                    <a asp-action="Edit" asp-route-id="@item.IdComplaint" class="btn btn-sm btn-outline-primary me-2" title="Редактировать">
                                         <i class="bi bi-pencil-fill"></i> <span class="d-none d-lg-inline">Редактировать</span>
                                     </a>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Удалить">
+                                    <a asp-action="Delete" asp-route-id="@item.IdComplaint" class="btn btn-sm btn-outline-danger" title="Удалить">
                                         <i class="bi bi-trash-fill"></i> <span class="d-none d-lg-inline">Удалить</span>
                                     </a>
                                 }
@@ -164,7 +164,6 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Function to apply table theme based on current state
             const applyTableTheme = (isDarkTheme) => {
                 const table = document.querySelector('.table');
                 if (table) {
@@ -178,30 +177,26 @@
                 }
             };
 
-            // Initial theme application on page load
             const savedTheme = localStorage.getItem('theme');
             const isDark = savedTheme === 'dark' || (savedTheme === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
             applyTableTheme(isDark);
 
-            // Event listener for theme toggle button (assuming it exists on _Layout)
             const themeToggle = document.getElementById('theme-toggle');
             if (themeToggle) {
                 themeToggle.addEventListener('click', function() {
-                    const currentTheme = localStorage.getItem('theme'); // localStorage should be updated by _Layout.cshtml
+                    const currentTheme = localStorage.getItem('theme');
                     applyTableTheme(currentTheme === 'dark');
                 });
             }
 
-            // Make table rows clickable for details view
             const tableRows = document.querySelectorAll('.table-row-clickable');
             tableRows.forEach(row => {
                 row.addEventListener('click', (event) => {
-                    // Prevent navigation if an action button within the row was clicked
                     if (!event.target.closest('a') && !event.target.closest('button')) {
                         window.location.href = row.dataset.href;
                     }
                 });
-                row.style.cursor = 'pointer'; // Visual cue for clickability
+                row.style.cursor = 'pointer';
             });
         });
     </script>

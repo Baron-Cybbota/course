@@ -32,32 +32,32 @@
         {
             <tr>
                 <td>
-                    @if (eventTitles != null && eventTitles.ContainsKey(item.EventId))
+                    @if (eventTitles != null && eventTitles.ContainsKey(item.IdEvent))
                     {
-                        @eventTitles[item.EventId]
+                        @eventTitles[item.IdEvent]
                     }
                     else
                     {
-                        <span>Неизвестное мероприятие (ID: @item.EventId)</span>
+                        <span>Неизвестное мероприятие (ID: @item.IdEvent)</span>
                     }
                 </td>
                 <td>
-                    @if (userLogins != null && userLogins.ContainsKey(item.UserId))
+                    @if (userLogins != null && userLogins.ContainsKey(item.IdUser))
                     {
-                        @userLogins[item.UserId]
+                        @userLogins[item.IdUser]
                     }
                     else
                     {
-                        <span>Неизвестный пользователь (ID: @item.UserId)</span>
+                        <span>Неизвестный пользователь (ID: @item.IdUser)</span>
                     }
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.ParticipationStatus)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-eventId="@item.EventId" asp-route-userId="@item.UserId" class="btn btn-sm btn-warning">Редактировать</a> |
-                    <a asp-action="Details" asp-route-eventId="@item.EventId" asp-route-userId="@item.UserId" class="btn btn-sm btn-info">Детали</a> |
-                    <a asp-action="Delete" asp-route-eventId="@item.EventId" asp-route-userId="@item.UserId" class="btn btn-sm btn-danger">Удалить</a>
+                    <a asp-action="Edit" asp-route-eventId="@item.IdEvent" asp-route-userId="@item.IdUser" class="btn btn-sm btn-warning">Редактировать</a> |
+                    <a asp-action="Details" asp-route-eventId="@item.IdEvent" asp-route-userId="@item.IdUser" class="btn btn-sm btn-info">Детали</a> |
+                    <a asp-action="Delete" asp-route-eventId="@item.IdEvent" asp-route-userId="@item.IdUser" class="btn btn-sm btn-danger">Удалить</a>
                 </td>
             </tr>
         }

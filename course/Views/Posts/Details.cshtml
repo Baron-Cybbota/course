@@ -1,5 +1,4 @@
 @model course.Models.Post
-@* Удалены устаревшие using-директивы Identity и прямое внедрение DbContext *@
 @using Microsoft.EntityFrameworkCore
 
 @{
@@ -16,6 +15,8 @@
     var existingPostRating = ViewData["ExistingPostRating"] as course.Models.Rating;
     var currentUserId = ViewData["CurrentUserId"] as int?; // ID текущего пользователя, если есть
     var existingCommentRatings = ViewData["ExistingCommentRatings"] as Dictionary<int, course.Models.Rating>;
+    var isCurrentUserAuthor = currentUserId.HasValue && Model.IdUser == currentUserId.Value; // Corrected: Model.IdUser
+    var isCurrentUserAdminOrModerator = ViewData["IsUserAdminOrModerator"] as bool? ?? false; // Assuming this is passed from controller
 
     // Устанавливаем значения по умолчанию, если они не были вычислены (хотя контроллер должен их всегда предоставлять)
     totalPostRating ??= 0;
@@ -24,237 +25,199 @@
 }
 
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="section-title text-center mx-auto">@Model.Title</h1>
-    </div>
-
-    <div class="card mb-4 p-4">
-        <div class="card-body">
-            <h4 class="card-title mb-3">Детали поста</h4>
-            <hr class="mb-4" />
-            <dl class="row mb-0">
-                <dt class="col-sm-3 col-md-2">
-                    @Html.DisplayNameFor(model => model.Title)
-                </dt>
-                <dd class="col-sm-9 col-md-10">
-                    @Html.DisplayFor(model => model.Title)
-                </dd>
-                <dt class="col-sm-3 col-md-2">
-                    @Html.DisplayNameFor(model => model.Content)
-                </dt>
-                <dd class="col-sm-9 col-md-10">
-                    <div class="post-content-container">
-                        @Html.Raw(Model.Content) @* Используйте @Html.Raw для отображения HTML-контента *@
-                    </div>
-                </dd>
-                <dt class="col-sm-3 col-md-2">
-                    Автор
-                </dt>
-                <dd class="col-sm-9 col-md-10">
-                    <span>@authorName</span>
-                </dd>
-                <dt class="col-sm-3 col-md-2">
-                    @Html.DisplayNameFor(model => model.CreationDate)
-                </dt>
-                <dd class="col-sm-9 col-md-10">
-                    @Html.DisplayFor(model => model.CreationDate)
-                </dd>
-                @if (Model.LastEditDate.HasValue) @* Проверяем наличие даты последнего редактирования *@
-                {
-                    <dt class="col-sm-3 col-md-2">
-                        Последнее редактирование
-                    </dt>
-                    <dd class="col-sm-9 col-md-10">
-                        @Html.DisplayFor(model => model.LastEditDate)
-                    </dd>
-                }
-            </dl>
-        </div>
-    </div>
-
-    <div class="d-flex flex-wrap gap-2 mb-4">
-        @* Логика доступа: Вам нужно будет реализовать свою собственную проверку аутентификации и ролей.
-           Ниже приведены ссылки, которые будут доступны, если вы не добавите свою логику авторизации.
-           Замените условные операторы (@if (currentUserId.HasValue && ...)) на вашу реальную логику ролей. *@
-
-        @* Пример: Если пользователь - автор поста ИЛИ администратор/модератор (нужна кастомная проверка ролей) *@
-        @* @if (currentUserId.HasValue && (Model.AuthorId == currentUserId || IsUserAdminOrModerator(currentUserId.Value))) *@
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
-            <i class="bi bi-pencil-fill me-1"></i> Редактировать
-        </a>
-        
-        @* Пример: Если пользователь администратор/модератор (нужна кастомная проверка ролей) *@
-        @* @if (currentUserId.HasValue && (IsUserAdminOrModerator(currentUserId.Value))) *@
-        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
-            <i class="bi bi-trash-fill me-1"></i> Удалить
-        </a>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="bi bi-arrow-left-circle-fill me-1"></i> Вернуться к списку
-        </a>
-
-        @* Пример: Если пользователь аутентифицирован и не является автором поста *@
-        @* @if (currentUserId.HasValue && Model.AuthorId != currentUserId) *@
-        <a asp-controller="Complaints" asp-action="Create" asp-route-postId="@Model.Id" class="btn btn-outline-danger ms-auto">
-            <i class="bi bi-flag-fill me-1"></i> Пожаловаться на пост
-        </a>
-    </div>
-
-    <hr />
-
-    <h3 class="mt-4 section-title-small">Оценка поста</h3>
-    <div class="card p-3 mb-4">
-        @if (currentUserId.HasValue) @* Проверяем, аутентифицирован ли пользователь *@
+    <div class="text-center mb-5">
+        <h1 class="section-title">@Model.Title</h1>
+        <p class="hero-subtitleD mb-0">Опубликовано <strong class="text-primary">@authorName</strong> &bull; @Model.CreationDate.ToString("dd MMMM, HH:mm")</p>
+        @if (Model.EditDate.HasValue)
         {
-            if (Model.AuthorId != currentUserId) @* Нельзя оценить свой пост *@
-            {
-                <div class="rating-form-section d-flex align-items-center flex-wrap gap-2">
-                    @if (existingPostRating == null)
+            <p class="text-muted fst-italic mt-1 mb-0">Последнее редактирование: @Model.EditDate.Value.ToString("dd MMMM, HH:mm")</p>
+        }
+    </div>
+
+    <div class="card p-4 mb-5 shadow-lg">
+        <div class="card-body">
+            <h2 class="card-title mb-4 border-bottom pb-2">Содержание поста</h2>
+            <div class="post-content-container">
+                @Html.Raw(Model.Content) @* Используйте @Html.Raw для отображения HTML-контента *@
+            </div>
+
+            @* BEGIN - Rating section moved here *@
+            <hr class="my-4"/>
+            <div class="post-rating-section">
+                <h6 class="mb-3 text-center text-muted">Оценка поста</h6>
+                <div class="d-flex align-items-center justify-content-center flex-wrap gap-3 mb-3">
+                    @if (currentUserId.HasValue)
                     {
-                        <span class="me-2">Оцените пост:</span>
-                        <form asp-controller="Ratings" asp-action="Create" method="post" class="d-inline-flex gap-2">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="PostId" value="@Model.Id" />
-                            <input type="hidden" name="UserId" value="@currentUserId.Value" /> @* Передаем UserId *@
-                            <input type="hidden" name="Value" value="True" /> @* Для bool Value: True = +1 *@
-                            <button type="submit" class="btn btn-success btn-sm" title="Понравилось">
-                                <i class="bi bi-hand-thumbs-up-fill"></i> +1
-                            </button>
-                        </form>
-                        <form asp-controller="Ratings" asp-action="Create" method="post" class="d-inline-flex gap-2">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="PostId" value="@Model.Id" />
-                            <input type="hidden" name="UserId" value="@currentUserId.Value" /> @* Передаем UserId *@
-                            <input type="hidden" name="Value" value="False" /> @* Для bool Value: False = -1 *@
-                            <button type="submit" class="btn btn-danger btn-sm" title="Не понравилось">
-                                <i class="bi bi-hand-thumbs-down-fill"></i> -1
-                            </button>
-                        </form>
+                        if (!isCurrentUserAuthor) @* Нельзя оценить свой пост *@
+                        {
+                            if (existingPostRating == null)
+                            {
+                                <span class="me-2 text-muted">Ваша оценка:</span>
+                                <form asp-controller="Posts" asp-action="Vote" method="post" class="d-inline-flex gap-2">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="postId" value="@Model.IdPost" /> @* Corrected: Model.IdPost *@
+                                    <input type="hidden" name="voteType" value="up" />
+                                    <button type="submit" class="btn btn-success btn-sm" title="Понравилось">
+                                        <i class="bi bi-hand-thumbs-up-fill me-1"></i> +1
+                                    </button>
+                                </form>
+                                <form asp-controller="Posts" asp-action="Vote" method="post" class="d-inline-flex gap-2">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="postId" value="@Model.IdPost" /> @* Corrected: Model.IdPost *@
+                                    <input type="hidden" name="voteType" value="down" />
+                                    <button type="submit" class="btn btn-danger btn-sm" title="Не понравилось">
+                                        <i class="bi bi-hand-thumbs-down-fill me-1"></i> -1
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <p class="mb-0 fs-6 me-2">
+                                    Вы уже оценили этот пост:
+                                    <strong class="@(existingPostRating.Value ? "text-success" : "text-danger")">
+                                        @(existingPostRating.Value ? "+1" : "-1")
+                                    </strong>
+                                </p>
+                                <form asp-controller="Posts" asp-action="Vote" method="post" class="d-inline-flex">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="postId" value="@Model.IdPost" /> @* Corrected: Model.IdPost *@
+                                    <input type="hidden" name="voteType" value="@(existingPostRating.Value ? "down" : "up")" /> @* Toggles the vote type *@
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Изменить оценку">
+                                        <i class="bi bi-arrow-repeat me-1"></i> Изменить
+                                    </button>
+                                </form>
+                            }
+                        }
+                        else
+                        {
+                            <p class="mb-0 text-muted">Вы не можете оценить свой собственный пост.</p>
+                        }
                     }
                     else
                     {
-                        <p class="mb-0">
-                            Вы уже оценили этот пост:
-                            <strong class="@(existingPostRating.Value ? "text-success" : "text-danger")"> @* Используем существующую оценку Value (bool) *@
-                                @(existingPostRating.Value ? "+1" : "-1")
-                            </strong>
-                        </p>
-                        @* Опционально: кнопка для удаления/изменения оценки (раскомментируйте, если хотите)
-                        <form asp-controller="Ratings" asp-action="Delete" method="post" class="d-inline-flex ms-2">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@existingPostRating.Id" />
-                            <button type="submit" class="btn btn-outline-secondary btn-sm" title="Изменить оценку">
-                                <i class="bi bi-x-circle"></i> Изменить
-                            </button>
-                        </form>
-                        *@
+                        <p class="mb-0">Чтобы оценить пост, пожалуйста, <a asp-controller="Account" asp-action="Login" class="text-decoration-none">войдите</a>.</p>
                     }
                 </div>
-            }
-            else
-            {
-                <p class="mb-0">Вы не можете оценить свой собственный пост.</p>
-            }
-        }
-        else
-        {
-            <p class="mb-0">Чтобы оценить пост, пожалуйста, <a href="/Account/Login">войдите</a>.</p> @* Ссылка на вашу кастомную страницу входа *@
-        }
 
-        <p class="mt-2 mb-0">
-            Текущий рейтинг поста:
-            <strong class="@(totalPostRating > 0 ? "text-success" : (totalPostRating < 0 ? "text-danger" : "text-muted"))">
-                @(totalPostRating > 0 ? "+" : "")@totalPostRating
-            </strong>
-            (<span class="text-muted">@postRatingsCount оценок</span>) @* Используем переданное количество оценок *@
-        </p>
+                <p class="fs-5 fw-bold text-center mb-0">
+                    Общий рейтинг:
+                    <strong class="@(totalPostRating > 0 ? "text-success" : (totalPostRating < 0 ? "text-danger" : "text-muted"))">
+                        @(totalPostRating > 0 ? "+" : "")@totalPostRating
+                    </strong>
+                    <span class="text-muted fs-6 ms-2">(@postRatingsCount оценок)</span>
+                </p>
 
-        @* Сообщения об успехе/ошибке для рейтинга поста (TempData) *@
-        @if (TempData["ErrorMessage"] != null)
+                @* Сообщения об успехе/ошибке для рейтинга поста (TempData) *@
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger mt-3 mb-0">@TempData["ErrorMessage"]</div>
+                }
+                @if (TempData["Message"] != null)
+                {
+                    <div class="alert alert-success mt-3 mb-0">@TempData["Message"]</div>
+                }
+            </div>
+            @* END - Rating section moved here *@
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-3 mb-5 justify-content-center"> @* Added justify-content-center for better button alignment *@
+        @* Логика доступа: Кнопки редактировать и удалить только для автора или админа/модератора *@
+        @if (isCurrentUserAuthor || isCurrentUserAdminOrModerator)
         {
-            <div class="alert alert-danger mt-3 mb-0">@TempData["ErrorMessage"]</div>
+            <a asp-action="Edit" asp-route-id="@Model.IdPost" class="btn btn-primary btn-lg custom-button-width"> @* Corrected: Model.IdPost *@
+                <i class="bi bi-pencil-fill me-2"></i> Редактировать
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.IdPost" class="btn btn-danger btn-lg custom-button-width"> @* Corrected: Model.IdPost *@
+                <i class="bi bi-trash-fill me-2"></i> Удалить
+            </a>
         }
-        @if (TempData["Message"] != null)
+        
+        @* Кнопка "Пожаловаться" для всех, кроме автора и админа/модератора (или если пользователь не автор) *@
+        @if (currentUserId.HasValue && !isCurrentUserAuthor && !isCurrentUserAdminOrModerator)
         {
-            <div class="alert alert-success mt-3 mb-0">@TempData["Message"]</div>
+            <a asp-controller="Complaints" asp-action="Create" asp-route-postId="@Model.IdPost" class="btn btn-outline-warning btn-lg custom-button-width"> @* Corrected: Model.IdPost *@
+                <i class="bi bi-flag-fill me-2"></i> Пожаловаться на пост
+            </a>
         }
     </div>
 
-    <hr />
+    <hr class="my-5"/>
 
-    <h3 class="mt-4 section-title-small">Комментарии</h3>
+    <h3 class="section-title-small text-center mb-4">Комментарии (@(comments?.Count ?? 0))</h3>
     <div class="comments-section">
         @if (comments != null && comments.Any())
         {
             @foreach (var comment in comments)
             {
-                // Получаем рейтинг и количество оценок для текущего комментария
-                var currentCommentTotalRating = commentTotalRatings != null && commentTotalRatings.ContainsKey(comment.Id) ? commentTotalRatings[comment.Id] : 0;
-                var currentCommentRatingsCount = commentRatingsCounts != null && commentRatingsCounts.ContainsKey(comment.Id) ? commentRatingsCounts[comment.Id] : 0;
-                var existingUserCommentRating = existingCommentRatings != null && existingCommentRatings.ContainsKey(comment.Id) ? existingCommentRatings[comment.Id] : null;
+                var currentCommentTotalRating = commentTotalRatings != null && commentTotalRatings.ContainsKey(comment.IdComment) ? commentTotalRatings[comment.IdComment] : 0; @* Corrected: comment.IdComment *@
+                var currentCommentRatingsCount = commentRatingsCounts != null && commentRatingsCounts.ContainsKey(comment.IdComment) ? commentRatingsCounts[comment.IdComment] : 0; @* Corrected: comment.IdComment *@
+                var existingUserCommentRating = existingCommentRatings != null && existingCommentRatings.ContainsKey(comment.IdComment) ? existingCommentRatings[comment.IdComment] : null; @* Corrected: comment.IdComment *@
+                var isCommentAuthor = currentUserId.HasValue && comment.IdUser == currentUserId.Value; @* Corrected: comment.IdUser *@
 
-                <div class="card mb-3">
+                <div class="card mb-3 shadow-sm comment-card-custom">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h5 class="card-title mb-0">
-                                @if (commentAuthors != null && commentAuthors.ContainsKey(comment.AuthorId))
+                                @if (commentAuthors != null && commentAuthors.ContainsKey(comment.IdUser)) @* Corrected: comment.IdUser *@
                                 {
-                                    <strong class="text-primary">@commentAuthors[comment.AuthorId]</strong>
+                                    <strong class="comment-author-name">@commentAuthors[comment.IdUser]</strong> @* Corrected: comment.IdUser *@
                                 }
                                 else
                                 {
                                     <span class="text-muted">Неизвестный автор</span>
                                 }
-                                <small class="text-muted ms-2">@comment.CreationDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                <small class="text-muted ms-2">@comment.CreationDate.ToString("dd.MM.yyyy, HH:mm")</small>
                             </h5>
-                            @if (comment.LastEditDate.HasValue) @* Проверяем наличие даты последнего редактирования *@
+                            @if (comment.EditDate.HasValue)
                             {
                                 <small class="text-muted fst-italic">Отредактировано</small>
                             }
                         </div>
-                        <p class="card-text">@comment.Content</p>
+                        <p class="card-text comment-content-text">@comment.Content</p>
 
                         <div class="d-flex flex-wrap gap-2 mb-2">
-                            @* Логика доступа для комментариев (замените на вашу кастомную авторизацию) *@
-                            @* @if (currentUserId.HasValue && (comment.AuthorId == currentUserId || IsUserAdminOrModerator(currentUserId.Value))) *@
-                            <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.Id" class="btn btn-sm btn-outline-primary" title="Редактировать">
-                                <i class="bi bi-pencil-fill"></i> <span class="d-none d-md-inline">Редактировать</span>
-                            </a>
+                            @* Редактировать и Удалить комментарий: Только автор комментария или админ/модератор *@
+                            @if (isCommentAuthor || isCurrentUserAdminOrModerator)
+                            {
+                                <a asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.IdComment" class="btn btn-sm btn-outline-primary" title="Редактировать"> @* Corrected: comment.IdComment *@
+                                    <i class="bi bi-pencil-fill"></i> <span class="d-none d-md-inline">Редактировать</span>
+                                </a>
+                                <a asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.IdComment" class="btn btn-sm btn-outline-danger" title="Удалить"> @* Corrected: comment.IdComment *@
+                                    <i class="bi bi-trash-fill"></i> <span class="d-none d-md-inline">Удалить</span>
+                                </a>
+                            }
                             
-                            @* @if (currentUserId.HasValue && (IsUserAdminOrModerator(currentUserId.Value))) *@
-                            <a asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.Id" class="btn btn-sm btn-outline-danger" title="Удалить">
-                                <i class="bi bi-trash-fill"></i> <span class="d-none d-md-inline">Удалить</span>
-                            </a>
-                            
-                            @* @if (currentUserId.HasValue && comment.AuthorId != currentUserId) *@
-                            <a asp-controller="Complaints" asp-action="Create" asp-route-commentId="@comment.Id" class="btn btn-sm btn-outline-warning ms-auto" title="Пожаловаться">
-                                <i class="bi bi-flag-fill"></i> <span class="d-none d-md-inline">Пожаловаться</span>
-                            </a>
+                            @* Пожаловаться на комментарий: Всем, кроме автора комментария и админа/модератора (или если пользователь не автор) *@
+                            @if (currentUserId.HasValue && !isCommentAuthor && !isCurrentUserAdminOrModerator)
+                            {
+                                <a asp-controller="Complaints" asp-action="Create" asp-route-commentId="@comment.IdComment" class="btn btn-sm btn-outline-warning ms-auto" title="Пожаловаться"> @* Corrected: comment.IdComment *@
+                                    <i class="bi bi-flag-fill"></i> <span class="d-none d-md-inline">Пожаловаться</span>
+                                </a>
+                            }
                         </div>
 
-                        @* Блок для формы оценки комментария и отображения общей оценки *@
-                        <h6 class="mt-3 mb-2 small-heading">Оценить комментарий:</h6>
-                        @if (currentUserId.HasValue) @* Проверяем, аутентифицирован ли пользователь *@
+                        <h6 class="mt-3 mb-2 small-heading text-muted">Оценка комментария:</h6>
+                        @if (currentUserId.HasValue)
                         {
-                            if (comment.AuthorId != currentUserId) @* Нельзя оценить свой комментарий *@
+                            if (!isCommentAuthor) @* Нельзя оценить свой комментарий *@
                             {
                                 <div class="rating-form-section mb-2 d-flex align-items-center flex-wrap gap-2">
                                     @if (existingUserCommentRating == null)
                                     {
-                                        <span class="me-2">Оцените:</span>
-                                        <form asp-controller="Ratings" asp-action="Create" method="post" class="d-inline-flex gap-2">
+                                        <span class="me-2 text-muted">Ваша оценка:</span>
+                                        <form asp-controller="Comments" asp-action="Vote" method="post" class="d-inline-flex gap-2">
                                             @Html.AntiForgeryToken()
-                                            <input type="hidden" name="CommentId" value="@comment.Id" />
-                                            <input type="hidden" name="UserId" value="@currentUserId.Value" /> @* Передаем UserId *@
-                                            <input type="hidden" name="Value" value="True" /> @* Для bool Value: True = +1 *@
+                                            <input type="hidden" name="commentId" value="@comment.IdComment" /> @* Corrected: comment.IdComment *@
+                                            <input type="hidden" name="voteType" value="up" />
                                             <button type="submit" class="btn btn-success btn-sm" title="Понравилось">
                                                 <i class="bi bi-hand-thumbs-up-fill"></i> +1
                                             </button>
                                         </form>
-                                        <form asp-controller="Ratings" asp-action="Create" method="post" class="d-inline-flex gap-2">
+                                        <form asp-controller="Comments" asp-action="Vote" method="post" class="d-inline-flex gap-2">
                                             @Html.AntiForgeryToken()
-                                            <input type="hidden" name="CommentId" value="@comment.Id" />
-                                            <input type="hidden" name="UserId" value="@currentUserId.Value" /> @* Передаем UserId *@
-                                            <input type="hidden" name="Value" value="False" /> @* Для bool Value: False = -1 *@
+                                            <input type="hidden" name="commentId" value="@comment.IdComment" /> @* Corrected: comment.IdComment *@
+                                            <input type="hidden" name="voteType" value="down" />
                                             <button type="submit" class="btn btn-danger btn-sm" title="Не понравилось">
                                                 <i class="bi bi-hand-thumbs-down-fill"></i> -1
                                             </button>
@@ -264,70 +227,68 @@
                                     {
                                         <p class="mb-0">
                                             Вы уже оценили этот комментарий:
-                                            <strong class="@(existingUserCommentRating.Value ? "text-success" : "text-danger")"> @* Используем существующую оценку Value (bool) *@
+                                            <strong class="@(existingUserCommentRating.Value ? "text-success" : "text-danger")">
                                                 @(existingUserCommentRating.Value ? "+1" : "-1")
                                             </strong>
                                         </p>
-                                        @* Optional: Button to remove/change rating *
-                                        <form asp-controller="Ratings" asp-action="Delete" method="post" class="d-inline-flex ms-2">
+                                        <form asp-controller="Comments" asp-action="Vote" method="post" class="d-inline-flex ms-2">
                                             @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@existingUserCommentRating.Id" />
+                                            <input type="hidden" name="commentId" value="@comment.IdComment" /> @* Corrected: comment.IdComment *@
+                                            <input type="hidden" name="voteType" value="@(existingUserCommentRating.Value ? "down" : "up")" /> @* Toggles the vote type *@
                                             <button type="submit" class="btn btn-outline-secondary btn-sm" title="Изменить оценку">
-                                                <i class="bi bi-x-circle"></i> Изменить
+                                                <i class="bi bi-arrow-repeat"></i> Изменить
                                             </button>
                                         </form>
-                                        *@
                                     }
                                 </div>
                             }
                             else
                             {
-                                <p class="mb-2">Вы не можете оценить свой собственный комментарий.</p>
+                                <p class="mb-2 text-muted">Вы не можете оценить свой собственный комментарий.</p>
                             }
                         }
                         else
                         {
-                            <p class="mb-2">Чтобы оценить комментарий, <a href="/Account/Login">войдите</a>.</p> @* Ссылка на вашу кастомную страницу входа *@
+                            <p class="mb-2">Чтобы оценить комментарий, <a asp-controller="Account" asp-action="Login" class="text-decoration-none">войдите</a>.</p>
                         }
 
-                        <p class="mt-1 mb-0">
-                            Текущий рейтинг комментария:
+                        <p class="mt-1 mb-0 fs-5 fw-bold">
+                            Рейтинг комментария:
                             <strong class="@(currentCommentTotalRating > 0 ? "text-success" : (currentCommentTotalRating < 0 ? "text-danger" : "text-muted"))">
                                 @(currentCommentTotalRating > 0 ? "+" : "")@currentCommentTotalRating
                             </strong>
-                            (<span class="text-muted">@currentCommentRatingsCount оценок</span>) @* Используем переданное количество оценок *@
+                            <span class="text-muted fs-6 ms-2">(@currentCommentRatingsCount оценок)</span>
                         </p>
-                        @* Конец блока оценки комментария *@
                     </div>
                 </div>
             }
         }
         else
         {
-            <p class="text-muted">К этому посту еще нет комментариев.</p>
+            <p class="text-muted text-center py-3">К этому посту еще нет комментариев. Будьте первым!</p>
         }
     </div>
 
-    <hr />
+    <hr class="my-5"/>
 
-    <h3 class="mt-4 section-title-small">Оставить комментарий</h3>
-    <div class="card p-3 mb-4">
-        @if (currentUserId.HasValue) @* Проверяем, аутентифицирован ли пользователь *@
+    <h3 class="section-title-small text-center mb-4">Оставить комментарий</h3>
+    <div class="card p-4 mb-5 shadow">
+        @if (currentUserId.HasValue)
         {
             <div class="comment-form-section">
                 <form asp-controller="Comments" asp-action="Create" method="post">
                     @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                    <input type="hidden" name="PostId" value="@Model.Id" />
-                    <input type="hidden" name="AuthorId" value="@currentUserId.Value" /> @* Передаем AuthorId *@
+                    <input type="hidden" name="PostId" value="@Model.IdPost" /> @* Corrected: Model.IdPost *@
+                    <input type="hidden" name="IdUser" value="@currentUserId.Value" /> @* Corrected: name="IdUser" *@
                     <div class="mb-3">
-                        <label for="Content" class="form-label">Ваш комментарий</label>
-                        <textarea name="Content" class="form-control" rows="4" placeholder="Введите ваш комментарий здесь..."></textarea>
+                        <label for="Content" class="form-label visually-hidden">Ваш комментарий</label> @* Visually hidden for accessibility, input has placeholder *@
+                        <textarea name="Content" class="form-control" rows="5" placeholder="Напишите свой комментарий здесь..." required></textarea>
                         <span data-valmsg-for="Content" class="text-danger d-block mt-1"></span>
                     </div>
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-chat-dots-fill me-1"></i> Добавить комментарий
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-chat-dots-fill me-2"></i> Добавить комментарий
                         </button>
                     </div>
                 </form>
@@ -335,7 +296,7 @@
         }
         else
         {
-            <p class="text-muted mb-0">Чтобы оставить комментарий, пожалуйста, <a href="/Account/Login">войдите</a>.</p> @* Ссылка на вашу кастомную страницу входа *@
+            <p class="text-muted text-center mb-0">Чтобы оставить комментарий, пожалуйста, <a asp-controller="Account" asp-action="Login" class="text-decoration-none">войдите</a>.</p>
         }
     </div>
 </div>
@@ -345,26 +306,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Функция для обработки изменений темы для динамических элементов, если необходимо,
-            // хотя большая часть стилей теперь обрабатывается через site.css и классы Bootstrap.
-            const applyDynamicTheming = (isDarkTheme) => {
-                // Пример: Если у вас были специфические элементы, управляемые JS, которым нужна корректировка темы
-                // Вы могли бы нацелить их здесь. Пока что большая часть этого находится в CSS.
-            };
-
-            // Начальная проверка темы при загрузке
-            const savedTheme = localStorage.getItem('theme');
-            const isDark = savedTheme === 'dark' || (savedTheme === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            applyDynamicTheming(isDark);
-
-            // Слушатель для переключения темы (предполагается, что он находится в _Layout)
-            const themeToggle = document.getElementById('theme-toggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('click', function() {
-                    const currentTheme = localStorage.getItem('theme');
-                    applyDynamicTheming(currentTheme === 'dark');
-                });
-            }
+            // No specific JS for dynamic theming needed here, as CSS handles most of it.
+            // The theme toggle logic should primarily reside in _Layout.cshtml if it affects the entire body.
         });
     </script>
 }

@@ -14,7 +14,7 @@
     <thead class="table-dark">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ReleaseYear)
@@ -26,7 +26,7 @@
                 @Html.DisplayNameFor(model => model.MaxPlayers)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AveragePlayTime)
+                @Html.DisplayNameFor(model => model.EstimatedPlayTime)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Genre)
@@ -42,7 +42,7 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Title)
+                    @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.ReleaseYear)
@@ -54,8 +54,7 @@
                     @Html.DisplayFor(modelItem => item.MaxPlayers)
                 </td>
                 <td>
-                    @* Отображаем TimeSpan в удобочитаемом формате, например "HH:mm" *@
-                    @(item.AveragePlayTime.HasValue ? item.AveragePlayTime.Value.ToString(@"hh\:mm") : "N/A")
+                    @(item.EstimatedPlayTime.HasValue ? item.EstimatedPlayTime.Value.ToString(@"hh\:mm") : "N/A")
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Genre)
@@ -64,9 +63,9 @@
                     @Html.DisplayFor(modelItem => item.Difficulty)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редактировать</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Удалить</a>
+                    <a asp-action="Edit" asp-route-id="@item.IdBoardGame" class="btn btn-sm btn-warning">Редактировать</a> |
+                    <a asp-action="Details" asp-route-id="@item.IdBoardGame" class="btn btn-sm btn-info">Детали</a> |
+                    <a asp-action="Delete" asp-route-id="@item.IdBoardGame" class="btn btn-sm btn-danger">Удалить</a>
                 </td>
             </tr>
         }

@@ -14,15 +14,15 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="EventId" /> @* EventId является частью составного ключа и не редактируется напрямую *
+            <input type="hidden" asp-for="IdEvent" /> @* IdEvent является частью составного ключа и не редактируется напрямую *
             <input type="hidden" asp-for="UserId" /> @* UserId также является частью составного ключа и не редактируется напрямую *@
 
             <div class="form-group mb-3">
-                <label asp-for="EventId" class="control-label">Мероприятие</label>
+                <label asp-for="IdEvent" class="control-label">Мероприятие</label>
                 @* Отображаем название мероприятия, но не позволяем его редактировать, так как оно часть ключа *@
                 @if (eventsSelectList != null)
                 {
-                    <input type="text" class="form-control" value="@eventsSelectList.FirstOrDefault(i => i.Value == Model.EventId.ToString())?.Text" disabled />
+                    <input type="text" class="form-control" value="@eventsSelectList.FirstOrDefault(i => i.Value == Model.IdEvent.ToString())?.Text" disabled />
                 }
                 else
                 {
@@ -30,11 +30,11 @@
                 }
             </div>
             <div class="form-group mb-3">
-                <label asp-for="UserId" class="control-label">Пользователь</label>
+                <label asp-for="IdUser" class="control-label">Пользователь</label>
                 @* Отображаем логин пользователя, но не позволяем его редактировать *@
                 @if (usersSelectList != null)
                 {
-                    <input type="text" class="form-control" value="@usersSelectList.FirstOrDefault(i => i.Value == Model.UserId.ToString())?.Text" disabled />
+                    <input type="text" class="form-control" value="@usersSelectList.FirstOrDefault(i => i.Value == Model.IdUser.ToString())?.Text" disabled />
                 }
                 else
                 {

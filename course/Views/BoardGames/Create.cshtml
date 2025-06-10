@@ -13,9 +13,9 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group mb-3">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <label asp-for="Name" class="control-label"></label> 
+                <input asp-for="Name" class="form-control" /> 
+                <span asp-validation-for="Name" class="text-danger"></span> 
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Description" class="control-label"></label>
@@ -38,9 +38,9 @@
                 <span asp-validation-for="MaxPlayers" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
-                <label asp-for="AveragePlayTime" class="control-label">Среднее время игры (чч:мм)</label>
-                <input asp-for="AveragePlayTime" class="form-control" type="time" step="1" /> @* Используем type="time" для TimeSpan *@
-                <span asp-validation-for="AveragePlayTime" class="text-danger"></span>
+                <label asp-for="EstimatedPlayTime" class="control-label">Среднее время игры (чч:мм)</label> 
+                <input asp-for="EstimatedPlayTime" class="form-control" type="time" step="1" />
+                <span asp-validation-for="EstimatedPlayTime" class="text-danger"></span> 
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Genre" class="control-label"></label>
@@ -52,11 +52,14 @@
                 <input asp-for="Difficulty" class="form-control" type="number" />
                 <span asp-validation-for="Difficulty" class="text-danger"></span>
             </div>
+            @* {{-- Removed ImageUrl section as it's not a property of the BoardGame model --}}
+            {{--
             <div class="form-group mb-3">
                 <label asp-for="ImageUrl" class="control-label"></label>
                 <input asp-for="ImageUrl" class="form-control" type="url" placeholder="http://example.com/image.png" />
                 <span asp-validation-for="ImageUrl" class="text-danger"></span>
             </div>
+            --}} *@
             <div class="form-group mt-3">
                 <input type="submit" value="Создать" class="btn btn-primary" />
             </div>

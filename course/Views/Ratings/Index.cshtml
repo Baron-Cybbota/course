@@ -14,7 +14,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.UserId)
+                @Html.DisplayNameFor(model => model.IdUser)
             </th>
             <th>
                 Относится к
@@ -30,9 +30,9 @@
         {
             <tr>
                 <td>
-                    @if (userNames != null && userNames.ContainsKey(item.UserId))
+                    @if (userNames != null && userNames.ContainsKey(item.IdUser))
                     {
-                        @userNames[item.UserId]
+                        @userNames[item.IdUser]
                     }
                     else
                     {
@@ -40,13 +40,13 @@
                     }
                 </td>
                 <td>
-                    @if (item.PostId.HasValue && postTitles != null && postTitles.ContainsKey(item.PostId.Value))
+                    @if (item.IdPost.HasValue && postTitles != null && postTitles.ContainsKey(item.IdPost.Value))
                     {
-                        <a asp-controller="Posts" asp-action="Details" asp-route-id="@item.PostId">Пост: @postTitles[item.PostId.Value]</a>
+                        <a asp-controller="Posts" asp-action="Details" asp-route-id="@item.IdPost">Пост: @postTitles[item.IdPost.Value]</a>
                     }
-                    else if (item.CommentId.HasValue && commentContents != null && commentContents.ContainsKey(item.CommentId.Value))
+                    else if (item.IdComment.HasValue && commentContents != null && commentContents.ContainsKey(item.IdComment.Value))
                     {
-                        <a asp-controller="Comments" asp-action="Details" asp-route-id="@item.CommentId">Комментарий: @commentContents[item.CommentId.Value]</a>
+                        <a asp-controller="Comments" asp-action="Details" asp-route-id="@item.IdComment">Комментарий: @commentContents[item.IdComment.Value]</a>
                     }
                     else
                     {
@@ -57,7 +57,7 @@
                     @Html.DisplayFor(modelItem => item.Value)
                 </td>
                 <td>
-                    <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+                    <a asp-action="Delete" asp-route-id="@item.IdRating">Удалить</a>
                 </td>
             </tr>
         }

@@ -20,15 +20,15 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="IdComplaint" /> @* Corrected from Id *@
             @* These are hidden because they should not be changed from the form *@
-            <input type="hidden" asp-for="AuthorId" />
-            <input type="hidden" asp-for="PostId" />
-            <input type="hidden" asp-for="CommentId" />
-            <input type="hidden" asp-for="CreatedDate" />
+            <input type="hidden" asp-for="IdUser" /> @* Corrected from AuthorId *@
+            <input type="hidden" asp-for="IdPost" /> @* Corrected from PostId *@
+            <input type="hidden" asp-for="IdComment" /> @* Corrected from CommentId *@
+            <input type="hidden" asp-for="CreationDate" /> @* Corrected from CreatedDate *@
             @* HandledByModeratorId and ResolvedDate are set by the controller based on status *@
-            <input type="hidden" asp-for="AdministratorId" />
-            <input type="hidden" asp-for="ResolvedDate" />
+            <input type="hidden" asp-for="IdAdministrator" /> @* Corrected from AdministratorId *@
+            <input type="hidden" asp-for="ResolutionDate" /> @* Corrected from ResolvedDate *@
 
 
             <div class="form-group mb-2">

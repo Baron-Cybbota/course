@@ -1,69 +1,60 @@
-@model IEnumerable<course.Models.Event>
+@model course.Models.Complaint
 
 @{
-    ViewData["Title"] = "Список мероприятий";
-    var boardGameTitles = ViewData["BoardGameTitles"] as Dictionary<int, string>;
+    ViewData["Title"] = "Подать жалобу";
+    var relatedContent = ViewData["RelatedContent"] as string;
+    var relatedPostId = ViewData["RelatedPostId"] as int?;
+    var relatedCommentId = ViewData["RelatedCommentId"] as int?;
 }
 
-<h1>Список мероприятий</h1>
+<h1>Подать жалобу</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Создать новое мероприятие</a>
-</p>
+<h4>Жалоба</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-<table class="table table-striped table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.BoardGameId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Date)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Time)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Location)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @if (boardGameTitles != null && boardGameTitles.ContainsKey(item.BoardGameId))
-                    {
-                        @boardGameTitles[item.BoardGameId]
-                    }
-                    else
-                    {
-                        <span>Неизвестная игра (ID: @item.BoardGameId)</span>
-                    }
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Date)
-                </td>
-                <td>
-                    @item.Time.ToString(@"hh\:mm")
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Location)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редактировать</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Удалить</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+            @if (relatedContent == "Post" && relatedPostId.HasValue)
+            {
+                <div class="form-group mb-2">
+                    <label class="control-label">Жалоба на пост ID:</label>
+                    <input type="text" value="@relatedPostId.Value" class="form-control" readonly />
+                    <input type="hidden" asp-for="IdPost" value="@relatedPostId.Value" />
+                </div>
+            }
+            else if (relatedContent == "Comment" && relatedCommentId.HasValue)
+            {
+                <div class="form-group mb-2">
+                    <label class="control-label">Жалоба на комментарий ID:</label>
+                    <input type="text" value="@relatedCommentId.Value" class="form-control" readonly />
+                    <input type="hidden" asp-for="IdComment" value="@relatedCommentId.Value" />
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    ID поста или комментария не указан. Пожалуйста, убедитесь, что вы подаете жалобу с конкретного поста или комментария.
+                </div>
+            }
+
+            <div class="form-group mb-2">
+                <label asp-for="Reason" class="control-label"></label>
+                <textarea asp-for="Reason" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Reason" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Подать жалобу" class="btn btn-primary mt-2" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Вернуться к списку жалоб</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

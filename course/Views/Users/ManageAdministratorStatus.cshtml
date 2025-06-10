@@ -1,4 +1,4 @@
-@model course.Models.UserAdminStatusViewModel
+@model course.Models.ViewModels.UserAdminStatusViewModel
 
 @{
     ViewData["Title"] = $"Управление статусом администратора для {Model.UserName}";
@@ -19,11 +19,11 @@
                 <label class="form-check-label" asp-for="IsAdministrator"></label>
             </div>
 
-            <div class="form-group mb-3" id="accessLevelGroup" style="@(Model.IsAdministrator ? "" : "display:none;")">
+            @* <div class="form-group mb-3" id="accessLevelGroup" style="@(Model.IsAdministrator ? "" : "display:none;")">
                 <label asp-for="AccessLevel" class="control-label"></label>
                 <input asp-for="AccessLevel" class="form-control" type="number" />
                 <span asp-validation-for="AccessLevel" class="text-danger"></span>
-            </div>
+            </div> *@
 
             @if (Model.IsAdministrator && Model.AssignmentDate.HasValue)
             {

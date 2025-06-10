@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using course.Data;
-using course.Models;
-using System.Threading.Tasks; // Для Task
-using System; // Для DateTime
-using System.Linq; // Для Any()
-using System.Collections.Generic; // Для Dictionary
+using course.Models; // Убедитесь, что это пространство имен соответствует вашим моделям
+using System.Threading.Tasks;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Security.Claims; // Для работы с Claims
 
 namespace course.Controllers
@@ -19,171 +19,203 @@ namespace course.Controllers
             _context = context;
         }
 
-        // GET: Posts
-        // Отображает список всех постов.
-        public async Task<IActionResult> Index()
+        // Вспомогательный метод для получения Id текущего пользователя
+        private int? GetCurrentUserId()
         {
-            var posts = await _context.Posts.ToListAsync();
-
-            // Получаем уникальные AuthorId из всех постов
-            var authorIds = posts.Select(p => p.AuthorId).Distinct().ToList();
-
-            // Загружаем авторов для этих ID
-            var authors = await _context.Users
-                                        .Where(u => authorIds.Contains(u.Id))
-                                        .ToDictionaryAsync(u => u.Id, u => u.Login);
-
-            ViewData["Authors"] = authors; // Передаем словарь авторов в View
-
-            return View(posts);
-        }
-
-        // GET: Posts/Details/5
-        // Отображает детали конкретного поста по Id, включая связанные данные.
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound(); // Если Id не предоставлен, возвращаем 404
-            }
-
-            var post = await _context.Posts
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (post == null)
-            {
-                return NotFound(); // Если пост не найден, возвращаем 404
-            }
-
-            // Получаем имя автора поста
-            var author = await _context.Users.FindAsync(post.AuthorId);
-            ViewData["AuthorName"] = author?.Login ?? "Неизвестный автор";
-
-            // Получаем все комментарии к этому посту
-            var comments = await _context.Comments
-                                         .Where(c => c.PostId == id)
-                                         .OrderBy(c => c.CreationDate)
-                                         .ToListAsync();
-            ViewData["Comments"] = comments;
-
-            // Получаем имена авторов комментариев
-            var commentAuthorIds = comments.Select(c => c.AuthorId).Distinct().ToList();
-            var commentAuthors = await _context.Users
-                                               .Where(u => commentAuthorIds.Contains(u.Id))
-                                               .ToDictionaryAsync(u => u.Id, u => u.Login);
-            ViewData["CommentAuthors"] = commentAuthors;
-
-            // Получаем рейтинги для этого поста
-            var postRatings = await _context.Ratings.Where(r => r.PostId == id).ToListAsync();
-
-            // Вычисляем общий рейтинг поста
-            int totalPostRating = postRatings.Sum(r => r.Value ? 1 : -1);
-            ViewData["TotalPostRating"] = totalPostRating;
-            // Передаем количество оценок для поста
-            ViewData["PostRatingsCount"] = postRatings.Count;
-
-            // Получаем текущего пользователя для логики оценки
-            int? currentUserId = null;
             if (User.Identity.IsAuthenticated)
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
                 {
-                    currentUserId = parsedUserId;
+                    return parsedUserId;
                 }
             }
-            ViewData["CurrentUserId"] = currentUserId;
+            return null;
+        }
 
-            // Проверяем, оценил ли текущий пользователь пост
-            if (currentUserId.HasValue)
+        // GET: Posts
+        public async Task<IActionResult> Index()
+        {
+            var posts = await _context.Posts
+                                       .Where(p => !p.IsHidden) // Предполагаем, что вы хотите показывать только не скрытые посты
+                                       .OrderByDescending(p => p.CreationDate)
+                                       .ToListAsync();
+
+            var authorIds = posts.Select(p => p.IdUser).Distinct().ToList();
+
+            var authors = await _context.Users
+                                        .Where(u => authorIds.Contains(u.IdUser))
+                                        .ToDictionaryAsync(u => u.IdUser, u => u.Login);
+
+            ViewData["Authors"] = authors;
+            return View(posts);
+        }
+
+        /// <summary>
+        /// Возвращает дополнительные посты в виде частичного представления для бесконечной прокрутки.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> GetMorePosts(int pageNumber, int pageSize)
+        {
+            var posts = await _context.Posts
+                                       .OrderByDescending(p => p.CreationDate)
+                                       .Skip((pageNumber - 1) * pageSize)
+                                       .Take(pageSize)
+                                       .ToListAsync();
+
+            if (!posts.Any())
             {
-                var existingPostRating = await _context.Ratings.FirstOrDefaultAsync(r => r.UserId == currentUserId.Value && r.PostId == post.Id);
-                ViewData["ExistingPostRating"] = existingPostRating;
+                return Content("");
             }
 
-            // Получаем рейтинги для каждого комментария и вычисляем их сумму и количество
+            var authorIds = posts.Select(p => p.IdUser).Distinct().ToList();
+
+            var authorNames = await _context.Users
+                                            .Where(u => authorIds.Contains(u.IdUser))
+                                            .ToDictionaryAsync(u => u.IdUser, u => u.Login);
+
+            // Since Rating is now directly on the Post model, we don't need to fetch from Ratings table here.
+            // The Post model already has the Rating.
+            // var postIds = posts.Select(p => p.IdPost).ToList();
+            // var postRatings = await _context.Ratings
+            //                                 .Where(r => r.IdPost.HasValue && postIds.Contains(r.IdPost.Value))
+            //                                 .GroupBy(r => r.IdPost.Value)
+            //                                 .ToDictionaryAsync(g => g.Key, g => g.Sum(r => r.Value ? 1 : -1));
+
+            var commentCounts = await _context.Comments
+                                              .Where(c => posts.Select(p => p.IdPost).Contains(c.IdPost)) // Use postIds or directly from posts
+                                              .GroupBy(c => c.IdPost)
+                                              .ToDictionaryAsync(g => g.Key, g => g.Count());
+
+            ViewData["AuthorNames"] = authorNames;
+            // ViewData["PostRatings"] = postRatings; // Remove this if you're getting rating from Post.Rating
+            ViewData["CommentCounts"] = commentCounts;
+
+            return PartialView("_PostCardPartial", posts);
+        }
+
+
+        // GET: Posts/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var post = await _context.Posts
+                .FirstOrDefaultAsync(m => m.IdPost == id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            var author = await _context.Users.FindAsync(post.IdUser);
+            ViewData["AuthorName"] = author?.Login ?? "Неизвестный автор";
+
+            var comments = await _context.Comments
+                                         .Where(c => c.IdPost == id)
+                                         .OrderBy(c => c.CreationDate)
+                                         .ToListAsync();
+            ViewData["Comments"] = comments;
+
+            var commentAuthorIds = comments.Select(c => c.IdUser).Distinct().ToList();
+            var commentAuthors = await _context.Users
+                                               .Where(u => commentAuthorIds.Contains(u.IdUser))
+                                               .ToDictionaryAsync(u => u.IdUser, u => u.Login);
+            ViewData["CommentAuthors"] = commentAuthors;
+
+            // When Post has Rating property, you fetch it directly from the post object.
+            // No need to query Ratings table for post's total rating here.
+            // However, you still need to determine if the *current user* has voted.
+            // var postRatings = await _context.Ratings.Where(r => r.IdPost == id).ToListAsync();
+            // int totalPostRating = postRatings.Sum(r => r.Value ? 1 : -1);
+            // ViewData["TotalPostRating"] = totalPostRating; // Use post.Rating instead
+            // ViewData["PostRatingsCount"] = postRatings.Count; // This count is still useful for number of votes
+
+            ViewData["TotalPostRating"] = post.Rating; // Use the Rating property directly from the Post model
+
+            int? currentUserId = GetCurrentUserId();
+            ViewData["CurrentUserId"] = currentUserId;
+
+            // Check if the current user has rated this post
+            if (currentUserId.HasValue)
+            {
+                var existingPostRating = await _context.Ratings.FirstOrDefaultAsync(r => r.IdUser == currentUserId.Value && r.IdPost == post.IdPost);
+                ViewData["ExistingPostRating"] = existingPostRating; // This will tell if user has upvoted/downvoted or not voted
+            }
+
+
+            // DECLARE THESE DICTIONARIES HERE
             var commentTotalRatings = new Dictionary<int, int>();
             var commentRatingsCounts = new Dictionary<int, int>();
-            if (comments != null) // Добавлена проверка на null
+            var existingCommentRatings = new Dictionary<int, Rating>(); // Declare for current user's comment ratings
+
+            if (comments != null)
             {
+                // Fetch all ratings for comments related to this post in one go to optimize
+                var allCommentRatings = await _context.Ratings
+                                                        .Where(r => r.IdComment.HasValue && comments.Select(c => c.IdComment).Contains(r.IdComment.Value))
+                                                        .ToListAsync();
+
                 foreach (var comment in comments)
                 {
-                    var currentCommentRatings = await _context.Ratings
-                                                            .Where(r => r.CommentId == comment.Id)
-                                                            .ToListAsync();
-                    commentTotalRatings[comment.Id] = currentCommentRatings.Sum(r => r.Value ? 1 : -1);
-                    commentRatingsCounts[comment.Id] = currentCommentRatings.Count;
+                    var currentCommentRatings = allCommentRatings.Where(r => r.IdComment == comment.IdComment).ToList();
+                    commentTotalRatings[comment.IdComment] = currentCommentRatings.Sum(r => r.Value ? 1 : -1);
+                    commentRatingsCounts[comment.IdComment] = currentCommentRatings.Count;
+
+                    // Check for current user's rating on this specific comment
+                    if (currentUserId.HasValue)
+                    {
+                        var userRatingForComment = currentCommentRatings.FirstOrDefault(r => r.IdUser == currentUserId.Value && r.IdComment == comment.IdComment);
+                        if (userRatingForComment != null)
+                        {
+                            existingCommentRatings[comment.IdComment] = userRatingForComment;
+                        }
+                    }
                 }
             }
             ViewData["CommentTotalRatings"] = commentTotalRatings;
             ViewData["CommentRatingsCounts"] = commentRatingsCounts;
-
-            // Pre-fetch existing ratings for the current user for all comments
-            if (currentUserId.HasValue)
-            {
-                var userCommentRatings = await _context.Ratings
-                                                       .Where(r => r.UserId == currentUserId.Value && r.CommentId.HasValue && comments.Select(c => c.Id).Contains(r.CommentId.Value))
-                                                       .ToDictionaryAsync(r => r.CommentId.Value, r => r);
-                ViewData["ExistingCommentRatings"] = userCommentRatings;
-            }
-            else
-            {
-                ViewData["ExistingCommentRatings"] = new Dictionary<int, Rating>(); // Пустой словарь, если пользователь не аутентифицирован
-            }
+            ViewData["ExistingCommentRatings"] = existingCommentRatings; // Pass this to the view
 
             return View(post);
         }
 
         // GET: Posts/Create
-        // Отображает форму для создания нового поста.
         public IActionResult Create()
         {
-            // Здесь не нужно передавать AuthorId, так как он будет установлен на сервере
             return View();
         }
 
         // POST: Posts/Create
-        // Обрабатывает отправку формы для создания нового поста.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Исключаем AuthorId из привязки, чтобы он не приходил из формы
-        public async Task<IActionResult> Create([Bind("Title,Content,IsHidden")] Post post)
+        public async Task<IActionResult> Create([Bind("Title,Content,IsHidden,IdEvent")] Post post)
         {
-            // Получаем ID текущего залогиненного пользователя
-            int? currentUserId = null;
-            if (User.Identity.IsAuthenticated)
-            {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
-                {
-                    currentUserId = parsedUserId;
-                }
-            }
+            int? currentUserId = GetCurrentUserId();
 
             if (!currentUserId.HasValue)
             {
-                // Если пользователь не залогинен, можно перенаправить на страницу логина
-                // или добавить ошибку в ModelState
                 ModelState.AddModelError(string.Empty, "Вы должны быть залогинены, чтобы создать пост.");
                 return View(post);
             }
 
             if (ModelState.IsValid)
             {
-                post.AuthorId = currentUserId.Value; // Устанавливаем AuthorId из залогиненного пользователя
-                post.CreationDate = DateTime.UtcNow; // Устанавливаем дату создания
-                post.LastEditDate = null; // Дата последнего редактирования отсутствует, так как пост новый
-                post.Rating = 0; // Начальный рейтинг
+                post.IdUser = currentUserId.Value;
+                post.CreationDate = DateTime.UtcNow;
+                post.EditDate = null;
+                post.Rating = 0; // Initialize rating to 0 when creating a new post
 
-                _context.Add(post); // Добавляем пост в контекст
-                await _context.SaveChangesAsync(); // Сохраняем изменения в базе данных
-                return RedirectToAction(nameof(Index)); // Перенаправляем на список постов
+                _context.Add(post);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-            // Если модель невалидна, возвращаем форму с ошибками
             return View(post);
         }
 
         // GET: Posts/Edit/5
-        // Отображает форму для редактирования существующего поста.
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -191,99 +223,74 @@ namespace course.Controllers
                 return NotFound();
             }
 
-            var post = await _context.Posts.FindAsync(id); // Находим пост по Id
+            var post = await _context.Posts.FindAsync(id);
             if (post == null)
             {
                 return NotFound();
             }
-            // Проверка на то, является ли текущий пользователь автором поста
-            int? currentUserId = null;
-            if (User.Identity.IsAuthenticated)
-            {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
-                {
-                    currentUserId = parsedUserId;
-                }
-            }
 
-            if (!currentUserId.HasValue || post.AuthorId != currentUserId.Value)
+            int? currentUserId = GetCurrentUserId();
+
+            if (!currentUserId.HasValue || post.IdUser != currentUserId.Value)
             {
-                return Forbid(); // Или NotFound(), в зависимости от вашей логики доступа
+                return Forbid();
             }
 
             return View(post);
         }
 
         // POST: Posts/Edit/5
-        // Обрабатывает отправку формы для редактирования поста.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Убедитесь, что все поля, которые могут быть изменены пользователем, включены.
-        // CreationDate, Id, AuthorId, Rating не должны меняться через форму редактирования.
-        // LastEditDate устанавливается здесь.
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content,IsHidden")] Post post)
+        public async Task<IActionResult> Edit(int id, [Bind("IdPost,Title,Content,IsHidden,IdEvent")] Post post)
         {
-            if (id != post.Id) // Проверяем, совпадает ли Id из маршрута с Id модели
+            if (id != post.IdPost)
             {
                 return NotFound();
             }
 
-            // Получаем ID текущего залогиненного пользователя
-            int? currentUserId = null;
-            if (User.Identity.IsAuthenticated)
-            {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
-                {
-                    currentUserId = parsedUserId;
-                }
-            }
+            int? currentUserId = GetCurrentUserId();
 
-            // Загружаем существующий пост из базы данных для проверки AuthorId
-            var existingPost = await _context.Posts.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+            var existingPost = await _context.Posts.AsNoTracking().FirstOrDefaultAsync(p => p.IdPost == id);
             if (existingPost == null)
             {
                 return NotFound();
             }
 
-            // Проверяем, что текущий пользователь является автором поста
-            if (!currentUserId.HasValue || existingPost.AuthorId != currentUserId.Value)
+            if (!currentUserId.HasValue || existingPost.IdUser != currentUserId.Value)
             {
-                return Forbid(); // Пользователь не имеет прав на редактирование этого поста
+                return Forbid();
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    post.LastEditDate = DateTime.UtcNow; // Обновляем дату последнего редактирования
-                    post.CreationDate = existingPost.CreationDate; // Сохраняем оригинальную дату создания
-                    post.AuthorId = existingPost.AuthorId; // Сохраняем оригинального автора
-                    post.Rating = existingPost.Rating; // Сохраняем текущий рейтинг
+                    post.EditDate = DateTime.UtcNow;
+                    post.CreationDate = existingPost.CreationDate;
+                    post.IdUser = existingPost.IdUser;
+                    post.Rating = existingPost.Rating; // Preserve the existing rating
 
-                    _context.Update(post); // Обновляем пост в контексте
+                    _context.Update(post);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException) // Обработка конфликтов параллельного доступа
+                catch (DbUpdateConcurrencyException)
                 {
-                    if (!PostExists(post.Id))
+                    if (!PostExists(post.IdPost))
                     {
                         return NotFound();
                     }
                     else
                     {
-                        throw; // Пробрасываем ошибку, если это не конфликт параллельного доступа
+                        throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = post.IdPost });
             }
-            // Если модель невалидна, возвращаем форму с ошибками
             return View(post);
         }
 
         // GET: Posts/Delete/5
-        // Отображает страницу подтверждения удаления поста.
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -292,37 +299,27 @@ namespace course.Controllers
             }
 
             var post = await _context.Posts
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.IdPost == id);
             if (post == null)
             {
                 return NotFound();
             }
-            // Проверка на то, является ли текущий пользователь автором поста
-            int? currentUserId = null;
-            if (User.Identity.IsAuthenticated)
+
+            int? currentUserId = GetCurrentUserId();
+
+            if (!currentUserId.HasValue || post.IdUser != currentUserId.Value)
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
-                {
-                    currentUserId = parsedUserId;
-                }
+                return Forbid();
             }
 
-            if (!currentUserId.HasValue || post.AuthorId != currentUserId.Value)
-            {
-                return Forbid(); // Или NotFound(), в зависимости от вашей логики доступа
-            }
-
-            // Получаем имя автора для отображения на странице удаления
-            var author = await _context.Users.FindAsync(post.AuthorId);
+            var author = await _context.Users.FindAsync(post.IdUser);
             ViewData["AuthorName"] = author?.Login ?? "Неизвестный автор";
 
             return View(post);
         }
 
         // POST: Posts/Delete/5
-        // Обрабатывает подтверждение удаления поста.
-        [HttpPost, ActionName("Delete")] // Указываем, что это POST-действие для маршрута Delete
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -332,31 +329,93 @@ namespace course.Controllers
                 return NotFound();
             }
 
-            // Проверка на то, является ли текущий пользователь автором поста
-            int? currentUserId = null;
-            if (User.Identity.IsAuthenticated)
+            int? currentUserId = GetCurrentUserId();
+
+            if (!currentUserId.HasValue || post.IdUser != currentUserId.Value)
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedUserId))
+                return Forbid();
+            }
+
+            _context.Posts.Remove(post);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Новый экшен для обработки голосования
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Vote(int postId, string voteType)
+        {
+            int? currentUserId = GetCurrentUserId();
+
+            if (!currentUserId.HasValue)
+            {
+                return Json(new { success = false, message = "Вы должны быть залогинены, чтобы голосовать." });
+            }
+
+            var post = await _context.Posts.FindAsync(postId);
+            if (post == null)
+            {
+                return Json(new { success = false, message = "Пост не найден." });
+            }
+
+            var existingRating = await _context.Ratings
+                                               .FirstOrDefaultAsync(r => r.IdUser == currentUserId.Value && r.IdPost == postId);
+
+            bool isUpvote = (voteType == "up");
+            int voteValue = isUpvote ? 1 : -1;
+
+            if (existingRating == null)
+            {
+                // Пользователь еще не голосовал за этот пост, добавляем новую запись
+                var newRating = new Rating
                 {
-                    currentUserId = parsedUserId;
+                    IdUser = currentUserId.Value,
+                    IdPost = postId,
+                    Value = isUpvote,
+                };
+                _context.Ratings.Add(newRating);
+                post.Rating += voteValue; // Update Post.Rating
+            }
+            else
+            {
+                // Пользователь уже голосовал
+                if (existingRating.Value == isUpvote)
+                {
+                    // Голос тот же, что и был - отменяем голос (удаляем запись)
+                    _context.Ratings.Remove(existingRating);
+                    post.Rating -= voteValue; // Update Post.Rating
+                }
+                else
+                {
+                    // Голос противоположный - меняем голос
+                    existingRating.Value = isUpvote;
+                    _context.Ratings.Update(existingRating);
+                    post.Rating += (voteValue * 2); // Update Post.Rating: -1 becomes 1 (+2), 1 becomes -1 (-2)
                 }
             }
 
-            if (!currentUserId.HasValue || post.AuthorId != currentUserId.Value)
+            try
             {
-                return Forbid(); // Пользователь не имеет прав на удаление этого поста
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, newRating = post.Rating }); // Return the updated post.Rating
             }
-
-            _context.Posts.Remove(post); // Удаляем пост из контекста
-            await _context.SaveChangesAsync(); // Сохраняем изменения
-            return RedirectToAction(nameof(Index));
+            catch (DbUpdateConcurrencyException)
+            {
+                return Json(new { success = false, message = "Ошибка сохранения данных. Пожалуйста, попробуйте снова." });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error voting: {ex.Message}");
+                return Json(new { success = false, message = "Произошла непредвиденная ошибка." });
+            }
         }
+
 
         // Вспомогательный метод для проверки существования поста
         private bool PostExists(int id)
         {
-            return _context.Posts.Any(e => e.Id == id);
+            return _context.Posts.Any(e => e.IdPost == id);
         }
     }
 }

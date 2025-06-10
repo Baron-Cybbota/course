@@ -1,8 +1,9 @@
-@model course.Models.Event
+@model course.Models.ViewModels.EventEditViewModel
 
 @{
     ViewData["Title"] = "Редактировать мероприятие";
-    var boardGameSelectList = ViewBag.BoardGameId as SelectList;
+    // boardGameSelectList is now part of the ViewModel, not ViewBag
+    // var boardGameSelectList = ViewBag.BoardGameId as SelectList;
 }
 
 <h1>Редактировать мероприятие</h1>
@@ -13,10 +14,22 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+            {{-- CHANGED: asp-for="Id" to asp-for="IdEvent" --}}
+            <input type="hidden" asp-for="IdEvent" />
+            {{-- ADDED: Hidden field for CurrentIdLocation --}}
+            <input type="hidden" asp-for="CurrentIdLocation" />
+
+            {{-- ADDED: Name Field --}}
+            <div class="form-group mb-3">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
             <div class="form-group mb-3">
                 <label asp-for="BoardGameId" class="control-label">Настольная игра</label>
-                <select asp-for="BoardGameId" class="form-control" asp-items="@boardGameSelectList"></select>
+                {{-- Changed asp-items to use ViewModel's SelectList property --}}
+                <select asp-for="BoardGameId" class="form-control" asp-items="@Model.BoardGameSelectList"></select>
                 <span asp-validation-for="BoardGameId" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
@@ -30,9 +43,10 @@
                 <span asp-validation-for="Time" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
-                <label asp-for="Location" class="control-label"></label>
-                <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger"></span>
+                {{-- CHANGED: asp-for="Location" to asp-for="LocationAddress" --}}
+                <label asp-for="LocationAddress" class="control-label"></label>
+                <input asp-for="LocationAddress" class="form-control" />
+                <span asp-validation-for="LocationAddress" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Description" class="control-label"></label>

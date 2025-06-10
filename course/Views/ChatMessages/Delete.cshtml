@@ -1,4 +1,4 @@
-@model course.Models.ChatMessage
+@model course.Models.Message
 
 @{
     ViewData["Title"] = "Удалить сообщение";
@@ -11,30 +11,43 @@
     <h4>Сообщение</h4>
     <hr />
     <dl class="row">
+        @* Removed "Чат" and "Отправитель" as they rely on external data not directly in the Message model for a simple delete view.
+           If you need to display sender's name or event name, your Controller action for this view would need to
+           fetch that data (e.g., using ViewData or a ViewModel) and pass it to the view. *@
+
         <dt class="col-sm-2">
-            Чат
+            @Html.DisplayNameFor(model => model.IdUser) @* Displaying the User ID directly as no "SenderName" property exists on Message *@
         </dt>
         <dd class="col-sm-10">
-            @ViewData["ChatName"] @* Название чата, передается из контроллера *@
+            @Html.DisplayFor(model => model.IdUser)
         </dd>
-        <dt class="col-sm-2">
-            Отправитель
-        </dt>
-        <dd class="col-sm-10">
-            @ViewData["SenderName"] @* Имя отправителя, передается из контроллера *@
-        </dd>
+
+        @* If a message is associated with an event, you might want to display the event ID or name.
+           You'd need to fetch the event name in your controller and pass it via ViewData or a ViewModel. *@
+        @if (Model.IdEvent.HasValue)
+        {
+            <dt class="col-sm-2">
+                Связано с событием
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.IdEvent) @* Displaying the Event ID *@
+            </dd>
+        }
+
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Content)
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Content)
         </dd>
+
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.SentDate)
+            @Html.DisplayNameFor(model => model.SendDate) @* **Corrected: Using SendDate** *@
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.SentDate)
+            @Html.DisplayFor(model => model.SendDate) @* **Corrected: Using SendDate** *@
         </dd>
+
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.IsRead)
         </dt>
@@ -43,13 +56,14 @@
         </dd>
     </dl>
 
-    <form asp-action="Delete" method="post"> @* Важно: метод "post" для DeleteConfirmed *@
-        <input type="hidden" asp-for="Id" />
-        @* ChatId не нужно как скрытое поле для удаления, так как DeleteConfirmed берет только Id сообщения.
-           Однако, если вы хотите вернуться к деталям чата после удаления, ChatId нужно сохранить.
-           Я оставлю его здесь, как в вашем оригинальном коде, для обратной ссылки. *@
-        <input type="hidden" asp-for="ChatId" /> 
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="IdMessage" /> @* **Corrected: Using IdMessage for the primary key** *@
+        @* If you need to redirect back to an event, you'd pass IdEvent.
+           Since there's no "ChatId" and "Chats" controller, the redirect path needs adjustment. *@
+        <input type="hidden" asp-for="IdEvent" /> @* Include IdEvent if it's needed for redirection context *@
         <input type="submit" value="Удалить" class="btn btn-danger" /> |
-        <a asp-controller="Chats" asp-action="Details" asp-route-id="@Model.ChatId" class="btn btn-secondary">Вернуться к чату</a>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Вернуться на главную</a> @* **Adjusted: Generic back link** *@
+        @* You might need a more specific back link based on where the message came from (e.g., an event details page).
+           If it's from an event: <a asp-controller="Events" asp-action="Details" asp-route-id="@Model.IdEvent" class="btn btn-secondary">Вернуться к событию</a> *@
     </form>
 </div>

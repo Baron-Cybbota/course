@@ -12,13 +12,13 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="AdministratorId" /> @* Не меняем модератора из формы *@
+            <input type="hidden" asp-for="IdBlacklist" />
+            <input type="hidden" asp-for="IdAdministrator" /> @* Не меняем модератора из формы *@
             <input type="hidden" asp-for="BlockDate" />     @* Не меняем дату блокировки из формы *@
             <div class="form-group">
-                <label asp-for="UserId" class="control-label">ID заблокированного пользователя</label>
-                <input asp-for="UserId" class="form-control" />
-                <span asp-validation-for="UserId" class="text-danger"></span>
+                <label asp-for="IdUser" class="control-label">ID заблокированного пользователя</label>
+                <input asp-for="IdUser" class="form-control" />
+                <span asp-validation-for="IdUser" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Reason" class="control-label"></label>

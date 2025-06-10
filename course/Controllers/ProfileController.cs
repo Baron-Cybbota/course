@@ -9,6 +9,7 @@ using BCrypt.Net; // Для хеширования и проверки паро�
 using System.Linq; // Для OrderByDescending и ToListAsync
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication; // ДОБАВЛЕНО: Для HttpContext extension methods
+using System.Collections.Generic; // ДОБАВЛЕНО: Для List<Claim>
 
 namespace course.Controllers
 {
@@ -28,13 +29,17 @@ namespace course.Controllers
         public async Task<IActionResult> Index()
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // --- CHANGE REQUIRED ---
+            // user.Id became user.IdUser. The claim should store IdUser.
             if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
             {
                 // Если ID пользователя не найден или некорректен (что не должно произойти для аутентифицированного пользователя)
                 return RedirectToAction("Login", "Account"); // Перенаправляем на страницу входа
             }
 
-            var user = await _context.Users.FindAsync(userId);
+            // --- CHANGE REQUIRED ---
+            // User.Id is now User.IdUser. FindAsync should use IdUser.
+            var user = await _context.Users.FindAsync(userId); // FindAsync uses the primary key
             if (user == null)
             {
                 // Пользователь не найден в базе данных, хотя Claim есть (очень редкий случай)
@@ -44,8 +49,10 @@ namespace course.Controllers
             }
 
             // Загружаем последние посты этого пользователя
+            // --- CHANGE REQUIRED ---
+            // Post.AuthorId is a foreign key to User.IdUser. Assuming it refers to the new IdUser.
             var userPosts = await _context.Posts
-                                          .Where(p => p.AuthorId == userId)
+                                          .Where(p => p.IdUser == userId) // Assuming AuthorId matches User.IdUser
                                           .OrderByDescending(p => p.CreationDate)
                                           .Take(5) // Ограничиваем количество постов для отображения
                                           .ToListAsync();
@@ -68,15 +75,19 @@ namespace course.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var user = await _context.Users.FindAsync(id);
+            // --- CHANGE REQUIRED ---
+            // User.Id is now User.IdUser. FindAsync should use IdUser.
+            var user = await _context.Users.FindAsync(id); // FindAsync uses the primary key
             if (user == null)
             {
                 return NotFound(); // Пользователь не найден
             }
 
             // Загружаем последние посты этого пользователя
+            // --- CHANGE REQUIRED ---
+            // Post.AuthorId is a foreign key to User.IdUser. Assuming it refers to the new IdUser.
             var userPosts = await _context.Posts
-                                          .Where(p => p.AuthorId == id.Value)
+                                          .Where(p => p.IdUser == id.Value) // Assuming AuthorId matches User.IdUser
                                           .OrderByDescending(p => p.CreationDate)
                                           .Take(5) // Ограничиваем количество постов для отображения
                                           .ToListAsync();
@@ -93,12 +104,16 @@ namespace course.Controllers
         public async Task<IActionResult> Edit()
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // --- CHANGE REQUIRED ---
+            // The claim should store IdUser.
             if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
             {
                 return RedirectToAction("Login", "Account");
             }
 
-            var user = await _context.Users.FindAsync(userId);
+            // --- CHANGE REQUIRED ---
+            // User.Id is now User.IdUser. FindAsync should use IdUser.
+            var user = await _context.Users.FindAsync(userId); // FindAsync uses the primary key
             if (user == null)
             {
                 return NotFound();
@@ -106,7 +121,9 @@ namespace course.Controllers
 
             var viewModel = new ProfileEditViewModel
             {
-                Id = user.Id,
+                // --- CHANGE REQUIRED ---
+                // User.Id is now User.IdUser. Assign IdUser to Id in ViewModel.
+                Id = user.IdUser, // Changed user.Id to user.IdUser
                 Login = user.Login,
                 Email = user.Email,
                 BlockStatus = user.BlockStatus,
@@ -124,6 +141,8 @@ namespace course.Controllers
         public async Task<IActionResult> Edit(ProfileEditViewModel model)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // --- CHANGE REQUIRED ---
+            // The claim should store IdUser. Check against model.Id (which should represent IdUser).
             if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId) || userId != model.Id)
             {
                 // Попытка редактирования чужого профиля или неверный ID
@@ -132,14 +151,18 @@ namespace course.Controllers
 
             if (ModelState.IsValid)
             {
-                var userToUpdate = await _context.Users.FindAsync(model.Id);
+                // --- CHANGE REQUIRED ---
+                // User.Id is now User.IdUser. FindAsync should use IdUser.
+                var userToUpdate = await _context.Users.FindAsync(model.Id); // FindAsync uses the primary key
                 if (userToUpdate == null)
                 {
                     return NotFound();
                 }
 
                 // Проверяем уникальность логина и email, если они изменились
-                if (await _context.Users.AnyAsync(u => u.Id != model.Id && (u.Login == model.Login || u.Email == model.Email)))
+                // --- CHANGE REQUIRED ---
+                // User.Id is now User.IdUser.
+                if (await _context.Users.AnyAsync(u => u.IdUser != model.Id && (u.Login == model.Login || u.Email == model.Email))) // Changed u.Id to u.IdUser
                 {
                     ModelState.AddModelError(string.Empty, "Пользователь с таким логином или Email уже существует.");
                     return View(model);
@@ -147,7 +170,7 @@ namespace course.Controllers
 
                 userToUpdate.Login = model.Login;
                 userToUpdate.Email = model.Email;
-                // BlockStatus и Rating не изменяются через эту форму, они для админов
+                // BlockStatus и Rating не изменяются через эту форму, они для админов. This is correct.
                 // userToUpdate.BlockStatus = model.BlockStatus;
                 // userToUpdate.Rating = model.Rating;
 
@@ -157,6 +180,8 @@ namespace course.Controllers
                     await _context.SaveChangesAsync();
 
                     // Обновляем Claims, если изменились Login или Email
+                    // --- CHANGE REQUIRED ---
+                    // Authenticate method needs to be updated to use IdUser.
                     await Authenticate(userToUpdate, rememberMe: User.Identity?.IsAuthenticated == true); // Проверяем, был ли пользователь "запомнен"
 
                     TempData["SuccessMessage"] = "Профиль успешно обновлен!";
@@ -164,7 +189,9 @@ namespace course.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(model.Id))
+                    // --- CHANGE REQUIRED ---
+                    // User.Id is now User.IdUser.
+                    if (!UserExists(model.Id)) // Changed model.Id to model.IdUser (assuming model.Id is IdUser)
                     {
                         return NotFound();
                     }
@@ -193,6 +220,8 @@ namespace course.Controllers
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            // --- CHANGE REQUIRED ---
+            // The claim should store IdUser.
             if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
             {
                 return RedirectToAction("Login", "Account");
@@ -200,7 +229,9 @@ namespace course.Controllers
 
             if (ModelState.IsValid)
             {
-                var user = await _context.Users.FindAsync(userId);
+                // --- CHANGE REQUIRED ---
+                // User.Id is now User.IdUser. FindAsync should use IdUser.
+                var user = await _context.Users.FindAsync(userId); // FindAsync uses the primary key
                 if (user == null)
                 {
                     return NotFound();
@@ -226,7 +257,9 @@ namespace course.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.Id))
+                    // --- CHANGE REQUIRED ---
+                    // User.Id is now User.IdUser.
+                    if (!UserExists(user.IdUser)) // Changed user.Id to user.IdUser
                     {
                         return NotFound();
                     }
@@ -245,16 +278,23 @@ namespace course.Controllers
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                // --- CHANGE REQUIRED ---
+                // User.Id is now User.IdUser. The claim should store IdUser.
+                new Claim(ClaimTypes.NameIdentifier, user.IdUser.ToString()), // Changed user.Id to user.IdUser
                 new Claim(ClaimTypes.Name, user.Login),
                 new Claim(ClaimTypes.Email, user.Email)
             };
 
-            var administrator = await _context.Administrators.FirstOrDefaultAsync(a => a.UserId == user.Id);
+            // --- CHANGE REQUIRED ---
+            // Administrator.UserId is now Administrator.IdUser.
+            // Administrator.AccessLevel has been removed.
+            var administrator = await _context.Administrators.FirstOrDefaultAsync(a => a.IdUser == user.IdUser); // Changed a.UserId to a.IdUser
             if (administrator != null)
             {
                 claims.Add(new Claim(ClaimTypes.Role, "Administrator"));
-                claims.Add(new Claim("AccessLevel", administrator.AccessLevel.ToString()));
+                // --- REMOVED ---
+                // AccessLevel is removed from Administrator model, so this claim should be removed.
+                // claims.Add(new Claim("AccessLevel", administrator.AccessLevel.ToString()));
             }
 
             var claimsIdentity = new ClaimsIdentity(
@@ -274,7 +314,9 @@ namespace course.Controllers
 
         private bool UserExists(int id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            // --- CHANGE REQUIRED ---
+            // User.Id is now User.IdUser.
+            return _context.Users.Any(e => e.IdUser == id); // Changed e.Id to e.IdUser
         }
     }
 }

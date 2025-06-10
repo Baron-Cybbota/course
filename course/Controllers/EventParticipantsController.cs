@@ -25,48 +25,49 @@ namespace course.Controllers
         {
             var participants = await _context.EventParticipants.ToListAsync();
 
-            // Получаем все уникальные EventId из участников
-            var eventIds = participants.Select(p => p.EventId).Distinct().ToList();
-            // Получаем все уникальные UserId из участников
-            var userIds = participants.Select(p => p.UserId).Distinct().ToList();
+            // Получаем все уникальные IdEvent из участников
+            var eventIds = participants.Select(p => p.IdEvent).Distinct().ToList(); // Corrected from p.EventId to p.IdEvent
+            // Получаем все уникальные IdUser из участников
+            var userIds = participants.Select(p => p.IdUser).Distinct().ToList();   // Corrected from p.UserId to p.IdUser
 
             // Загружаем названия мероприятий
-            var eventTitles = await _context.Events
-                                            .Where(e => eventIds.Contains(e.Id))
-                                            .ToDictionaryAsync(e => e.Id, e => e.Description); // Или 'Title', если есть
+            var eventNames = await _context.Events
+                                             .Where(e => eventIds.Contains(e.IdEvent)) // Corrected from e.Id to e.IdEvent
+                                             .ToDictionaryAsync(e => e.IdEvent, e => e.Name); // Corrected from e.Id to e.IdEvent and e.Description to e.Name (assuming Name is the display property)
 
             // Загружаем логины пользователей
             var userLogins = await _context.Users
-                                          .Where(u => userIds.Contains(u.Id))
-                                          .ToDictionaryAsync(u => u.Id, u => u.Login);
+                                           .Where(u => userIds.Contains(u.IdUser)) // Corrected from u.Id to u.IdUser
+                                           .ToDictionaryAsync(u => u.IdUser, u => u.Login); // Corrected from u.Id to u.IdUser
 
-            ViewData["EventTitles"] = eventTitles;
+            ViewData["EventNames"] = eventNames; // Renamed to EventNames for consistency
             ViewData["UserLogins"] = userLogins;
 
             return View(participants);
         }
 
         // GET: EventParticipants/Details?eventId=1&userId=101
-        // Отображает детали конкретного участника мероприятия по составному ключу (EventId и UserId).
-        public async Task<IActionResult> Details(int? eventId, int? userId)
+        // Отображает детали конкретного участника мероприятия по составному ключу (IdEvent и IdUser).
+        public async Task<IActionResult> Details(int? idEvent, int? idUser) // Corrected parameter names
         {
-            if (eventId == null || userId == null)
+            if (idEvent == null || idUser == null) // Corrected parameter names
             {
                 return NotFound(); // Если один из ключей не предоставлен, возвращаем 404
             }
 
             var participant = await _context.EventParticipants
-                .FirstOrDefaultAsync(m => m.EventId == eventId && m.UserId == userId);
+                .FirstOrDefaultAsync(m => m.IdEvent == idEvent && m.IdUser == idUser); // Corrected to IdEvent and IdUser
             if (participant == null)
             {
                 return NotFound(); // Если участник не найден, возвращаем 404
             }
 
             // Получаем название связанного мероприятия и логин пользователя
-            var eventEntity = await _context.Events.FindAsync(participant.EventId);
-            var user = await _context.Users.FindAsync(participant.UserId);
+            // Using FirstOrDefaultAsync to fetch, as FindAsync expects primary key only
+            var eventEntity = await _context.Events.FirstOrDefaultAsync(e => e.IdEvent == participant.IdEvent); // Corrected to IdEvent
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.IdUser == participant.IdUser); // Corrected to IdUser
 
-            ViewData["EventTitle"] = eventEntity?.Description ?? "Неизвестное мероприятие"; // Или 'Title', если есть
+            ViewData["EventName"] = eventEntity?.Name ?? "Неизвестное мероприятие"; // Corrected from Description to Name
             ViewData["UserLogin"] = user?.Login ?? "Неизвестный пользователь";
 
             return View(participant);
@@ -76,9 +77,10 @@ namespace course.Controllers
         // Отображает форму для добавления нового участника в мероприятие.
         public async Task<IActionResult> Create()
         {
-            // Для выбора EventId и UserId, передаем списки доступных мероприятий и пользователей.
-            ViewBag.Events = new SelectList(await _context.Events.ToListAsync(), "Id", "Description"); // Или "Title" для мероприятий, если есть
-            ViewBag.Users = new SelectList(await _context.Users.ToListAsync(), "Id", "Login");
+            // Для выбора IdEvent и IdUser, передаем списки доступных мероприятий и пользователей.
+            // Using IdEvent and Name for Events, IdUser and Login for Users
+            ViewBag.Events = new SelectList(await _context.Events.OrderBy(e => e.Name).ToListAsync(), "IdEvent", "Name"); // Corrected "Id" to "IdEvent", "Description" to "Name"
+            ViewBag.Users = new SelectList(await _context.Users.OrderBy(u => u.Login).ToListAsync(), "IdUser", "Login"); // Corrected "Id" to "IdUser"
             return View();
         }
 
@@ -87,11 +89,11 @@ namespace course.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken] // Защита от CSRF-атак
         // Только эти поля
-        public async Task<IActionResult> Create([Bind("EventId,UserId,ParticipationStatus")] EventParticipant eventParticipant)
+        public async Task<IActionResult> Create([Bind("IdEvent,IdUser,ParticipationStatus")] EventParticipant eventParticipant) // Corrected Bind properties to IdEvent, IdUser
         {
             // Проверяем, не является ли пользователь уже участником этого мероприятия.
             // Это предотвратит ошибку составного уникального ключа.
-            if (await _context.EventParticipants.AnyAsync(ep => ep.EventId == eventParticipant.EventId && ep.UserId == eventParticipant.UserId))
+            if (await _context.EventParticipants.AnyAsync(ep => ep.IdEvent == eventParticipant.IdEvent && ep.IdUser == eventParticipant.IdUser)) // Corrected to IdEvent and IdUser
             {
                 ModelState.AddModelError("", "Этот пользователь уже является участником данного мероприятия.");
             }
@@ -103,23 +105,23 @@ namespace course.Controllers
                 return RedirectToAction(nameof(Index)); // Перенаправляем на список участников
             }
             // Если модель невалидна, возвращаем форму с ошибками, повторно заполняя ViewBag
-            ViewBag.Events = new SelectList(await _context.Events.ToListAsync(), "Id", "Description", eventParticipant.EventId);
-            ViewBag.Users = new SelectList(await _context.Users.ToListAsync(), "Id", "Login", eventParticipant.UserId);
+            ViewBag.Events = new SelectList(await _context.Events.OrderBy(e => e.Name).ToListAsync(), "IdEvent", "Name", eventParticipant.IdEvent); // Corrected
+            ViewBag.Users = new SelectList(await _context.Users.OrderBy(u => u.Login).ToListAsync(), "IdUser", "Login", eventParticipant.IdUser); // Corrected
             return View(eventParticipant);
         }
 
-        // GET: EventParticipants/Edit?eventId=1&userId=101
+        // GET: EventParticipants/Edit?idEvent=1&idUser=101
         // Отображает форму для редактирования существующего участника мероприятия.
         // Обратите внимание: два параметра для составного ключа.
-        public async Task<IActionResult> Edit(int? eventId, int? userId)
+        public async Task<IActionResult> Edit(int? idEvent, int? idUser) // Corrected parameter names
         {
-            if (eventId == null || userId == null)
+            if (idEvent == null || idUser == null) // Corrected parameter names
             {
                 return NotFound();
             }
 
             // Используем FindAsync с составным ключом (важно: порядок параметров должен совпадать с определением ключа в DbContext)
-            var participant = await _context.EventParticipants.FindAsync(eventId, userId); 
+            var participant = await _context.EventParticipants.FindAsync(idEvent, idUser); // Corrected parameter names
             if (participant == null)
             {
                 return NotFound();
@@ -129,19 +131,19 @@ namespace course.Controllers
             // и возможные удаления/создания записей, если ключ меняется.
             // При редактировании, пользователь и мероприятие уже выбраны, так что эти SelectList могут быть не нужны
             // или использоваться для отображения текущих значений.
-            ViewBag.Events = new SelectList(await _context.Events.ToListAsync(), "Id", "Description", participant.EventId);
-            ViewBag.Users = new SelectList(await _context.Users.ToListAsync(), "Id", "Login", participant.UserId);
+            ViewBag.Events = new SelectList(await _context.Events.OrderBy(e => e.Name).ToListAsync(), "IdEvent", "Name", participant.IdEvent); // Corrected
+            ViewBag.Users = new SelectList(await _context.Users.OrderBy(u => u.Login).ToListAsync(), "IdUser", "Login", participant.IdUser); // Corrected
             return View(participant);
         }
 
-        // POST: EventParticipants/Edit?eventId=1&userId=101
+        // POST: EventParticipants/Edit?idEvent=1&idUser=101
         // Обрабатывает отправку формы для редактирования участника мероприятия.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int eventId, int userId, [Bind("EventId,UserId,ParticipationStatus")] EventParticipant eventParticipant)
+        public async Task<IActionResult> Edit(int idEvent, int idUser, [Bind("IdEvent,IdUser,ParticipationStatus")] EventParticipant eventParticipant) // Corrected parameter names and Bind properties
         {
             // Проверяем, что переданные Id из маршрута соответствуют ключевым полям модели
-            if (eventId != eventParticipant.EventId || userId != eventParticipant.UserId)
+            if (idEvent != eventParticipant.IdEvent || idUser != eventParticipant.IdUser) // Corrected to IdEvent and IdUser
             {
                 return NotFound();
             }
@@ -155,7 +157,7 @@ namespace course.Controllers
                 }
                 catch (DbUpdateConcurrencyException) // Обработка конфликтов параллельного доступа
                 {
-                    if (!EventParticipantExists(eventParticipant.EventId, eventParticipant.UserId))
+                    if (!EventParticipantExists(eventParticipant.IdEvent, eventParticipant.IdUser)) // Corrected to IdEvent and IdUser
                     {
                         return NotFound();
                     }
@@ -167,32 +169,32 @@ namespace course.Controllers
                 return RedirectToAction(nameof(Index));
             }
             // Если модель невалидна, возвращаем форму с ошибками
-            ViewBag.Events = new SelectList(await _context.Events.ToListAsync(), "Id", "Description", eventParticipant.EventId);
-            ViewBag.Users = new SelectList(await _context.Users.ToListAsync(), "Id", "Login", eventParticipant.UserId);
+            ViewBag.Events = new SelectList(await _context.Events.OrderBy(e => e.Name).ToListAsync(), "IdEvent", "Name", eventParticipant.IdEvent); // Corrected
+            ViewBag.Users = new SelectList(await _context.Users.OrderBy(u => u.Login).ToListAsync(), "IdUser", "Login", eventParticipant.IdUser); // Corrected
             return View(eventParticipant);
         }
 
-        // GET: EventParticipants/Delete?eventId=1&userId=101
+        // GET: EventParticipants/Delete?idEvent=1&idUser=101
         // Отображает страницу подтверждения удаления участника мероприятия.
-        public async Task<IActionResult> Delete(int? eventId, int? userId)
+        public async Task<IActionResult> Delete(int? idEvent, int? idUser) // Corrected parameter names
         {
-            if (eventId == null || userId == null)
+            if (idEvent == null || idUser == null) // Corrected parameter names
             {
                 return NotFound();
             }
 
             var participant = await _context.EventParticipants
-                .FirstOrDefaultAsync(m => m.EventId == eventId && m.UserId == userId);
+                .FirstOrDefaultAsync(m => m.IdEvent == idEvent && m.IdUser == idUser); // Corrected to IdEvent and IdUser
             if (participant == null)
             {
                 return NotFound();
             }
 
             // Получаем название связанного мероприятия и логин пользователя
-            var eventEntity = await _context.Events.FindAsync(participant.EventId);
-            var user = await _context.Users.FindAsync(participant.UserId);
+            var eventEntity = await _context.Events.FirstOrDefaultAsync(e => e.IdEvent == participant.IdEvent); // Corrected to IdEvent
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.IdUser == participant.IdUser); // Corrected to IdUser
 
-            ViewData["EventTitle"] = eventEntity?.Description ?? "Неизвестное мероприятие";
+            ViewData["EventName"] = eventEntity?.Name ?? "Неизвестное мероприятие"; // Corrected to Name
             ViewData["UserLogin"] = user?.Login ?? "Неизвестный пользователь";
 
             return View(participant);
@@ -202,10 +204,10 @@ namespace course.Controllers
         // Обрабатывает подтверждение удаления участника мероприятия.
         [HttpPost, ActionName("Delete")] // Указываем, что это POST-действие для маршрута Delete
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int eventId, int userId)
+        public async Task<IActionResult> DeleteConfirmed(int idEvent, int idUser) // Corrected parameter names
         {
             // Находим участника по составному ключу
-            var participant = await _context.EventParticipants.FindAsync(eventId, userId);
+            var participant = await _context.EventParticipants.FindAsync(idEvent, idUser); // Corrected parameter names
             if (participant != null)
             {
                 _context.EventParticipants.Remove(participant); // Удаляем участника из контекста
@@ -215,9 +217,9 @@ namespace course.Controllers
         }
 
         // Вспомогательный метод для проверки существования участника мероприятия по составному ключу
-        private bool EventParticipantExists(int eventId, int userId)
+        private bool EventParticipantExists(int idEvent, int idUser) // Corrected parameter names
         {
-            return _context.EventParticipants.Any(e => e.EventId == eventId && e.UserId == userId);
+            return _context.EventParticipants.Any(e => e.IdEvent == idEvent && e.IdUser == idUser); // Corrected to IdEvent and IdUser
         }
     }
 }

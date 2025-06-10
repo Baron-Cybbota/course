@@ -21,7 +21,7 @@
                 <div class="form-group mb-2">
                     <label class="control-label">Жалоба на пост ID:</label>
                     <input type="text" value="@relatedPostId.Value" class="form-control" readonly />
-                    <input type="hidden" asp-for="PostId" value="@relatedPostId.Value" />
+                    <input type="hidden" asp-for="IdPost" value="@relatedPostId.Value" /> @* Corrected from PostId *@
                 </div>
             }
             else if (relatedContent == "Comment" && relatedCommentId.HasValue)
@@ -29,7 +29,7 @@
                 <div class="form-group mb-2">
                     <label class="control-label">Жалоба на комментарий ID:</label>
                     <input type="text" value="@relatedCommentId.Value" class="form-control" readonly />
-                    <input type="hidden" asp-for="CommentId" value="@relatedCommentId.Value" />
+                    <input type="hidden" asp-for="IdComment" value="@relatedCommentId.Value" /> @* Corrected from CommentId *@
                 </div>
             }
             else

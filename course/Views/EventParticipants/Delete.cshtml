@@ -34,8 +34,8 @@
     </dl>
 
     <form asp-action="Delete" method="post">
-        <input type="hidden" name="eventId" value="@Model.EventId" />
-        <input type="hidden" name="userId" value="@Model.UserId" />
+        <input type="hidden" name="eventId" value="@Model.IdEvent" />
+        <input type="hidden" name="userId" value="@Model.IdUser" />
         <input type="submit" value="Удалить" class="btn btn-danger" /> |
         <a asp-action="Index" class="btn btn-secondary">Вернуться к списку</a>
     </form>

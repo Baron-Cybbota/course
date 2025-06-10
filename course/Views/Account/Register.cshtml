@@ -4,10 +4,93 @@
     ViewData["Title"] = "Регистрация";
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow-lg p-4">
+<style>
+    /* Main container styling for full height and centering */
+    .container-fluid.vh-100 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* Ensure it takes full viewport height */
+        background-color: #f8f9fa; /* Light background for the whole page */
+    }
+
+    /* Custom style for the background image section on larger screens */
+    .bg-register-image {
+        background-image: url('/images/acc_cover.png'); /* Replace with your desired background image path */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 0.5rem 0 0 0.5rem; /* Rounded corners on the left side */
+        overflow: hidden; /* Ensures image fits within rounded corners */
+        position: relative; /* For potential overlay effects */
+    }
+
+    /* Optional: Add an overlay to the background image for better text readability */
+    .bg-register-image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.2); /* Darker overlay for better contrast */
+        z-index: 1; /* Above image */
+    }
+
+    /* Media query to hide the background image section entirely on small screens */
+    @@media (max-width: 767.98px) { /* Bootstrap's 'md' breakpoint is 768px */
+        .d-md-flex.bg-register-image {
+            display: none !important; /* Force hide the background image column on small screens */
+        }
+        /* Adjust card styling for small screens when image is hidden */
+        .card.shadow-lg {
+            border-radius: 0.5rem; /* Full rounded corners on small screens */
+        }
+    }
+
+    /* Card styling for the registration form */
+    .card.shadow-lg {
+        border: none; /* Remove default card border */
+        border-radius: 0 0.5rem 0.5rem 0; /* Rounded corners on the right side on larger screens */
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important; /* More pronounced shadow */
+        background-color: #ffffff; /* White background for the card */
+    }
+
+    /* Form input and button styling */
+    .form-floating .form-control {
+        border-radius: 0.3rem;
+    }
+
+    .btn-primary {
+        background-color: #007bff; /* Standard Bootstrap primary blue */
+        border-color: #007bff;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+        border-color: #004085;
+    }
+
+    .text-danger {
+        font-size: 0.875em; /* Slightly smaller validation text */
+    }
+
+    hr {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<div class="container-fluid vh-100 d-flex justify-content-center align-items-center">
+    <div class="row w-100">
+        @* Background image section - visible only on medium and larger screens *@
+        <div class="col-md-7 d-none d-md-flex align-items-center justify-content-center bg-register-image">
+            @* The background image (reg_cover.png) is applied via CSS. *@
+        </div>
+
+        @* Registration form section *@
+        <div class="col-md-5 d-flex align-items-center justify-content-center">
+            <div class="card shadow-lg p-4 w-100" style="max-width: 400px;">
                 <h1 class="card-title text-center mb-4">Регистрация</h1>
                 <hr />
                 <form asp-action="Register" method="post">
@@ -26,13 +109,13 @@
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input asp-for="Password" class="form-control" placeholder="Пароль" />
+                        <input asp-for="Password" class="form-control" placeholder="Пароль" type="password" />
                         <label asp-for="Password"></label>
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
 
                     <div class="form-floating mb-4">
-                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Подтвердите пароль" />
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Подтвердите пароль" type="password" />
                         <label asp-for="ConfirmPassword"></label>
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>

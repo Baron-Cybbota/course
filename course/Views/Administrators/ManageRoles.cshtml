@@ -1,4 +1,4 @@
-@model course.Models.UserAdminStatusViewModel
+@model course.Models.ViewModels.UserAdminStatusViewModel
 
 @{
     ViewData["Title"] = $"Управление статусом администратора для {Model.UserName}";
@@ -43,12 +43,6 @@
         </div>
     </div>
 
-    <div id="accessLevelSection" class="form-group mb-3" style="display: @(Model.IsAdministrator ? "block" : "none");">
-        <label asp-for="AccessLevel" class="control-label"></label>
-        <input asp-for="AccessLevel" class="form-control" type="number" min="1" />
-        <span asp-validation-for="AccessLevel" class="text-danger"></span>
-    </div>
-
     @if (Model.IsAdministrator && Model.AssignmentDate.HasValue)
     {
         <div class="form-group mb-3">
@@ -69,23 +63,20 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var isAdministratorCheckbox = document.getElementById('IsAdministrator');
-            var accessLevelSection = document.getElementById('accessLevelSection');
+            // Removed accessLevelSection as it's no longer used
+            // var accessLevelSection = document.getElementById('accessLevelSection');
 
-            function toggleAccessLevelSection() {
-                if (isAdministratorCheckbox.checked) {
-                    accessLevelSection.style.display = 'block';
-                } else {
-                    accessLevelSection.style.display = 'none';
-                    // Очищаем AccessLevel, когда пользователь не администратор,
-                    // чтобы он не отправлялся с некорректным значением.
-                    document.getElementById('AccessLevel').value = '';
-                }
+            function toggleAssignmentDateDisplay() {
+                // This function is no longer needed to hide/show AccessLevelSection
+                // but if you had other elements dependent on IsAdministrator, you'd handle them here.
+                // For AssignmentDate, its display is handled directly by the
             }
 
-            isAdministratorCheckbox.addEventListener('change', toggleAccessLevelSection);
+            // No need for an event listener to toggle AccessLevelSection since it's removed.
+            // isAdministratorCheckbox.addEventListener('change', toggleAccessLevelSection);
 
-            // Вызываем при загрузке страницы, чтобы установить правильное состояние
-            toggleAccessLevelSection();
+            // No initial call to toggleAccessLevelSection needed.
+            // toggleAccessLevelSection();
         });
     </script>
 }

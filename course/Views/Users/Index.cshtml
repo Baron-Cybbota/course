@@ -67,16 +67,16 @@
                 </td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Действия пользователя">
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning" title="Редактировать">
+                        <a asp-action="Edit" asp-route-id="@item.IdUser" class="btn btn-sm btn-warning" title="Редактировать">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info ms-1" title="Детали">
+                        <a asp-action="Details" asp-route-id="@item.IdUser" class="btn btn-sm btn-info ms-1" title="Детали">
                             <i class="bi bi-info-circle"></i>
                         </a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger ms-1" title="Удалить">
+                        <a asp-action="Delete" asp-route-id="@item.IdUser" class="btn btn-sm btn-danger ms-1" title="Удалить">
                             <i class="bi bi-trash"></i>
                         </a>
-                        <a asp-action="ManageAdministratorStatus" asp-route-id="@item.Id" class="btn btn-sm btn-primary ms-1" title="Управление админ. статусом">
+                        <a asp-action="ManageAdministratorStatus" asp-route-id="@item.IdUser" class="btn btn-sm btn-primary ms-1" title="Управление админ. статусом">
                             <i class="bi bi-person-fill-gear"></i>
                         </a>
                     </div>

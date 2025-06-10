@@ -18,41 +18,41 @@ namespace course.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
-        {
-            var posts = await _context.Posts
-                                       .Where(p => !p.IsHidden)
-                                       .OrderByDescending(p => p.CreationDate)
-                                       .ToListAsync();
+    public async Task<IActionResult> Index()
+    {
+        const int initialPageSize = 25;
 
-            // Получаем все уникальные AuthorId из полученных постов
-            var authorIds = posts.Select(p => p.AuthorId).Distinct().ToList();
+        var posts = await _context.Posts
+                                .Where(p => !p.IsHidden)
+                                .OrderByDescending(p => p.CreationDate)
+                                .Take(initialPageSize)
+                                .ToListAsync();
 
-            // Загружаем пользователей (авторов) по их ID напрямую из DbContext
-            var authors = await _context.Users
-                                        .Where(u => authorIds.Contains(u.Id))
-                                        .ToDictionaryAsync(u => u.Id, u => u.Login);
+        var authorIds = posts.Select(p => p.IdUser).Distinct().ToList();
 
-            ViewData["AuthorNames"] = authors;
+        var authorNames = await _context.Users
+                                        .Where(u => authorIds.Contains(u.IdUser))
+                                        .ToDictionaryAsync(u => u.IdUser, u => u.Login);
 
-            // Вычисляем суммарный рейтинг и количество комментариев для каждого поста
-            var postRatings = await _context.Ratings
-                                            .Where(r => r.PostId.HasValue && posts.Select(p => p.Id).Contains(r.PostId.Value))
-                                            .GroupBy(r => r.PostId.Value)
-                                            .Select(g => new { PostId = g.Key, TotalRating = g.Sum(r => r.Value ? 1 : -1) })
-                                            .ToDictionaryAsync(x => x.PostId, x => x.TotalRating);
+        var postIds = posts.Select(p => p.IdPost).ToList();
+        var postRatings = await _context.Ratings
+                                        .Where(r => r.IdPost.HasValue && postIds.Contains(r.IdPost.Value))
+                                        .GroupBy(r => r.IdPost.Value)
+                                        .Select(g => new { PostId = g.Key, TotalRating = g.Sum(r => r.Value ? 1 : -1) })
+                                        .ToDictionaryAsync(x => x.PostId, x => x.TotalRating);
 
-            var commentCounts = await _context.Comments
-                                              .Where(c => posts.Select(p => p.Id).Contains(c.PostId))
-                                              .GroupBy(c => c.PostId)
-                                              .Select(g => new { PostId = g.Key, Count = g.Count() })
-                                              .ToDictionaryAsync(x => x.PostId, x => x.Count);
+        var commentCounts = await _context.Comments
+                                        .Where(c => postIds.Contains(c.IdPost))
+                                        .GroupBy(c => c.IdPost)
+                                        .Select(g => new { PostId = g.Key, Count = g.Count() })
+                                        .ToDictionaryAsync(x => x.PostId, x => x.Count);
 
-            ViewData["PostRatings"] = postRatings;
-            ViewData["CommentCounts"] = commentCounts;
+        ViewData["AuthorNames"] = authorNames;
+        ViewData["PostRatings"] = postRatings;
+        ViewData["CommentCounts"] = commentCounts;
 
-            return View(posts);
-        }
+        return View(posts);
+    }
 
         public IActionResult About()
         {

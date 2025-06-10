@@ -1,0 +1,82 @@
+@* REMOVE THIS LINE: @using course.Models.ViewModels *@
+@* REMOVE THIS LINE: @model LocationViewModel *@
+
+@{
+    ViewData["Title"] = "Выбор расположения на карте";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+@if (TempData["Message"] != null) // Changed from ViewBag.Message to TempData["Message"]
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+@if (ViewData.ModelState.Any(x => x.Value.Errors.Any())) // To display validation errors
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var modelState in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="SaveLocation" method="post" class="mt-3">
+    <div class="form-group">
+        <label for="Address">Адрес</label> {{-- Changed from LocationName --}}
+        <input type="text" class="form-control" id="LocationName" name="Address" value="@ViewBag.Address" readonly /> {{-- Changed id to LocationName, name to Address, and value to ViewBag.Address --}}
+    </div>
+    <div class="form-group">
+        <label for="Latitude">Широта</label>
+        <input type="text" class="form-control" id="Latitude" name="Latitude" value="@ViewBag.Latitude" readonly /> {{-- Changed value to ViewBag.Latitude --}}
+    </div>
+    <div class="form-group">
+        <label for="Longitude">Долгота</label>
+        <input type="text" class="form-control" id="Longitude" name="Longitude" value="@ViewBag.Longitude" readonly /> {{-- Changed value to ViewBag.Longitude --}}
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Сохранить</button>
+</form>
+
+<div id="map" style="height: 500px;" class="mt-4 mb-3"></div>
+
+<script>
+    const map = L.map('map').setView([53.9, 27.5667], 7); // Центр Беларуси
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker;
+
+    map.on('click', async function (e) {
+        const lat = e.latlng.lat;
+        const lon = e.latlng.lng;
+
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng).addTo(map);
+        }
+
+        document.getElementById("Latitude").value = lat;
+        document.getElementById("Longitude").value = lon;
+
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+            const data = await response.json();
+            const address = data.display_name || "Не найдено";
+            document.getElementById("LocationName").value = address;
+        } catch (err) {
+            console.error(err);
+            document.getElementById("LocationName").value = "Ошибка получения адреса";
+        }
+    });
+</script>

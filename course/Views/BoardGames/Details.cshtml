@@ -1,20 +1,20 @@
 @model course.Models.BoardGame
 
 @{
-    ViewData["Title"] = "Детали игры: " + Model.Title;
+    ViewData["Title"] = "Детали игры: " + Model.Name; @* Corrected from Model.Title *@
 }
 
 <h1>Детали игры</h1>
 
 <div>
-    <h4>@Model.Title</h4>
+    <h4>@Model.Name</h4> @* Corrected from Model.Title *@
     <hr />
     <dl class="row">
         <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Title)
+            @Html.DisplayNameFor(model => model.Name) @* Corrected from model.Title *@
         </dt>
         <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Title)
+            @Html.DisplayFor(model => model.Name) @* Corrected from model.Title *@
         </dd>
         <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Description)
@@ -41,10 +41,10 @@
             @Html.DisplayFor(model => model.MaxPlayers)
         </dd>
         <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.AveragePlayTime)
+            @Html.DisplayNameFor(model => model.EstimatedPlayTime) @* Corrected from model.AveragePlayTime *@
         </dt>
         <dd class="col-sm-9">
-            @(Model.AveragePlayTime.HasValue ? Model.AveragePlayTime.Value.ToString(@"hh\:mm") : "N/A")
+            @(Model.EstimatedPlayTime.HasValue ? Model.EstimatedPlayTime.Value.ToString(@"hh\:mm") : "N/A") @* Corrected from Model.AveragePlayTime *@
         </dd>
         <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Genre)
@@ -58,13 +58,16 @@
         <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Difficulty)
         </dd>
+        @* Removed ImageUrl section as it's not a property of the BoardGame model. *@
+        @* If you need to display an image here, consider fetching it separately or using a ViewModel. *@
+        @*
         <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.ImageUrl)
         </dt>
         <dd class="col-sm-9">
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
-                <img src="@Model.ImageUrl" alt="Обложка игры @Model.Title" class="img-fluid rounded" style="max-width: 250px; height: auto;" 
+                <img src="@Model.ImageUrl" alt="Обложка игры @Model.Title" class="img-fluid rounded" style="max-width: 250px; height: auto;"
                      onerror="this.onerror=null;this.src='https://placehold.co/250x250/cccccc/333333?text=Нет+изображения';" />
             }
             else
@@ -72,9 +75,10 @@
                 <img src="https://placehold.co/250x250/cccccc/333333?text=Нет+изображения" alt="Нет изображения" class="img-fluid rounded" style="max-width: 250px; height: auto;" />
             }
         </dd>
+        *@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактировать</a> |
+    <a asp-action="Edit" asp-route-id="@Model.IdBoardGame" class="btn btn-warning">Редактировать</a> | @* Corrected from Model.Id *@
     <a asp-action="Index" class="btn btn-secondary">Вернуться к списку</a>
 </div>

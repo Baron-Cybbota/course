@@ -1,0 +1,75 @@
+@model IEnumerable<course.Models.Post>
+@using course.Models
+@using System.Security.Claims
+
+@{
+    var authorNames = ViewData["AuthorNames"] as Dictionary<int, string>;
+    var postRatings = ViewData["PostRatings"] as Dictionary<int, int>;
+    var commentCounts = ViewData["CommentCounts"] as Dictionary<int, int>;
+
+    postRatings ??= new Dictionary<int, int>();
+    commentCounts ??= new Dictionary<int, int>();
+}
+
+@foreach (var post in Model)
+{
+    var totalPostRating = postRatings.TryGetValue(post.IdPost, out int rating) ? rating : 0; @* Corrected: post.IdPost *@
+    var commentCount = commentCounts.TryGetValue(post.IdPost, out int count) ? count : 0; @* Corrected: post.IdPost *@
+    var currentUserId = User.Identity?.IsAuthenticated == true ? User.FindFirst(ClaimTypes.NameIdentifier)?.Value : null;
+
+    <div class="card post-card mb-4" data-post-id="@post.IdPost"> @* Corrected: post.IdPost *@
+        <div class="d-flex align-items-start">
+            <div class="vote-buttons text-center px-2 py-3">
+                <button class="btn btn-link vote-btn vote-up-btn" data-post-id="@post.IdPost" data-vote-type="up"> @* Corrected: post.IdPost *@
+                    <i class="bi bi-arrow-up-circle-fill upvote-icon"></i>
+                </button>
+                <div class="vote-score fw-bold @(totalPostRating > 0 ? "text-success" : (totalPostRating < 0 ? "text-danger" : "text-muted"))">
+                    @(totalPostRating > 0 ? "+" : "")@totalPostRating
+                </div>
+                <button class="btn btn-link vote-btn vote-down-btn" data-post-id="@post.IdPost" data-vote-type="down"> @* Corrected: post.IdPost *@
+                    <i class="bi bi-arrow-down-circle-fill downvote-icon"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.IdPost" class="text-decoration-none text-dark"> @* Corrected: post.IdPost *@
+                    <h3 class="card-title post-title">
+                        @Html.DisplayFor(modelItem => post.Title)
+                    </h3>
+                </a>
+                <div class="post-meta mb-3">
+                    <i class="bi bi-person-circle"></i>
+                    Опубликовано:
+                    @if (authorNames != null && authorNames.ContainsKey(post.IdUser)) @* Corrected: post.IdUser *@
+                    {
+                        <a asp-controller="Users" asp-action="Details" asp-route-id="@post.IdUser" class="post-author"> @* Corrected: post.IdUser *@
+                            <strong>@authorNames[post.IdUser]</strong> @* Corrected: post.IdUser *@
+                        </a>
+                    }
+                    else
+                    {
+                        <strong class="post-author">Неизвестный автор</strong>
+                    }
+                    <span class="post-date">(от @post.CreationDate.ToString("dd.MM.yyyy в HH:mm"))</span>
+
+                    @if (post.EditDate.HasValue) @* Corrected: post.LastEditDate *@
+                    {
+                        <br />
+                        <small class="post-edited-info">
+                            <i class="bi bi-pencil-square"></i> Изменено: @post.EditDate.Value.ToString("dd.MM.yyyy в HH:mm")
+                        </small>
+                    }
+                </div>
+                <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.IdPost" class="text-decoration-none text-dark"> @* Corrected: post.IdPost *@
+                    <p class="card-text post-content">@Html.Raw(post.Content.Length > 1089 ? post.Content.Substring(0, 1089) + "..." : post.Content)</p>
+                </a>
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <small class="post-stats">
+                        <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.IdPost" class="text-decoration-none text-muted"> @* Corrected: post.IdPost *@
+                            <i class="bi bi-chat-dots-fill me-1" style="font-size: 1.3rem;"></i> @commentCount 
+                        </a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -1,22 +1,22 @@
 @model course.Models.BoardGame
 
 @{
-    ViewData["Title"] = "Редактировать игру: " + Model.Title;
+    ViewData["Title"] = "Редактировать игру: " + Model.Name;
 }
 
 <h1>Редактировать игру</h1>
 
-<h4>@Model.Title</h4>
+<h4>@Model.Name</h4>
 <hr />
 <div class="row">
     <div class="col-md-6">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" /> @* Важно для идентификации редактируемой записи *@
+            <input type="hidden" asp-for="IdBoardGame" />
             <div class="form-group mb-3">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Description" class="control-label"></label>
@@ -39,11 +39,10 @@
                 <span asp-validation-for="MaxPlayers" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
-                <label asp-for="AveragePlayTime" class="control-label">Среднее время игры (чч:мм)</label>
-                @* Приводим TimeSpan к строке "HH:mm" для input type="time" *@
-                <input asp-for="AveragePlayTime" class="form-control" type="time" step="1" 
-                       value="@(Model.AveragePlayTime.HasValue ? Model.AveragePlayTime.Value.ToString(@"hh\:mm") : "")" />
-                <span asp-validation-for="AveragePlayTime" class="text-danger"></span>
+                <label asp-for="EstimatedPlayTime" class="control-label">Среднее время игры (чч:мм)</label>
+                <input asp-for="EstimatedPlayTime" class="form-control" type="time" step="1"
+                       value="@(Model.EstimatedPlayTime.HasValue ? Model.EstimatedPlayTime.Value.ToString(@"hh\:mm") : "")" />
+                <span asp-validation-for="EstimatedPlayTime" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Genre" class="control-label"></label>
@@ -55,11 +54,7 @@
                 <input asp-for="Difficulty" class="form-control" type="number" />
                 <span asp-validation-for="Difficulty" class="text-danger"></span>
             </div>
-            <div class="form-group mb-3">
-                <label asp-for="ImageUrl" class="control-label"></label>
-                <input asp-for="ImageUrl" class="form-control" type="url" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
-            </div>
+            @* The ImageUrl section has been removed as it is not a property of the BoardGame model. *@
             <div class="form-group mt-3">
                 <input type="submit" value="Сохранить" class="btn btn-primary" />
             </div>

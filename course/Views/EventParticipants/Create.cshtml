@@ -15,18 +15,18 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group mb-3">
-                <label asp-for="EventId" class="control-label">Мероприятие</label>
-                <select asp-for="EventId" class="form-control" asp-items="@eventsSelectList">
+                <label asp-for="IdEvent" class="control-label">Мероприятие</label>
+                <select asp-for="IdEvent" class="form-control" asp-items="@eventsSelectList">
                     <option value="">-- Выберите мероприятие --</option>
                 </select>
-                <span asp-validation-for="EventId" class="text-danger"></span>
+                <span asp-validation-for="IdEvent" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
-                <label asp-for="UserId" class="control-label">Пользователь</label>
-                <select asp-for="UserId" class="form-control" asp-items="@usersSelectList">
+                <label asp-for="IdUser" class="control-label">Пользователь</label>
+                <select asp-for="IdUser" class="form-control" asp-items="@usersSelectList">
                     <option value="">-- Выберите пользователя --</option>
                 </select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
+                <span asp-validation-for="IdUser" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
                 <label asp-for="ParticipationStatus" class="control-label"></label>

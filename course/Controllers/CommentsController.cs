@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using course.Data;
 using course.Models;
-using System.Threading.Tasks; // Для Task
-using System; // Для DateTime
-using System.Linq; // Для Any()
-using Microsoft.AspNetCore.Mvc.Rendering; // Для SelectList
+using course.Models.ViewModels; // Still assuming you'll use these ViewModels
+using System.Threading.Tasks;
+using System;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 
 namespace course.Controllers
 {
@@ -19,65 +21,142 @@ namespace course.Controllers
         }
 
         // GET: Comments
-        // Отображает список всех комментариев.
+        /// <summary>
+        /// Displays a list of all comments.
+        /// </summary>
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Comments.ToListAsync());
+            var comments = await _context.Comments.ToListAsync();
+
+            // Explicitly fetch Post Titles and User Logins for display
+            var postTitles = new Dictionary<int, string>();
+            var userLogins = new Dictionary<int, string>();
+
+            // Get all unique Post Ids and User Ids from comments
+            var postIds = comments.Select(c => c.IdPost).Distinct().ToList();
+            var userIds = comments.Select(c => c.IdUser).Distinct().ToList();
+
+            // Fetch all necessary post titles and user logins in batches
+            var posts = await _context.Posts
+                                      .Where(p => postIds.Contains(p.IdPost))
+                                      .Select(p => new { p.IdPost, p.Title })
+                                      .ToListAsync();
+
+            var users = await _context.Users
+                                    .Where(u => userIds.Contains(u.IdUser))
+                                    .Select(u => new { u.IdUser, u.Login })
+                                    .ToListAsync();
+
+            foreach (var post in posts)
+            {
+                postTitles[post.IdPost] = post.Title;
+            }
+
+            foreach (var user in users)
+            {
+                userLogins[user.IdUser] = user.Login;
+            }
+
+            ViewData["PostTitles"] = postTitles;
+            ViewData["UserLogins"] = userLogins;
+
+            return View(comments);
         }
 
         // GET: Comments/Details/5
-        // Отображает детали конкретного комментария по Id.
+        /// <summary>
+        /// Displays details of a specific comment by Id.
+        /// </summary>
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
-                return NotFound(); // Если Id не предоставлен, возвращаем 404
+                return NotFound();
             }
 
+            // Find comment using IdComment
             var comment = await _context.Comments
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.IdComment == id);
+
             if (comment == null)
             {
-                return NotFound(); // Если комментарий не найден, возвращаем 404
+                return NotFound();
             }
+
+            // Explicitly fetch related Post Title and User Login
+            var postTitle = await _context.Posts
+                                            .Where(p => p.IdPost == comment.IdPost)
+                                            .Select(p => p.Title)
+                                            .FirstOrDefaultAsync();
+            var userLogin = await _context.Users
+                                            .Where(u => u.IdUser == comment.IdUser)
+                                            .Select(u => u.Login)
+                                            .FirstOrDefaultAsync();
+
+            ViewData["PostTitle"] = postTitle ?? "Неизвестная публикация";
+            ViewData["UserLogin"] = userLogin ?? "Неизвестный пользователь";
 
             return View(comment);
         }
 
         // GET: Comments/Create
-        // Отображает форму для создания нового комментария.
+        /// <summary>
+        /// Displays the form for creating a new comment.
+        /// </summary>
         public async Task<IActionResult> Create()
         {
-            // Для выбора PostId и AuthorId, если это требуется на форме.
-            // ViewBag.PostId = new SelectList(await _context.Posts.ToListAsync(), "Id", "Title");
-            // ViewBag.AuthorId = new SelectList(await _context.Users.ToListAsync(), "Id", "Login");
-            return View();
+            // Populate SelectLists for the ViewModel
+            var posts = await _context.Posts.OrderBy(p => p.Title).ToListAsync();
+            var users = await _context.Users.OrderBy(u => u.Login).ToListAsync();
+
+            var viewModel = new CommentCreateViewModel
+            {
+                PostsSelectList = new SelectList(posts, "IdPost", "Title"),
+                UsersSelectList = new SelectList(users, "IdUser", "Login")
+            };
+
+            return View(viewModel); // Pass the ViewModel to the view
         }
 
         // POST: Comments/Create
-        // Обрабатывает отправку формы для создания нового комментария.
+        /// <summary>
+        /// Handles the form submission for creating a new comment.
+        /// </summary>
         [HttpPost]
-        [ValidateAntiForgeryToken] // Защита от CSRF-атак
-         // Поля, которые пользователь может ввести. CreationDate, Rating устанавливаются сервером.
-        public async Task<IActionResult> Create([Bind("PostId,AuthorId,Content")] Comment comment)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("IdPost,IdUser,Content")] CommentCreateViewModel viewModel)
         {
-            if (ModelState.IsValid) // Проверяем валидность модели на основе Data Annotations
+            if (ModelState.IsValid)
             {
-                comment.CreationDate = DateTime.UtcNow; // Устанавливаем дату создания
-                comment.Rating = 0; // Начальный рейтинг
-                
-                _context.Add(comment); // Добавляем комментарий в контекст
-                await _context.SaveChangesAsync(); // Сохраняем изменения в базе данных
-                return RedirectToAction(nameof(Index)); // Перенаправляем на список комментариев
+                var comment = new Comment
+                {
+                    IdPost = viewModel.IdPost,
+                    IdUser = viewModel.IdUser,
+                    Content = viewModel.Content,
+                    CreationDate = DateTime.UtcNow,
+                    Rating = 0 // Initial rating
+                };
+
+                _context.Add(comment);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Комментарий успешно добавлен.";
+                return RedirectToAction(nameof(Index));
             }
-            // Если модель невалидна, возвращаем форму с ошибками
-            // ViewBag.PostId = new SelectList(await _context.Posts.ToListAsync(), "Id", "Title", comment.PostId);
-            // ViewBag.AuthorId = new SelectList(await _context.Users.ToListAsync(), "Id", "Login", comment.AuthorId);
-            return View(comment);
+
+            // If model is invalid, re-populate SelectLists for the ViewModel and return the view
+            var posts = await _context.Posts.OrderBy(p => p.Title).ToListAsync();
+            var users = await _context.Users.OrderBy(u => u.Login).ToListAsync();
+            viewModel.PostsSelectList = new SelectList(posts, "IdPost", "Title", viewModel.IdPost);
+            viewModel.UsersSelectList = new SelectList(users, "IdUser", "Login", viewModel.IdUser);
+
+            TempData["ErrorMessage"] = "Ошибка при создании комментария. Проверьте введенные данные.";
+            return View(viewModel); // Pass the ViewModel back with errors
         }
 
         // GET: Comments/Edit/5
-        // Отображает форму для редактирования существующего комментария.
+        /// <summary>
+        /// Displays the form for editing an existing comment.
+        /// </summary>
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -85,27 +164,27 @@ namespace course.Controllers
                 return NotFound();
             }
 
-            var comment = await _context.Comments.FindAsync(id); // Находим комментарий по Id
+            var comment = await _context.Comments.FindAsync(id); // Find by IdComment
             if (comment == null)
             {
                 return NotFound();
             }
-            // Для редактирования PostId или AuthorId, если они должны быть редактируемыми.
-            // ViewBag.PostId = new SelectList(await _context.Posts.ToListAsync(), "Id", "Title", comment.PostId);
-            // ViewBag.AuthorId = new SelectList(await _context.Users.ToListAsync(), "Id", "Login", comment.AuthorId);
+            // Populate SelectLists for IdPost and IdUser (even if not directly editable by user)
+            ViewBag.IdPost = new SelectList(await _context.Posts.ToListAsync(), "IdPost", "Title", comment.IdPost);
+            ViewBag.IdUser = new SelectList(await _context.Users.ToListAsync(), "IdUser", "Login", comment.IdUser);
+
             return View(comment);
         }
 
         // POST: Comments/Edit/5
-        // Обрабатывает отправку формы для редактирования комментария.
+        /// <summary>
+        /// Handles the form submission for editing a comment.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Bind("Id,PostId,AuthorId,Content,CreationDate,Rating")
-        // Убедитесь, что все поля, которые могут быть изменены пользователем, включены.
-        // CreationDate, Id, PostId, AuthorId, Rating обычно не меняются через форму редактирования.
-        public async Task<IActionResult> Edit(int id, [Bind("Id,PostId,AuthorId,Content,CreationDate,Rating")] Comment comment)
+        public async Task<IActionResult> Edit(int id, [Bind("IdComment,Content")] Comment comment)
         {
-            if (id != comment.Id) // Проверяем, совпадает ли Id из маршрута с Id модели
+            if (id != comment.IdComment)
             {
                 return NotFound();
             }
@@ -114,44 +193,48 @@ namespace course.Controllers
             {
                 try
                 {
-                    // Сохраняем текущие значения, которые не должны меняться через форму
-                    var existingComment = await _context.Comments.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+                    // Load the existing entry to preserve immutable fields
+                    var existingComment = await _context.Comments.AsNoTracking().FirstOrDefaultAsync(c => c.IdComment == id);
                     if (existingComment == null)
                     {
                         return NotFound();
                     }
-                    
-                    // Обновляем только поля, которые могут быть изменены пользователем
-                    // Content уже в Bind, но если были бы другие поля для редактирования
-                    comment.CreationDate = existingComment.CreationDate; // Сохраняем оригинальную дату создания
-                    comment.PostId = existingComment.PostId; // Сохраняем оригинальный PostId
-                    comment.AuthorId = existingComment.AuthorId; // Сохраняем оригинального автора
-                    comment.Rating = existingComment.Rating; // Сохраняем текущий рейтинг
 
-                    _context.Update(comment); // Обновляем комментарий в контексте
+                    // Transfer immutable fields from the existing entity
+                    comment.CreationDate = existingComment.CreationDate;
+                    comment.IdPost = existingComment.IdPost; // Preserve original Post
+                    comment.IdUser = existingComment.IdUser; // Preserve original Author
+                    comment.Rating = existingComment.Rating; // Preserve original Rating
+                    comment.EditDate = DateTime.UtcNow; // Set EditDate when modified
+
+                    _context.Update(comment); // Mark the entity for update
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Комментарий успешно обновлен.";
                 }
-                catch (DbUpdateConcurrencyException) // Обработка конфликтов параллельного доступа
+                catch (DbUpdateConcurrencyException)
                 {
-                    if (!CommentExists(comment.Id))
+                    if (!CommentExists(comment.IdComment))
                     {
                         return NotFound();
                     }
                     else
                     {
-                        throw; // Пробрасываем ошибку, если это не конфликт параллельного доступа
+                        throw;
                     }
                 }
                 return RedirectToAction(nameof(Index));
             }
-            // Если модель невалидна, возвращаем форму с ошибками
-            // ViewBag.PostId = new SelectList(await _context.Posts.ToListAsync(), "Id", "Title", comment.PostId);
-            // ViewBag.AuthorId = new SelectList(await _context.Users.ToListAsync(), "Id", "Login", comment.AuthorId);
+            // If model is invalid, return the form with errors, re-populating ViewBag
+            ViewBag.IdPost = new SelectList(await _context.Posts.ToListAsync(), "IdPost", "Title", comment.IdPost);
+            ViewBag.IdUser = new SelectList(await _context.Users.ToListAsync(), "IdUser", "Login", comment.IdUser);
+            TempData["ErrorMessage"] = "Ошибка при обновлении комментария. Проверьте введенные данные.";
             return View(comment);
         }
 
         // GET: Comments/Delete/5
-        // Отображает страницу подтверждения удаления комментария.
+        /// <summary>
+        /// Displays the confirmation page for deleting a comment.
+        /// </summary>
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -160,35 +243,73 @@ namespace course.Controllers
             }
 
             var comment = await _context.Comments
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.IdComment == id);
+
             if (comment == null)
             {
                 return NotFound();
             }
 
-            return View(comment);
+            // Explicitly fetch related Post Title and User Login for display
+            var postTitle = await _context.Posts
+                                            .Where(p => p.IdPost == comment.IdPost)
+                                            .Select(p => p.Title)
+                                            .FirstOrDefaultAsync();
+            var userLogin = await _context.Users
+                                            .Where(u => u.IdUser == comment.IdUser)
+                                            .Select(u => u.Login)
+                                            .FirstOrDefaultAsync();
+
+            // Populate the ViewModel for the delete confirmation view
+            var viewModel = new CommentDeleteViewModel
+            {
+                IdComment = comment.IdComment,
+                IdPost = comment.IdPost, // Crucial for redirection
+                Content = comment.Content,
+                CreationDate = comment.CreationDate,
+                PostTitle = postTitle ?? "Неизвестная публикация",
+                AuthorName = userLogin ?? "Неизвестный пользователь"
+            };
+
+            return View(viewModel); // Pass the ViewModel to the view
         }
 
         // POST: Comments/Delete/5
-        // Обрабатывает подтверждение удаления комментария.
-        [HttpPost, ActionName("Delete")] // Указываем, что это POST-действие для маршрута Delete
+        /// <summary>
+        /// Handles the confirmation of deleting a comment.
+        /// </summary>
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var comment = await _context.Comments.FindAsync(id);
-            if (comment != null)
+            var commentToDelete = await _context.Comments.FindAsync(id);
+
+            if (commentToDelete == null)
             {
-                _context.Comments.Remove(comment); // Удаляем комментарий из контекста
+                TempData["ErrorMessage"] = "Комментарий не найден для удаления.";
+                return NotFound();
             }
-            
-            await _context.SaveChangesAsync(); // Сохраняем изменения
+
+            // Capture IdPost BEFORE deleting for redirection if needed
+            var postIdForRedirection = commentToDelete.IdPost;
+
+            _context.Comments.Remove(commentToDelete);
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Комментарий успешно удален.";
+
+            // Example: Redirect to the post details page after deleting a comment
+            // return RedirectToAction("Details", "Posts", new { id = postIdForRedirection });
+
+            // Or, redirect back to the comment index as per your original code
             return RedirectToAction(nameof(Index));
         }
 
-        // Вспомогательный метод для проверки существования комментария
+        /// <summary>
+        /// Helper method to check if a comment exists.
+        /// </summary>
         private bool CommentExists(int id)
         {
-            return _context.Comments.Any(e => e.Id == id);
+            return _context.Comments.Any(e => e.IdComment == id);
         }
     }
 }

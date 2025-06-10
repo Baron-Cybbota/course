@@ -12,8 +12,8 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="AuthorId" />
+            <input type="hidden" asp-for="IdPost" /> @* Corrected: Changed Id to IdPost *@
+            <input type="hidden" asp-for="IdUser" /> @* Corrected: Changed AuthorId to IdUser *@
             <input type="hidden" asp-for="CreationDate" />
             <input type="hidden" asp-for="Rating" /> @* Keep Rating as hidden, it's not edited directly by user *@
             <div class="form-group">

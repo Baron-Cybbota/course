@@ -12,10 +12,10 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="PostId" />
-            <input type="hidden" asp-for="AuthorId" />
-            <input type="hidden" asp-for="CreationDate" /> 
+            <input type="hidden" asp-for="IdComment" />
+            <input type="hidden" asp-for="IdPost" />
+            <input type="hidden" asp-for="IdUser" />
+            <input type="hidden" asp-for="CreationDate" />
             <div class="form-group">
                 <label asp-for="Content" class="control-label"></label>
                 <textarea asp-for="Content" class="form-control" rows="3"></textarea>
@@ -29,7 +29,7 @@
 </div>
 
 <div>
-    <a asp-controller="Posts" asp-action="Details" asp-route-id="@Model.PostId">Вернуться к посту</a>
+    <a asp-controller="Posts" asp-action="Details" asp-route-id="@Model.IdPost">Вернуться к посту</a>
 </div>
 
 @section Scripts {

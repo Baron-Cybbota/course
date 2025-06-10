@@ -1,59 +1,110 @@
-/* Основные цвета */
+
 :root {
     --primary-dark: #1a1a2e;
     --secondary-dark: #16213e;
     --accent-gold: #f9c74f;
     --accent-teal: #4cc9f0;
     --light-bg: #f8f9fa;
-    --text-dark: #212529; /* Темный текст для светлой темы */
-    --text-light: #f8f9fa; /* Светлый текст (используется для кнопок и заголовков на темном фоне) */
-    
-    /* Новые переменные для темной темы */
-    --dark-theme-bg: #121212; /* Очень темный основной фон */
-    --dark-theme-card-bg: #1e1e1e; /* Темный фон для карточек/блоков */
-    --dark-theme-text: #F5F5F5; /* Светлый текст для темной темы */
-    --dark-theme-muted-text: #B0B0B0; /* Более светлый "muted" текст */
-    --dark-theme-border: #333333; /* Границы в темной теме */
-    --dark-theme-navbar-bg: #212121; /* Фон навигации в темной теме */
+    --text-dark: #212529;
+    --text-light: #f8f9fa;
+
+    --dark-theme-bg: #121212;
+    --dark-theme-card-bg: #1e1e1e;
+    --dark-theme-text: #F5F5F5;
+    --dark-theme-muted-text: #B0B0B0;
+    --dark-theme-border: #333333;
+    --dark-theme-navbar-bg: #212121;
 }
 
-/* Общие стили */
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--text-dark); /* Базовый цвет текста для светлой темы */
-    background-color: var(--light-bg); /* Базовый фон для светлой темы */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Плавный переход */
+    color: var(--text-dark);
+    background-color: var(--light-bg);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Герой секция */
+
 .hero-section {
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                url('https://images.unsplash.com/photo-1610890716170-90b5c9b864b1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-    background-size: cover;
-    background-position: center;
-    color: white;
-    padding: 120px 0;
+    background: linear-gradient(135deg, var(--accent-teal) 0%, var(--primary-dark) 100%);
+    color: var(--text-light);
+    padding: 100px 0;
     text-align: center;
     position: relative;
+    overflow: hidden;
+    margin-bottom: 50px;
+    border-radius: 0 0 50px 50px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.hero-section::before,
+.hero-section::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    filter: blur(50px);
+    pointer-events: none;
+}
+
+.hero-section::before {
+    width: 300px;
+    height: 300px;
+    background-color: var(--accent-gold);
+    top: -50px;
+    left: -50px;
+    animation: moveShape1 10s infinite alternate ease-in-out;
+}
+
+.hero-section::after {
+    width: 400px;
+    height: 400px;
+    background-color: var(--accent-teal);
+    bottom: -80px;
+    right: -80px;
+    animation: moveShape2 12s infinite alternate ease-in-out;
+}
+
+@keyframes moveShape1 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(50px, 50px) scale(1.1); }
+}
+
+@keyframes moveShape2 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-50px, -50px) scale(0.9); }
 }
 
 .hero-content {
-    max-width: 800px;
+    max-width: 850px;
     margin: 0 auto;
     padding: 0 20px;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: 3.8rem;
     font-weight: 700;
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 15px;
+    color: var(--text-light);
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
 }
 
 .hero-subtitle {
     font-size: 1.5rem;
     margin-bottom: 30px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    color: var(--text-light);
+    opacity: 0.9;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero-subtitleD {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    color: var(--text-dark);
+    opacity: 0.9;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .hero-cta {
@@ -62,45 +113,48 @@ body {
     gap: 15px;
 }
 
-/* Кнопки */
-.btn-gold {
+.hero-cta .btn-gold {
     background-color: var(--accent-gold);
-    color: var(--text-dark);
-    border: none;
-    padding: 10px 25px;
-    font-weight: 600;
-    border-radius: 30px;
-    transition: all 0.3s ease;
+    color: var(--primary-dark);
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border-radius: 40px;
+    box-shadow: 0 8px 20px rgba(249, 199, 79, 0.3);
+    transition: all 0.3s ease; 
 }
 
-.btn-gold:hover {
+.hero-cta .btn-gold:hover {
     background-color: #e9b949;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(249, 199, 79, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(249, 199, 79, 0.5);
 }
 
-.btn-outline-light {
-    border: 2px solid white;
-    color: white;
+.hero-cta .btn-outline-light {
+    border: 2px solid var(--text-light);
+    color: var(--text-light);
     background: transparent;
-    padding: 10px 25px;
-    font-weight: 600;
-    border-radius: 30px;
-    transition: all 0.3s ease;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border-radius: 40px;
+    transition: all 0.3s ease; 
 }
 
-.btn-outline-light:hover {
-    background: white;
+.hero-cta .btn-outline-light:hover {
+    background: var(--text-light);
     color: var(--primary-dark);
 }
 
-/* Секции */
+
 .section-title {
     font-size: 2.5rem;
     margin-bottom: 50px;
     position: relative;
     display: inline-block;
-    color: var(--primary-dark); /* Цвет для светлой темы */
+    color: var(--primary-dark);
+    width: fit-content;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .section-title:after {
@@ -113,7 +167,6 @@ body {
     left: 25%;
 }
 
-/* Категории */
 .category-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -122,7 +175,7 @@ body {
 }
 
 .category-card {
-    background: white; /* Фон для светлой темы */
+    background: white;
     border-radius: 10px;
     padding: 30px 20px;
     text-align: center;
@@ -142,13 +195,12 @@ body {
 }
 
 .category-card h3 {
-    color: var(--primary-dark); /* Цвет для светлой темы */
+    color: var(--primary-dark);
     font-size: 1.2rem;
 }
 
-/* Игра месяца */
 .featured-games {
-    background: white; /* Фон для светлой темы */
+    background: white;
     border-radius: 15px;
     padding: 40px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -157,12 +209,12 @@ body {
 
 .game-title {
     font-size: 2rem;
-    color: var(--primary-dark); /* Цвет для светлой темы */
+    color: var(--primary-dark);
     margin-bottom: 20px;
 }
 
 .game-description {
-    color: var(--text-dark); /* Цвет для светлой темы */
+    color: var(--text-dark);
     margin-bottom: 25px;
     font-size: 1.1rem;
 }
@@ -174,7 +226,7 @@ body {
 }
 
 .game-rating span {
-    color: var(--text-dark); /* Цвет для светлой темы */
+    color: var(--text-dark);
     margin-left: 10px;
 }
 
@@ -186,7 +238,7 @@ body {
 }
 
 .game-image {
-    background: url('https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+    background: url('https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); 
     background-size: cover;
     background-position: center;
     height: 100%;
@@ -204,22 +256,24 @@ body {
     font-size: 0.9rem;
 }
 
-/* Обзоры */
 .review-slider {
     display: flex;
     gap: 20px;
     overflow-x: auto;
     padding: 20px 0;
     scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; 
 }
 
 .review-card {
     min-width: 300px;
-    background: white; /* Фон для светлой темы */
+    flex-shrink: 0; 
+    background: white;
     border-radius: 10px;
     padding: 25px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     scroll-snap-align: start;
+    transition: all 0.3s ease; 
 }
 
 .review-header {
@@ -238,7 +292,7 @@ body {
 
 .review-author h4 {
     margin: 0;
-    color: var(--primary-dark); /* Цвет для светлой темы */
+    color: var(--primary-dark);
 }
 
 .review-rating {
@@ -246,7 +300,7 @@ body {
 }
 
 .review-content {
-    color: var(--text-dark); /* Цвет для светлой темы */
+    color: var(--text-dark);
     margin-bottom: 15px;
     font-style: italic;
 }
@@ -256,7 +310,7 @@ body {
     color: var(--accent-teal);
 }
 
-/* Рассылка */
+
 .newsletter-box {
     background: var(--secondary-dark);
     color: white;
@@ -294,7 +348,20 @@ body {
     padding: 15px 25px;
 }
 
-/* Сообщество */
+.newsletter-form .btn.btn-gold {
+    background-color: var(--accent-gold);
+    color: var(--primary-dark);
+    box-shadow: 0 5px 15px rgba(249, 199, 79, 0.3);
+    transition: all 0.3s ease;
+}
+
+.newsletter-form .btn.btn-gold:hover {
+    background-color: #e9b949;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(249, 199, 79, 0.5);
+}
+
+
 .community-section {
     background: var(--primary-dark);
     color: white;
@@ -325,13 +392,13 @@ body {
     opacity: 0.9;
 }
 
-/* Посты */
+
 .card {
     margin-bottom: 20px;
     border: none;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
-    background-color: var(--light-bg); /* Фон для светлой темы */
+    background-color: white; 
 }
 
 .card:hover {
@@ -339,100 +406,127 @@ body {
 }
 
 .card-header {
-    background-color: white; /* Фон для светлой темы */
+    background-color: white;
     color: var(--text-dark);
     border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 .card-body {
-    background-color: var(--light-bg); /* Фон для светлой темы */
+    background-color: white; 
 }
 
 .card-body .text-muted {
-    color: #6c757d !important; /* Стандартный цвет text-muted */
-}
-
-/* Footer */
-footer {
-    background-color: #f8f9fa; /* Фон для светлой темы */
-    border-top-color: rgba(0, 0, 0, 0.125) !important;
     color: #6c757d !important;
 }
 
-footer a {
-    color: #0d6efd !important; /* Стандартный цвет ссылок Bootstrap */
+
+footer {
+    background-color: #f8f9fa;
+    border-top-color: rgba(0, 0, 0, 0.125) !important;
+    color: #6c757d !important;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
-/* Адаптивность */
+footer a {
+    color: #0d6efd !important;
+}
+
+
 @media (max-width: 768px) {
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
     }
-    
+
     .hero-subtitle {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
-    
+
     .hero-cta {
         flex-direction: column;
         align-items: center;
     }
-    
+
+    .hero-section::before,
+    .hero-section::after {
+        display: none;
+    }
+
     .newsletter-form {
         flex-direction: column;
     }
-    
+
     .newsletter-form .form-control {
         border-radius: 30px;
         margin-bottom: 10px;
     }
-    
+
     .newsletter-form .btn {
         border-radius: 30px;
     }
-    
+
     .community-stats {
         flex-direction: column;
         gap: 20px;
     }
 }
 
-/* --- Dark Theme Styles --- */
+
 body.dark-theme {
-    background-color: var(--dark-theme-bg); /* Основной очень темный фон */
-    color: var(--dark-theme-text); /* Яркий светлый текст */
+    background-color: var(--dark-theme-bg);
+    color: var(--dark-theme-text);
 }
 
 body.dark-theme .navbar {
-    background-color: var(--dark-theme-navbar-bg) !important; /* Темная навигационная панель */
+    background-color: var(--dark-theme-navbar-bg) !important;
     border-bottom-color: var(--dark-theme-border) !important;
 }
 
 body.dark-theme .navbar-brand,
 body.dark-theme .nav-link,
-body.dark-theme .text-dark { /* Важно: переопределяем .text-dark для навигации и других элементов */
-    color: var(--dark-theme-text) !important; /* Светлый текст для навигации */
+body.dark-theme .text-dark {
+    color: var(--dark-theme-text) !important;
 }
 
 body.dark-theme .hero-section {
-    /* Фон героя остается темным, как и задумывалось */
-    background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), /* Чуть более темное наложение */
-                url('https://images.unsplash.com/photo-1610890716170-90b5c9b864b1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-    background-size: cover;
-    background-position: center;
-    color: var(--dark-theme-text); /* Убедимся, что текст в херо тоже светлый */
+    background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--primary-dark) 100%);
+    color: var(--dark-theme-text);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-theme .hero-title {
+    color: var(--dark-theme-text);
+}
+
+body.dark-theme .hero-subtitle {
+    color: var(--dark-theme-muted-text);
+}
+
+body.dark-theme .hero-cta .btn-gold {
+    background-color: var(--accent-gold);
+    color: var(--primary-dark);
+}
+
+body.dark-theme .hero-cta .btn-outline-light {
+    border: 2px solid var(--accent-teal);
+    color: var(--accent-teal);
+}
+
+body.dark-theme .hero-cta .btn-outline-light:hover {
+    background: var(--accent-teal);
+    color: var(--dark-theme-bg);
 }
 
 body.dark-theme .section-title {
-    color: var(--dark-theme-text); /* Светлый заголовок секции */
+    color: var(--dark-theme-text);
 }
 
 body.dark-theme .category-card,
 body.dark-theme .featured-games,
-body.dark-theme .review-card {
-    background: var(--dark-theme-card-bg); /* Темный фон для карточек и блоков */
-    color: var(--dark-theme-text); /* Светлый текст внутри карточек */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4); /* Более заметная тень */
+body.dark-theme .review-card,
+body.dark-theme .card { 
+    background-color: var(--dark-theme-card-bg) !important; 
+    color: var(--dark-theme-text);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
 }
 
 body.dark-theme .category-card:hover {
@@ -441,46 +535,41 @@ body.dark-theme .category-card:hover {
 
 body.dark-theme .category-card h3,
 body.dark-theme .game-title,
-body.dark-theme .review-author h4 { /* Добавлено, чтобы заголовки в обзорах тоже были светлыми */
-    color: var(--dark-theme-text); /* Светлые заголовки внутри карточек */
+body.dark-theme .review-author h4,
+body.dark-theme .newsletter-box h3,
+body.dark-theme .newsletter-box p { 
+    color: var(--dark-theme-text);
 }
 
 body.dark-theme .game-rating span {
     color: var(--dark-theme-text);
 }
 
-body.dark-theme .card {
-    background-color: var(--dark-theme-card-bg); /* Фон для карточек постов */
-    color: var(--dark-theme-text); /* Текст в карточках постов */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
 body.dark-theme .card-header {
-    background-color: #2b2b2b; /* Чуть светлее, чем фон карточки, для различия */
+    background-color: #2b2b2b;
     border-bottom-color: var(--dark-theme-border) !important;
-    color: var(--dark-theme-text); /* Заголовок карточки поста тоже светлый */
+    color: var(--dark-theme-text);
 }
 
 body.dark-theme .card-body {
-    background-color: var(--dark-theme-card-bg); /* Темное тело карточки поста */
+    background-color: var(--dark-theme-card-bg);
 }
 
-body.dark-theme .card-body .text-muted {
-    color: var(--dark-theme-muted-text) !important; /* Более светлый "muted" текст для темной темы */
-}
-
-body.dark-theme .btn-outline-secondary { /* Кнопка "Читать далее" в светлой теме */
-    color: var(--dark-theme-muted-text); /* Цвет текста кнопки "Читать далее" */
-    border-color: var(--dark-theme-border); /* Цвет рамки кнопки "Читать далее" */
+body.dark-theme .text-muted, 
+body.dark-theme .card-body .text-muted,
+body.dark-theme .list-group-item .text-muted,
+body.dark-theme .list-group-item .event-location, 
+body.dark-theme .newsletter-form .form-control::placeholder,
+body.dark-theme .btn-outline-secondary { 
+    color: var(--dark-theme-muted-text) !important;
 }
 
 body.dark-theme .btn-outline-secondary:hover {
     background-color: #444444;
-    color: white; /* Текст становится белым при наведении */
+    color: white;
     border-color: #555555;
 }
 
-/* Стиль кнопки переключения темы в темной теме */
 body.dark-theme #theme-toggle.btn-outline-light {
     color: white;
     border-color: white;
@@ -492,29 +581,23 @@ body.dark-theme #theme-toggle.btn-outline-light:hover {
 }
 
 body.dark-theme footer {
-    background-color: var(--dark-theme-navbar-bg); /* Темный футер */
+    background-color: var(--dark-theme-navbar-bg);
     border-top-color: var(--dark-theme-border) !important;
     color: var(--dark-theme-text) !important;
 }
 
 body.dark-theme footer a {
-    color: var(--accent-teal) !important; /* Ссылки в футере могут быть акцентным цветом */
+    color: var(--accent-teal) !important;
 }
 
 body.dark-theme .alert-info {
-    background-color: #2b2b2b; /* Темнее для инфо-алертов */
+    background-color: #2b2b2b;
     color: var(--dark-theme-text);
     border-color: var(--dark-theme-border);
 }
 
-/* Переопределение цветов для newsletter-box */
 body.dark-theme .newsletter-box {
-    background: #1e1e1e; /* Темнее, чем secondary-dark, для контраста с nav */
-}
-
-body.dark-theme .newsletter-box h3,
-body.dark-theme .newsletter-box p {
-    color: var(--dark-theme-text); /* Убедимся, что текст в newsletter-box светлый */
+    background: #1e1e1e;
 }
 
 body.dark-theme .newsletter-form .form-control {
@@ -523,101 +606,224 @@ body.dark-theme .newsletter-form .form-control {
     border: 1px solid var(--dark-theme-border);
 }
 
-body.dark-theme .newsletter-form .form-control::placeholder {
-    color: var(--dark-theme-muted-text);
-}
-
-/* Переопределение для Bootstrap иконок */
 body.dark-theme .bi {
-    color: var(--dark-theme-text); /* Общий цвет иконок в темной теме */
+    color: var(--dark-theme-text);
 }
 
 body.dark-theme .game-rating .bi-star-fill,
 body.dark-theme .game-rating .bi-star-half,
-body.dark-theme .review-rating .bi-star-fill {
-    color: var(--accent-gold); /* Золотые звезды остаются золотыми */
-}
-
-body.dark-theme .category-icon {
-    color: var(--accent-gold); /* Иконки категорий остаются золотыми */
+body.dark-theme .review-rating .bi-star-fill,
+body.dark-theme .category-icon { 
+    color: var(--accent-gold);
 }
 
 body.dark-theme .review-game {
-    color: var(--accent-teal); /* Цвет названия игры в обзорах остается бирюзовым */
+    color: var(--accent-teal);
 }
 
-/* Общие стили для таблиц */
+
 .table {
     margin-top: 20px;
-    border-radius: 0.75rem; /* Скругленные углы таблицы */
-    overflow: hidden; /* Обрезаем содержимое по скругленным углам */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Легкая тень */
+    border-radius: 0.75rem;
+    overflow: hidden; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .table th, .table td {
     padding: 1rem;
 }
 
-/* Светлая тема для таблицы */
 .table-light thead th {
-    background-color: var(--light-bg); /* Светлый фон для заголовков */
-    color: var(--text-dark); /* Темный текст для заголовков */
-    border-bottom: 2px solid var(--dark-theme-border);
+    background-color: var(--light-bg);
+    color: var(--text-dark);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1); 
 }
 
 .table-light tbody tr {
-    background-color: white; /* Белый фон для строк */
-    color: var(--text-dark); /* Темный текст для строк */
-    border-bottom: 1px solid var(--dark-theme-border);
+    background-color: white;
+    color: var(--text-dark);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05); 
+}
+
+.table-light tbody tr:last-child {
+    border-bottom: none; 
 }
 
 .table-light tbody tr:hover {
-    background-color: #e9ecef; /* Более светлый фон при наведении */
+    background-color: #e9ecef;
 }
 
-/* Темная тема для таблицы */
 body.dark-theme .table-dark thead th {
-    background-color: var(--dark-theme-card-bg); /* Темный фон для заголовков */
-    color: var(--dark-theme-text); /* Светлый текст для заголовков */
+    background-color: var(--dark-theme-card-bg);
+    color: var(--dark-theme-text);
     border-bottom: 2px solid var(--dark-theme-border);
 }
 
 body.dark-theme .table-dark tbody tr {
-    background-color: #2b2b2b; /* Более темный фон для строк */
-    color: var(--dark-theme-text); /* Светлый текст для строк */
+    background-color: #2b2b2b;
+    color: var(--dark-theme-text);
     border-bottom: 1px solid var(--dark-theme-border);
 }
 
-body.dark-theme .table-dark tbody tr:hover {
-    background-color: #3a3a3a; /* Еще более темный фон при наведении */
+body.dark-theme .table-dark tbody tr:last-child {
+    border-bottom: none; 
 }
 
-/* Стили для кнопок внутри таблицы */
+body.dark-theme .table-dark tbody tr:hover {
+    background-color: #3a3a3a;
+}
+
 .table .btn {
     font-size: 0.85rem;
     padding: 0.4rem 0.8rem;
     border-radius: 0.375rem;
 }
 
-/* Переопределение для span "Неизвестный" */
-body.dark-theme .table .text-muted {
-    color: var(--dark-theme-muted-text) !important;
-}
-
-/* Выравнивание кнопок */
 .table td.text-end {
-    white-space: nowrap; /* Предотвращаем перенос кнопок на новую строку */
+    white-space: nowrap;
 }
 
-/* Отступ для кнопки создания чата, чтобы отделить её от заголовка */
 .mb-4.text-center {
     margin-top: 2rem;
 }
 
-/* Центрирование section-title */
-.section-title {
-    width: fit-content;
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
+.container.mt-5 {
+    margin-top: 3rem !important;
 }
+
+
+
+.sticky-sidebar {
+    position: sticky;
+    top: 80px; /* Регулируйте это значение в зависимости от высоты вашего фиксированного navbar */
+    align-self: flex-start;
+    max-height: calc(100vh - 100px); /* Регулируйте значение. Учитывает высоту навбара и футера/нижний отступ. */
+    overflow-y: auto; /* Добавляет прокрутку, если содержимое сайдбара длиннее, чем max-height */
+    padding-bottom: 1rem; /* Добавим небольшой отступ снизу, чтобы скролл не "упирался" */
+}
+
+
+.sidebar-block {
+    background-color: var(--light-bg); 
+    padding: 1.5rem; 
+    border-radius: 0.5rem; 
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); 
+    margin-bottom: 1.5rem; 
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-dark); 
+    margin-bottom: 1rem;
+}
+
+.sidebar-block .bi {
+    color: #007bff; 
+}
+
+.list-group-item.sidebar-list-item {
+    padding-top: 0.75rem; 
+    padding-bottom: 0.75rem; 
+    border-radius: 0.3rem; 
+    border: 1px solid rgba(0,0,0,0.05); 
+    margin-bottom: 0.5rem; 
+    background-color: white; 
+    transition: background-color 0.2s ease;
+}
+
+.list-group-item.sidebar-list-item:hover {
+    background-color: #e9ecef; 
+}
+
+.event-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    color: var(--text-dark);
+}
+
+.event-location {
+    font-size: 0.9rem;
+    color: #6c757d; 
+    margin-bottom: 0.25rem;
+}
+
+.event-date,
+.event-time {
+    font-size: 0.85rem;
+    color: #6c757d; 
+}
+
+
+.btn-outline-gold {
+    color: #daa520; 
+    border-color: #daa520;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-gold:hover {
+    background-color: #daa520;
+    color: #fff;
+}
+
+
+body.dark-theme .sidebar-block {
+    background-color: var(--dark-theme-card-bg) !important; 
+    color: var(--dark-theme-text);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-theme .sidebar-title {
+    color: var(--dark-theme-text);
+}
+
+body.dark-theme .sidebar-block .bi {
+    color: var(--accent-gold); 
+}
+
+body.dark-theme .list-group-item.sidebar-list-item {
+    background-color: #2b2b2b; 
+    color: var(--dark-theme-text);
+    border-color: var(--dark-theme-border);
+}
+
+body.dark-theme .list-group-item.sidebar-list-item:hover {
+    background-color: #3a3a3a;
+    color: var(--dark-theme-text);
+}
+
+body.dark-theme .list-group-item .event-title {
+    color: var(--dark-theme-text);
+}
+
+body.dark-theme .list-group-item .event-location,
+body.dark-theme .list-group-item .event-date,
+body.dark-theme .list-group-item .event-time {
+    color: var(--dark-theme-muted-text) !important;
+}
+
+body.dark-theme .btn-outline-gold {
+    border-color: var(--accent-gold); 
+    color: var(--accent-gold);
+    background-color: transparent;
+}
+
+body.dark-theme .btn-outline-gold:hover {
+    background-color: var(--accent-gold);
+    color: var(--primary-dark); 
+    border-color: var(--accent-gold);
+}
+
+
+body.dark-theme .alert-info {
+    background-color: #1a1a1a;
+    border-color: #333333;
+    color: #cccccc;
+}
+
+.card-text.post-content{
+    white-space: pre-wrap;
+}
+

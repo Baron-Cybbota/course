@@ -1,8 +1,7 @@
-@model course.Models.Event
+@model course.Models.ViewModels.EventDeleteViewModel 
 
 @{
-    ViewData["Title"] = "Удалить мероприятие: " + ViewData["BoardGameTitle"];
-    var boardGameTitle = ViewData["BoardGameTitle"] as string;
+    ViewData["Title"] = "Удалить мероприятие: " + Model.Name; // Use Model.Name for title
 }
 
 <h1>Удалить мероприятие</h1>
@@ -12,11 +11,19 @@
     <h4>Мероприятие</h4>
     <hr />
     <dl class="row">
+        {{-- ADDED: Display Event Name --}}
         <dt class="col-sm-3">
-            Настольная игра
+            @Html.DisplayNameFor(model => model.Name)
         </dt>
         <dd class="col-sm-9">
-            @boardGameTitle
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.BoardGameTitle) @* Use ViewModel property for title *@
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.BoardGameTitle) @* Use ViewModel property for title *@
         </dd>
         <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Date)
@@ -31,10 +38,10 @@
             @Model.Time.ToString(@"hh\:mm")
         </dd>
         <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Location)
+            @Html.DisplayNameFor(model => model.LocationAddress) @* CHANGED to LocationAddress *@
         </dt>
         <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Location)
+            @Html.DisplayFor(model => model.LocationAddress) @* CHANGED to LocationAddress *@
         </dd>
         <dt class="col-sm-3">
             @Html.DisplayNameFor(model => model.Description)
@@ -45,7 +52,7 @@
     </dl>
 
     <form asp-action="Delete" method="post">
-        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="IdEvent" />
         <input type="submit" value="Удалить" class="btn btn-danger" /> |
         <a asp-action="Index" class="btn btn-secondary">Вернуться к списку</a>
     </form>

@@ -5,8 +5,6 @@ D:\College\course\course\obj\Debug\net9.0\course.AssemblyInfo.cs
 D:\College\course\course\obj\Debug\net9.0\course.csproj.CoreCompileInputs.cache
 D:\College\course\course\obj\Debug\net9.0\course.MvcApplicationPartsAssemblyInfo.cs
 D:\College\course\course\obj\Debug\net9.0\course.MvcApplicationPartsAssemblyInfo.cache
-D:\College\course\course\obj\Debug\net9.0\course.RazorAssemblyInfo.cache
-D:\College\course\course\obj\Debug\net9.0\course.RazorAssemblyInfo.cs
 D:\College\course\course\bin\Debug\net9.0\appsettings.Development.json
 D:\College\course\course\bin\Debug\net9.0\appsettings.json
 D:\College\course\course\bin\Debug\net9.0\course.staticwebassets.runtime.json
@@ -532,9 +530,7 @@ D:\College\course\course\bin\Debug\net9.0\ru\Microsoft.CodeAnalysis.Workspaces.M
 D:\College\course\course\bin\Debug\net9.0\tr\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 D:\College\course\course\bin\Debug\net9.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 D:\College\course\course\bin\Debug\net9.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
-D:\College\course\course\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 D:\College\course\course\obj\Debug\net9.0\scopedcss\bundle\course.styles.css
-D:\College\course\course\obj\Debug\net9.0\scopedcss\projectbundle\course.bundle.scp.css
 D:\College\course\course\obj\Debug\net9.0\compressed\ofa40bqe71-b9sayid5wm.gz
 D:\College\course\course\obj\Debug\net9.0\compressed\j9swiz3yzq-90yqlj465b.gz
 D:\College\course\course\obj\Debug\net9.0\compressed\vltxs1u3vm-xtxxf3hu2r.gz
@@ -660,8 +656,6 @@ D:\College\course\course\obj\Debug\net9.0\compressed\npoxp2rktw-2z0ns9nrw6.gz
 D:\College\course\course\obj\Debug\net9.0\compressed\60syersg6o-muycvpuwrr.gz
 D:\College\course\course\obj\Debug\net9.0\compressed\tmihftuh08-87fc7y1x7t.gz
 D:\College\course\course\obj\Debug\net9.0\compressed\114hpev1ng-mlv21k5csn.gz
-D:\College\course\course\obj\Debug\net9.0\compressed\4zif0i503t-y4q7osg93h.gz
-D:\College\course\course\obj\Debug\net9.0\compressed\3517n8zu9i-y4q7osg93h.gz
 D:\College\course\course\obj\Debug\net9.0\staticwebassets.build.json
 D:\College\course\course\obj\Debug\net9.0\staticwebassets.development.json
 D:\College\course\course\obj\Debug\net9.0\staticwebassets.build.endpoints.json
@@ -677,4 +671,17 @@ D:\College\course\course\obj\Debug\net9.0\refint\course.dll
 D:\College\course\course\obj\Debug\net9.0\course.pdb
 D:\College\course\course\obj\Debug\net9.0\course.genruntimeconfig.cache
 D:\College\course\course\obj\Debug\net9.0\ref\course.dll
-D:\College\course\course\obj\Debug\net9.0\compressed\y8lyr8eiux-5x77ymrmw5.gz
+D:\College\course\course\obj\Debug\net9.0\course.sourcelink.json
+D:\College\course\course\bin\Debug\net9.0\publish\web.config
+D:\College\course\course\bin\Debug\net9.0\publish\appsettings.Development.json
+D:\College\course\course\bin\Debug\net9.0\publish\appsettings.json
+D:\College\course\course\bin\Debug\net9.0\publish\course.deps.json
+D:\College\course\course\bin\Debug\net9.0\publish\course.runtimeconfig.json
+D:\College\course\course\bin\Debug\net9.0\publish\course.staticwebassets.endpoints.json
+D:\College\course\course\obj\Debug\net9.0\course.RazorAssemblyInfo.cache
+D:\College\course\course\obj\Debug\net9.0\course.RazorAssemblyInfo.cs
+D:\College\course\course\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
+D:\College\course\course\obj\Debug\net9.0\scopedcss\projectbundle\course.bundle.scp.css
+D:\College\course\course\obj\Debug\net9.0\compressed\y8lyr8eiux-ntd15iiyli.gz
+D:\College\course\course\obj\Debug\net9.0\compressed\4zif0i503t-y4q7osg93h.gz
+D:\College\course\course\obj\Debug\net9.0\compressed\3517n8zu9i-y4q7osg93h.gz

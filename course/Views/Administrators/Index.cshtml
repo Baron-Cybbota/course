@@ -22,10 +22,9 @@
 <table class="table">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.Id)</th>
-            <th>@Html.DisplayNameFor(model => model.UserId)</th>
+            <th>@Html.DisplayNameFor(model => model.IdAdministrator)</th>
+            <th>@Html.DisplayNameFor(model => model.IdUser)</th>
             <th>@Html.DisplayNameFor(model => model.AssignmentDate)</th>
-            <th>@Html.DisplayNameFor(model => model.AccessLevel)</th>
             <th>Действия</th>
         </tr>
     </thead>
@@ -33,14 +32,13 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(modelItem => item.Id)</td>
-                <td>@Html.DisplayFor(modelItem => item.UserId)</td>
+                <td>@Html.DisplayFor(modelItem => item.IdAdministrator)</td>
+                <td>@Html.DisplayFor(modelItem => item.IdUser)</td>
                 <td>@Html.DisplayFor(modelItem => item.AssignmentDate)</td>
-                <td>@Html.DisplayFor(modelItem => item.AccessLevel)</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Редактировать</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a> |
-                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
+                    <a asp-action="Edit" asp-route-id="@item.IdAdministrator" class="btn btn-sm btn-warning">Редактировать</a> |
+                    <a asp-action="Details" asp-route-id="@item.IdAdministrator" class="btn btn-sm btn-info">Детали</a> |
+                    <form asp-action="Delete" asp-route-id="@item.IdAdministrator" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-sm btn-danger ms-2">Удалить</button>
                     </form>
                 </td>

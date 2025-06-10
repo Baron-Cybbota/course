@@ -5,6 +5,7 @@ using course.Models;
 using System.Threading.Tasks; // Для Task
 using System; // Для DateTime
 using System.Linq; // Для Any()
+// No SelectList is needed as there are no foreign keys to populate dropdowns directly in this controller.
 
 namespace course.Controllers
 {
@@ -34,7 +35,7 @@ namespace course.Controllers
             }
 
             var boardGame = await _context.BoardGames
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.IdBoardGame == id); // CORRECTED: Use IdBoardGame
             if (boardGame == null)
             {
                 return NotFound(); // Если настольная игра не найдена, возвращаем 404
@@ -54,15 +55,17 @@ namespace course.Controllers
         // Обрабатывает отправку формы для создания новой настольной игры.
         [HttpPost]
         [ValidateAntiForgeryToken] // Защита от CSRF-атак
-         // Поля, которые пользователь может ввести
-        public async Task<IActionResult> Create([Bind("Title,Description,ReleaseYear,MinPlayers,MaxPlayers,AveragePlayTime,Genre,Difficulty,ImageUrl")] BoardGame boardGame)
+        // CORRECTED: Use Name and EstimatedPlayTime, removed ImageUrl as it's not on BoardGame model
+        public async Task<IActionResult> Create([Bind("Name,Description,ReleaseYear,MinPlayers,MaxPlayers,EstimatedPlayTime,Genre,Difficulty")] BoardGame boardGame)
         {
             if (ModelState.IsValid) // Проверяем валидность модели на основе Data Annotations
             {
                 _context.Add(boardGame); // Добавляем настольную игру в контекст
                 await _context.SaveChangesAsync(); // Сохраняем изменения в базе данных
+                TempData["SuccessMessage"] = "Настольная игра успешно добавлена.";
                 return RedirectToAction(nameof(Index)); // Перенаправляем на список настольных игр
             }
+            TempData["ErrorMessage"] = "Ошибка при создании настольной игры. Проверьте введенные данные.";
             return View(boardGame); // Если модель невалидна, возвращаем форму с ошибками
         }
 
@@ -75,7 +78,7 @@ namespace course.Controllers
                 return NotFound();
             }
 
-            var boardGame = await _context.BoardGames.FindAsync(id); // Находим настольную игру по Id
+            var boardGame = await _context.BoardGames.FindAsync(id); // Will implicitly use IdBoardGame
             if (boardGame == null)
             {
                 return NotFound();
@@ -87,10 +90,10 @@ namespace course.Controllers
         // Обрабатывает отправку формы для редактирования настольной игры.
         [HttpPost]
         [ValidateAntiForgeryToken]
-         // Убедитесь, что все поля, которые могут быть изменены пользователем, включены
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,ReleaseYear,MinPlayers,MaxPlayers,AveragePlayTime,Genre,Difficulty,ImageUrl")] BoardGame boardGame)
+        // CORRECTED: Use IdBoardGame in Bind, and Name, EstimatedPlayTime. Removed ImageUrl.
+        public async Task<IActionResult> Edit(int id, [Bind("IdBoardGame,Name,Description,ReleaseYear,MinPlayers,MaxPlayers,EstimatedPlayTime,Genre,Difficulty")] BoardGame boardGame)
         {
-            if (id != boardGame.Id) // Проверяем, совпадает ли Id из маршрута с Id модели
+            if (id != boardGame.IdBoardGame) // CORRECTED: Check against IdBoardGame
             {
                 return NotFound();
             }
@@ -99,12 +102,15 @@ namespace course.Controllers
             {
                 try
                 {
+                    // No need to use AsNoTracking and re-assign if all properties are bound and expected to change.
+                    // If you had properties not in the form and not in Bind, you would fetch and preserve them here.
                     _context.Update(boardGame); // Обновляем настольную игру в контексте
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Настольная игра успешно обновлена.";
                 }
                 catch (DbUpdateConcurrencyException) // Обработка конфликтов параллельного доступа
                 {
-                    if (!BoardGameExists(boardGame.Id))
+                    if (!BoardGameExists(boardGame.IdBoardGame)) // CORRECTED: Check against IdBoardGame
                     {
                         return NotFound();
                     }
@@ -115,6 +121,7 @@ namespace course.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            TempData["ErrorMessage"] = "Ошибка при обновлении настольной игры. Проверьте введенные данные.";
             return View(boardGame);
         }
 
@@ -128,7 +135,7 @@ namespace course.Controllers
             }
 
             var boardGame = await _context.BoardGames
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.IdBoardGame == id); // CORRECTED: Use IdBoardGame
             if (boardGame == null)
             {
                 return NotFound();
@@ -143,20 +150,21 @@ namespace course.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var boardGame = await _context.BoardGames.FindAsync(id);
+            var boardGame = await _context.BoardGames.FindAsync(id); // Will implicitly use IdBoardGame
             if (boardGame != null)
             {
                 _context.BoardGames.Remove(boardGame); // Удаляем настольную игру из контекста
             }
             
             await _context.SaveChangesAsync(); // Сохраняем изменения
+            TempData["SuccessMessage"] = "Настольная игра успешно удалена.";
             return RedirectToAction(nameof(Index));
         }
 
         // Вспомогательный метод для проверки существования настольной игры
         private bool BoardGameExists(int id)
         {
-            return _context.BoardGames.Any(e => e.Id == id);
+            return _context.BoardGames.Any(e => e.IdBoardGame == id); // CORRECTED: Use IdBoardGame
         }
     }
 }
